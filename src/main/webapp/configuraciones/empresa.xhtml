@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+        <!--h:outputScript library="js" name="jquery-1.11.3.min.js"/-->
+        <!--h:outputScript library="js" name="script.js"/-->
+    </h:head>
+    <h:body>
+        <p:growl showDetail="true" autoUpdate="true"/>
+        <div>
+            <h:form id="IdFormEmpresa">
+                <div style="display: inline-block; width: 70%">
+                    <p:panelGrid styleClass="panelGridSinBorder">
+                        <f:facet name="header">
+                            <p:row>
+                                <p:column>Empresa</p:column>
+                            </p:row>                    
+                        </f:facet>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idCodigo" value="Codigo:" class="labelFormulario"/>
+                                <p:inputText id="idCodigo" value="#{empresaMB.codigo}" class="campoFormulario" >
+                                    <p:ajax event="blur" listener="#{empresaMB.buscarEmpresa}" update="@none"/>
+                                </p:inputText>
+                                <p:commandButton icon="ui-icon-search" onclick="PF('dlgEmpresa').show()" class="campoFormulario"/>
+                                <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
+                                <p:selectOneMenu id="IdSelectDepartamentos" value="#{empresaMB.idDepartamento}" style="width: 150px" class="campoFormulario">
+                                    <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
+                                    <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
+                                    <p:ajax event="change" update="IdSelectMunicipios" listener="#{empresaMB.actualizarMunicipios}"/>
+                                </p:selectOneMenu> 
+                                <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormulario"/>
+                                <p:selectOneMenu id="IdSelectMunicipios" value="#{empresaMB.idMunicipio}" style="width: 150px" class="campoFormulario">
+                                    <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
+                                    <f:selectItems value="#{empresaMB.listaMuncipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
+                                </p:selectOneMenu>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idTipoEmp" value="Tipo Emp:" class="labelFormulario"/>
+                                <p:selectOneMenu id="idTipoEmp"  style="width: 250px" value="#{empresaMB.tipoEmpresa}" class="campoFormulario">
+                                    <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
+                                    <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoEmpresa" itemValue="#{tipoEmpresa.id}" itemLabel="#{tipoEmpresa.descripcion}"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel for="idTipoDoc" value="Tipo Doc:" class="labelFormulario"/>
+                                <p:selectOneMenu id="idTipoDoc" value="#{empresaMB.tipoDocEmpresa}" class="campoFormulario">
+                                    <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
+                                    <f:selectItems value="#{aplicacionMB.listaTipodocempresa}" var="doctipoempresa" itemValue="#{doctipoempresa.id}" itemLabel="#{doctipoempresa.documentoempresa}"/>
+                                </p:selectOneMenu>
+                                <p:outputLabel for="idNoDoc" value="No. Documento:" class="labelFormulario"/>
+                                <p:inputText id="idNoDoc" value="#{empresaMB.numDocumento}" class="campoFormulario"/>                        
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="nomEmpresa" value="Empresa:" class="labelFormulario"/>
+                                <p:inputText id="nomEmpresa"  size="50" value="#{empresaMB.nombre}" class="campoFormulario"/>
+                                <p:commandButton icon="ui-icon-image" value="Logo" onclick="PF('dlgLogo').show()" class="campoFormulario"/>
+                                <p:outputLabel id="nombreImagen" value="#{empresaMB.nombreArchivo}" class="labelFormularioInformativa"/>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idDireccion" value="Direccion:" class="labelFormulario"/>
+                                <p:inputText id="idDireccion" value="#{empresaMB.direccion}" class="campoFormulario"/>
+                                <p:outputLabel for="idTelefono1" value="Telefono 1:" class="labelFormulario"/>
+                                <p:inputText id="idTelefono1" value="#{empresaMB.telefono1}" class="campoFormulario"/>
+                                <p:outputLabel for="idTelefono2" value="Telefono 2:" class="labelFormulario"/>
+                                <p:inputText id="idTelefono2" value="#{empresaMB.telefono2}" class="campoFormulario"/>                        
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idWebsite" class="labelFormulario" value="WebSite:"/>
+                                <p:inputText id="idWebsite" class="campoFormulario" size="40" value="#{empresaMB.website}"/>
+                                <p:outputLabel for="idMail" class="labelFormulario" value="Mail:"/>
+                                <p:inputText id="idMail"  class="campoFormulario" size="40" value="#{empresaMB.mail}"/>                                    
+                            </p:column>                        
+                        </p:row>
+                        <p:row>
+                            <p:column style="text-align: center">
+                                <p:commandButton value="Aceptar" icon="ui-icon-disk" actionListener="#{empresaMB.accion}"/>
+                                <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{empresaMB.limpiarFormulario}" update="@form" />                
+                            </p:column>
+                        </p:row>
+
+                    </p:panelGrid>
+
+                </div>
+
+                <div style="display: inline-block; width: 29%; vertical-align: top">
+                    <p:panel rendered="#{empresaMB.empresaSeleccionada != null}" style="text-align: center">
+                        <p:graphicImage  value="#{empresaMB.image}" style="width: 250px; height: 250px;text-align: center" rendered="#{empresaMB.empresaSeleccionada.logo != null}" >
+                            <f:param name="id" value="#{empresaMB.empresaSeleccionada.idEmpresa}"/>
+                        </p:graphicImage>                
+                    </p:panel>
+                </div>
+            </h:form>
+        </div>
+
+        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
+            <h:form>
+                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{empresaMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
+                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
+                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{empresaMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
+            </h:form>
+        </p:dialog>    
+
+        <p:dialog id="IdModalLogo" widgetVar="dlgLogo" header="Cargar Logo" modal="true" width="600px" resizable="false">
+            <h:form>
+                <p:fileUpload value="#{empresaMB.file}" fileUploadListener="#{empresaMB.handleFileUpload}" label="Buscar Imagen" cancelLabel="Cancelar" uploadLabel="Cargar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" update="@none" sizeLimit="16777215"/>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+

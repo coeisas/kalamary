@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Kalamary</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        #{sesionMB.controlSesion()}
+        <p:layout fullPage="true">
+            <p:layoutUnit position="north" size="45" style="border: none">
+                <h:form id="IdFormToolBar">
+                    <p:toolbar style="margin: 0px">
+                        <f:facet name="left">
+
+                            <h:outputLabel>KALAMARY</h:outputLabel>
+
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>
+                            <p:outputLabel>#{sesionMB.usuarioActual.cfgempresasedeidSede.cfgempresaidEmpresa.nomEmpresa} - #{sesionMB.usuarioActual.cfgempresasedeidSede.nomSede}</p:outputLabel> 
+                            <span class="ui-separator">
+                                <span class="ui-icon ui-icon-grip-dotted-vertical" />
+                            </span>                    
+                                <p:outputLabel>#{sesionMB.usuarioActual.nombreCompleto()}</p:outputLabel>    
+                        </f:facet>
+
+                        <f:facet name="right">
+                            <p:commandButton action="#{sesionMB.cerrarSesion}" title="Salir" icon="ui-icon-power" />
+                        </f:facet>
+
+                    </p:toolbar>    
+                </h:form>
+            </p:layoutUnit>            
+            <p:layoutUnit position="west" header="Menu" resizable="true" collapsible="true" size="200">
+                <h:form id="IdFormMenu">
+                    <p:menu style="width: 95%" toggleable="true">
+                        <p:menuitem icon="ui-icon-print" value="Facturacion" actionListener="#{sesionMB.determinarPath('nada')}"/>
+                        <p:menuitem icon="ui-icon-cancel" value="Anular Factura" actionListener="#{sesionMB.determinarPath('nada')}"/>
+                        <p:menuitem icon="ui-icon-key" value="Abrir/Cerrar Caja" actionListener="#{sesionMB.determinarPath('nada')}" />
+                        <p:menuitem icon="ui-icon-search" value="Consultar Precios" actionListener="#{sesionMB.determinarPath('nada')}" />
+                        <p:menuitem icon="ui-icon-script" value="Inventario" actionListener="#{sesionMB.determinarPath('nada')}"/>
+                        <p:submenu label="Configuracion" icon="ui-icon-wrench" style="height: auto" expanded="false" >
+                            <p:menuitem icon="ui-icon-suitcase" value="Empresa" actionListener="#{sesionMB.determinarPath('empresa')}"/>
+                            <p:menuitem icon="ui-icon-home" value="Sedes" actionListener="#{sesionMB.determinarPath('sede')}" />
+                            <p:menuitem icon="ui-icon-pin-s" value="Productos" actionListener="#{sesionMB.determinarPath('nada')}" />
+                            <p:menuitem icon="ui-icon-star" value="Kit" actionListener="#{sesionMB.determinarPath('nada')}" />
+                            <p:menuitem icon="ui-icon-tag" value="Cajas" actionListener="#{sesionMB.determinarPath('nada')}"/>
+                            <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{sesionMB.determinarPath('usuario')}" />
+                            <p:menuitem icon="ui-icon-contact" value="Clientes" actionListener="#{sesionMB.determinarPath('cliente')}" />
+                            <p:menuitem icon="ui-icon-document" value="Impuestos" actionListener="#{sesionMB.determinarPath('nada')}" />
+                            <p:menuitem icon="ui-icon-note" value="Documentos" actionListener="#{sesionMB.determinarPath('nada')}" />
+                        </p:submenu>
+                    </p:menu>
+                </h:form>   
+            </p:layoutUnit>
+            <p:layoutUnit position="center">
+                <h:form id="IdFormMain">
+                    <iframe src="#{sesionMB.path}" style="width: 99%;height: 500px;border: none"/>
+                </h:form>
+            </p:layoutUnit>
+        </p:layout>
+    </h:body>
+</html>
+
