@@ -18,120 +18,123 @@
             </p:inputText>            
             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
             <p:outputLabel class="labelFormularioInformativa" value="#{clienteMB.nombreEmpresa}"/>
-            <p:separator style="clear: left"/>
-            <p:panelGrid class="panelGridSinBorder" style="width: 85%;">
+            <br style="clear: left"/>
+            <p:separator />
+            <div style="text-align: center">
+                <p:panelGrid class="panelGridSinBorder" style="width: 85%; margin: 0 auto">
 
-                <f:facet name="header">
-                    <p:row><p:column colspan="2">Cliente</p:column></p:row>
-                </f:facet>
+                    <f:facet name="header">
+                        <p:row><p:column colspan="2">Cliente</p:column></p:row>
+                    </f:facet>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="idCodigoCliente" class="labelFormulario" value="Cod. Cliente:"/>
-                        <p:inputText id="idCodigoCliente" class="campoFormulario" value="#{clienteMB.codigoCliente}">
-                            <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
-                        </p:inputText>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarUsuarios}"/>
-                        <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
-                        <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario">
-                            <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
-                            <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
-                            <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
-                        </p:selectOneMenu> 
-                        <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormulario"/>
-                        <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario">
-                            <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
-                            <f:selectItems value="#{clienteMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
-                        </p:selectOneMenu>
-                    </p:column>
-                    <p:column rowspan="5">
-                        <div style="text-align: center">
-                            <p:panel rendered="#{clienteMB.clienteSeleccionado != null}">
-                                <p:graphicImage  value="#{clienteMB.image}" style="width: 75px; height: 100px;text-align: center" rendered="#{clienteMB.clienteSeleccionado.foto != null}" >
-                                    <f:param name="id" value="#{clienteMB.clienteSeleccionado.idCliente}"/>
-                                </p:graphicImage>                                  
-                            </p:panel>
-                            <p:separator/>
-                            <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
-                        </div>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="idCodigoCliente" class="labelFormulario" value="Cod. Cliente:"/>
+                            <p:inputText id="idCodigoCliente" class="campoFormulario" value="#{clienteMB.codigoCliente}">
+                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarUsuarios}"/>
+                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
+                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario">
+                                <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
+                                <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
+                                <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
+                            </p:selectOneMenu> 
+                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormulario"/>
+                            <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario">
+                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
+                                <f:selectItems value="#{clienteMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column rowspan="5">
+                            <div style="text-align: center">
+                                <p:panel rendered="#{clienteMB.clienteSeleccionado != null}">
+                                    <p:graphicImage  value="#{clienteMB.image}" style="width: 75px; height: 100px;text-align: center" rendered="#{clienteMB.clienteSeleccionado.foto != null}" >
+                                        <f:param name="id" value="#{clienteMB.clienteSeleccionado.idCliente}"/>
+                                    </p:graphicImage>                                  
+                                </p:panel>
+                                <p:separator/>
+                                <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
+                            </div>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel class="labelFormulario" value="Identificacion:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}">
-                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
-                        </p:selectOneMenu>
-                        <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
-                        <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                            <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="IdTipoCliente" class="labelFormulario" value="Tipo Cliente:"/>
-                        <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario">
-                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoCliente" itemLabel="#{tipoCliente.descripcion}" itemValue="#{tipoCliente.id}"/>
-                        </p:selectOneMenu>                        
-                    </p:column>
-                </p:row>
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
-                        <p:inputText id="IdPrimerNombre" class="campoFormulario" size="25" value="#{clienteMB.primerNombre}"/>
-                        <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
-                        <p:inputText id="IdSegundoNombre" class="campoFormulario" size="25" value="#{clienteMB.segundoNombre}"/>                        
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdTipoCliente" class="labelFormulario" value="Tipo Cliente:"/>
+                            <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoCliente" itemLabel="#{tipoCliente.descripcion}" itemValue="#{tipoCliente.id}"/>
+                            </p:selectOneMenu>                        
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
+                            <p:inputText id="IdPrimerNombre" class="campoFormulario" size="25" value="#{clienteMB.primerNombre}"/>
+                            <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
+                            <p:inputText id="IdSegundoNombre" class="campoFormulario" size="25" value="#{clienteMB.segundoNombre}"/>                        
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
-                        <p:inputText id="IdPrimerApellido" class="campoFormulario" size="25" value="#{clienteMB.primerApellido}" />
-                        <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
-                        <p:inputText id="IdSegundoApellido" class="campoFormulario" size="25" value="#{clienteMB.segundoApellido}" />                                                
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
+                            <p:inputText id="IdPrimerApellido" class="campoFormulario" size="25" value="#{clienteMB.primerApellido}" />
+                            <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
+                            <p:inputText id="IdSegundoApellido" class="campoFormulario" size="25" value="#{clienteMB.segundoApellido}" />                                                
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
-                        <p:inputText id="IdDireccion" class="campoFormulario" size="80" value="#{clienteMB.direccion}"/>
-                        <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
-                        <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{clienteMB.telefono}"/>                        
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
+                            <p:inputText id="IdDireccion" class="campoFormulario" size="80" value="#{clienteMB.direccion}"/>
+                            <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
+                            <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{clienteMB.telefono}"/>                        
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
+                    <p:row>
+                        <p:column colspan="2">
 
-                        <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                        <p:inputText id="IdMail" class="campoFormulario" size="50" value="#{clienteMB.mail}"/>
-                        <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
-                        <p:calendar id="IdFechaNacimiento" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{clienteMB.fechaNacimiento}"/>
-                    </p:column>
-                </p:row>
+                            <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
+                            <p:inputText id="IdMail" class="campoFormulario" size="50" value="#{clienteMB.mail}"/>
+                            <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
+                            <p:calendar id="IdFechaNacimiento" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{clienteMB.fechaNacimiento}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
-                        <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{clienteMB.cupoCredito}" />
-                        <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
-                        <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{clienteMB.tarjetaMembresia}" />
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
+                            <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{clienteMB.cupoCredito}" />
+                            <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
+                            <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{clienteMB.tarjetaMembresia}" />
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2" style="text-align: center">
-                        <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{clienteMB.accion}"/>&nbsp;
-                        <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{clienteMB.cancelar}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2" style="text-align: center">
+                            <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{clienteMB.accion}"/>&nbsp;
+                            <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{clienteMB.cancelar}"/>
+                        </p:column>
+                    </p:row>
 
-            </p:panelGrid>
+                </p:panelGrid>
+            </div>
         </h:form>
 
         <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">

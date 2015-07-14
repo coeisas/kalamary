@@ -44,13 +44,13 @@
                         <p:menuitem icon="ui-icon-search" value="Consultar Precios" actionListener="#{sesionMB.determinarPath('nada')}" />
                         <p:menuitem icon="ui-icon-script" value="Inventario" actionListener="#{sesionMB.determinarPath('nada')}"/>
                         <p:submenu label="Configuracion" icon="ui-icon-wrench" style="height: auto" expanded="false" >
-                            <p:menuitem icon="ui-icon-suitcase" value="Empresa" actionListener="#{sesionMB.determinarPath('empresa')}"/>
-                            <p:menuitem icon="ui-icon-home" value="Sedes" actionListener="#{sesionMB.determinarPath('sede')}" />
+                            <p:menuitem icon="ui-icon-suitcase" value="Empresa" actionListener="#{sesionMB.determinarPath('configuraciones/empresa')}"/>
+                            <p:menuitem icon="ui-icon-home" value="Sedes" actionListener="#{sesionMB.determinarPath('configuraciones/sede')}" />
                             <p:menuitem icon="ui-icon-pin-s" value="Productos" actionListener="#{sesionMB.determinarPath('nada')}" />
                             <p:menuitem icon="ui-icon-star" value="Kit" actionListener="#{sesionMB.determinarPath('nada')}" />
-                            <p:menuitem icon="ui-icon-tag" value="Cajas" actionListener="#{sesionMB.determinarPath('nada')}"/>
-                            <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{sesionMB.determinarPath('usuario')}" />
-                            <p:menuitem icon="ui-icon-contact" value="Clientes" actionListener="#{sesionMB.determinarPath('cliente')}" />
+                            <p:menuitem icon="ui-icon-tag" value="Cajas" actionListener="#{sesionMB.determinarPath('configuraciones/caja')}"/>
+                            <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{sesionMB.determinarPath('configuraciones/usuario')}" />
+                            <p:menuitem icon="ui-icon-contact" value="Clientes" actionListener="#{sesionMB.determinarPath('configuraciones/cliente')}" />
                             <p:menuitem icon="ui-icon-document" value="Impuestos" actionListener="#{sesionMB.determinarPath('nada')}" />
                             <p:menuitem icon="ui-icon-note" value="Documentos" actionListener="#{sesionMB.determinarPath('nada')}" />
                         </p:submenu>

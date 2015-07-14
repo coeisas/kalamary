@@ -61,7 +61,7 @@ public class SesionMB implements Serializable {
     }
 
     public void determinarPath(String file) {
-        path = "configuraciones/" + file + ".xhtml";
+        path = file + ".xhtml";
 //        System.out.println(path);
         RequestContext.getCurrentInstance().update("IdFormMain");
 //        RequestContext.getCurrentInstance().update("contentPanel");

@@ -14,136 +14,138 @@
         <h:form id="IdFormUsuario">
             <p:commandButton value="Cargar Usuario" icon="ui-icon-person" actionListener="#{usuarioMB.cargarUsuarios}"/>
             <p:separator/>
-            <p:panelGrid class="panelGridSinBorder">
+            <div style="text-align: center">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
 
-                <f:facet name="header">
-                    <p:row><p:column colspan="2">Usuario</p:column></p:row>
-                </f:facet>
+                    <f:facet name="header">
+                        <p:row><p:column colspan="2">Usuario</p:column></p:row>
+                    </f:facet>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
-                        <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{usuarioMB.codEmpresa}">
-                            <p:ajax event="blur" listener="#{usuarioMB.buscarEmpresa}" update="@none"/>
-                        </p:inputText>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
-                        <p:outputLabel id="LabelNombreEmpresa" class="labelFormularioInformativa" value="#{usuarioMB.nomEmpresa}"/>
-                    </p:column>
-                    <p:column rowspan="5">
-                        <div style="text-align: center">
-                            <p:panel rendered="#{usuarioMB.usuarioSeleccionado != null}">
-                                <p:graphicImage  value="#{usuarioMB.image}" style="width: 75px; height: 100px;text-align: center" rendered="#{usuarioMB.usuarioSeleccionado.foto != null}" >
-                                    <f:param name="id" value="#{usuarioMB.usuarioSeleccionado.idUsuario}"/>
-                                </p:graphicImage>                                  
-                            </p:panel>
-                            <p:separator/>
-                            <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
-                        </div>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
+                            <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{usuarioMB.codEmpresa}">
+                                <p:ajax event="blur" listener="#{usuarioMB.buscarEmpresa}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
+                            <p:outputLabel id="LabelNombreEmpresa" class="labelFormularioInformativa" value="#{usuarioMB.nomEmpresa}"/>
+                        </p:column>
+                        <p:column rowspan="5">
+                            <div style="text-align: center">
+                                <p:panel rendered="#{usuarioMB.usuarioSeleccionado != null}">
+                                    <p:graphicImage  value="#{usuarioMB.image}" style="width: 75px; height: 100px;text-align: center" rendered="#{usuarioMB.usuarioSeleccionado.foto != null}" >
+                                        <f:param name="id" value="#{usuarioMB.usuarioSeleccionado.idUsuario}"/>
+                                    </p:graphicImage>                                  
+                                </p:panel>
+                                <p:separator/>
+                                <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
+                            </div>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="idCodigoSede" class="labelFormulario" value="Cod. Sede:"/>
-                        <p:inputText id="idCodigoSede" class="campoFormulario" value="#{usuarioMB.codSede}">
-                            <p:ajax event="blur" listener="#{usuarioMB.buscarSede}" update="@none"/>
-                        </p:inputText>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()"/>
-                        <p:outputLabel id="LabelNombreSede" class="labelFormularioInformativa" value="#{usuarioMB.nomSede}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="idCodigoSede" class="labelFormulario" value="Cod. Sede:"/>
+                            <p:inputText id="idCodigoSede" class="campoFormulario" value="#{usuarioMB.codSede}">
+                                <p:ajax event="blur" listener="#{usuarioMB.buscarSede}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()"/>
+                            <p:outputLabel id="LabelNombreSede" class="labelFormularioInformativa" value="#{usuarioMB.nomSede}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel class="labelFormulario" value="Identificacion:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idIdentificacion}">
-                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
-                        </p:selectOneMenu>
-                        <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
-                        <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{usuarioMB.numIdentificacion}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idIdentificacion}">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                            <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{usuarioMB.numIdentificacion}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
-                        <p:inputText id="IdPrimerNombre" class="campoFormulario" size="25" value="#{usuarioMB.primerNombre}"/>
-                        <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
-                        <p:inputText id="IdSegundoNombre" class="campoFormulario" size="25" value="#{usuarioMB.segundoNombre}"/>                        
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
+                            <p:inputText id="IdPrimerNombre" class="campoFormulario" size="25" value="#{usuarioMB.primerNombre}"/>
+                            <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
+                            <p:inputText id="IdSegundoNombre" class="campoFormulario" size="25" value="#{usuarioMB.segundoNombre}"/>                        
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column>
-                        <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
-                        <p:inputText id="IdPrimerApellido" class="campoFormulario" size="25" value="#{usuarioMB.primerApellido}" />
-                        <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
-                        <p:inputText id="IdSegundoApellido" class="campoFormulario" size="25" value="#{usuarioMB.segundoApellido}" />                                                
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
+                            <p:inputText id="IdPrimerApellido" class="campoFormulario" size="25" value="#{usuarioMB.primerApellido}" />
+                            <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
+                            <p:inputText id="IdSegundoApellido" class="campoFormulario" size="25" value="#{usuarioMB.segundoApellido}" />                                                
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel for="IdComision" class="labelFormulario" value="Comision Venta %:"/>
-                        <p:spinner id="IdComision" class="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>
-                        <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
-                        <p:inputText id="IdDireccion" class="campoFormulario" size="80" value="#{usuarioMB.direccion}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdComision" class="labelFormulario" value="Comision Venta %:"/>
+                            <p:spinner id="IdComision" class="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>
+                            <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
+                            <p:inputText id="IdDireccion" class="campoFormulario" size="80" value="#{usuarioMB.direccion}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
-                        <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>
-                        <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                        <p:inputText id="IdMail" class="campoFormulario" size="50" value="#{usuarioMB.mail}"/>
-                        <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
-                        <p:calendar id="IdFechaNacimiento" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{usuarioMB.fechaNacimiento}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
+                            <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>
+                            <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
+                            <p:inputText id="IdMail" class="campoFormulario" size="50" value="#{usuarioMB.mail}"/>
+                            <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
+                            <p:calendar id="IdFechaNacimiento" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{usuarioMB.fechaNacimiento}"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel class="labelFormulario" value="Usuario:"/>
-                        <p:inputText class="campoFormulario" value="#{usuarioMB.usuario}">
-                            <p:ajax event="blur" listener="#{usuarioMB.validarUsuario}" update="@none"/>
-                        </p:inputText>
-                        <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormulario" value="Contraseña:" style="color: #{usuarioMB.background}"/>
-                        <p:password id="IdPass1" class="campoFormulario" value="#{usuarioMB.contrasenia}" >
-                            <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass1 IdLabelPass2"/>
-                        </p:password>
-                        <p:outputLabel id="IdLabelPass2" for="IdPass2" class="labelFormulario" value="Repetir Contraseña:" style="color: #{usuarioMB.background}"/>
-                        <p:password id="IdPass2" class="campoFormulario" value="#{usuarioMB.contraseniaR}" >
-                            <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass2 IdLabelPass1"/>
-                        </p:password>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel class="labelFormulario" value="Usuario:"/>
+                            <p:inputText class="campoFormulario" value="#{usuarioMB.usuario}">
+                                <p:ajax event="blur" listener="#{usuarioMB.validarUsuario}" update="@none"/>
+                            </p:inputText>
+                            <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormulario" value="Contraseña:" style="color: #{usuarioMB.background}"/>
+                            <p:password id="IdPass1" class="campoFormulario" value="#{usuarioMB.contrasenia}" >
+                                <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass1 IdLabelPass2"/>
+                            </p:password>
+                            <p:outputLabel id="IdLabelPass2" for="IdPass2" class="labelFormulario" value="Repetir Contraseña:" style="color: #{usuarioMB.background}"/>
+                            <p:password id="IdPass2" class="campoFormulario" value="#{usuarioMB.contraseniaR}" >
+                                <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass2 IdLabelPass1"/>
+                            </p:password>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2">
-                        <p:outputLabel class="labelFormulario" value="Rol:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idRole}">
-                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                            <f:selectItems value="#{aplicacionMB.listaRoles}" var="role" itemLabel="#{role.nomrol}" itemValue="#{role.idrol}"/>
-                        </p:selectOneMenu>
-                        <p:outputLabel class="labelFormulario" value="Caja:" />
-                        <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idCaja}">
-                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                        </p:selectOneMenu>
-                        <p:outputLabel class="labelFormulario" value="Activo:" style="display: #{usuarioMB.displayActivoControl}"/>
-                        <p:inputSwitch value="#{usuarioMB.usuarioActivo}" class="campoFormulario" style="display: #{usuarioMB.displayActivoControl}" offLabel="No" onLabel="Si"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel class="labelFormulario" value="Rol:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idRole}">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaRoles}" var="role" itemLabel="#{role.nomrol}" itemValue="#{role.idrol}"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel class="labelFormulario" value="Caja:" />
+                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idCaja}">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                            </p:selectOneMenu>
+                            <p:outputLabel class="labelFormulario" value="Activo:" style="display: #{usuarioMB.displayActivoControl}"/>
+                            <p:inputSwitch value="#{usuarioMB.usuarioActivo}" class="campoFormulario" style="display: #{usuarioMB.displayActivoControl}" offLabel="No" onLabel="Si"/>
+                        </p:column>
+                    </p:row>
 
-                <p:row>
-                    <p:column colspan="2" style="text-align: center">
-                        <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{usuarioMB.accion}"/>&nbsp;
-                        <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{usuarioMB.cancelar}"/>
-                    </p:column>
-                </p:row>
+                    <p:row>
+                        <p:column colspan="2" style="text-align: center">
+                            <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{usuarioMB.accion}"/>&nbsp;
+                            <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{usuarioMB.cancelar}"/>
+                        </p:column>
+                    </p:row>
 
-            </p:panelGrid>
+                </p:panelGrid>
+            </div>
         </h:form>
 
         <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">

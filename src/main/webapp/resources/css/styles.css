@@ -23,7 +23,7 @@ body {
 
 
 .campoFormulario{
-    float: left; margin-right: .1em;color: #3c667c
+    float: left; margin-right: .1em
 }
 
 .labelFormulario{
@@ -31,5 +31,5 @@ body {
 }
 
 .labelFormularioInformativa{
-    float: left; padding: .25em; margin: 0px;  margin-right: 2em; font-weight: bold;font-style: italic 
+    float: left; padding: .25em; margin: 0px;  margin-right: .5em; font-weight: bold;font-style: italic;width: auto
 }

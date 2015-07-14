@@ -1,0 +1,98 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <div style="text-align: center">
+            <h:form id="IdFormCaja">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;width: 70%">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column>Caja</p:column>
+                        </p:row>
+                    </f:facet>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdCodEmpresa" class="labelFormulario" value="Codigo Empresa:" />
+                            <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{cajaMB.codigoEmpresa}">
+                                <p:ajax event="blur" listener="#{cajaMB.buscarEmpresaPorCodigo}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{cajaMB.nombreEmpresa}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdCodSede" class="labelFormulario" value="Codigo Sede:" />
+                            <p:inputText id="IdCodSede" class="campoFormulario" value="#{cajaMB.codigoSede}">
+                                <p:ajax event="blur" listener="#{cajaMB.buscarSedePorCodigo}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{cajaMB.cargarSedes}"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{cajaMB.nombreSede}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdCodCaja" class="labelFormulario" value="Codigo Caja:" />                        
+                            <p:inputText id="IdCodCaja" class="campoFormulario" value="#{cajaMB.codigoCaja}">
+                                <p:ajax event="blur" listener="#{cajaMB.buscarCajaPorCodigo}" update="@none"/>
+                            </p:inputText>
+                            <p:outputLabel for="IdCaja" class="labelFormulario" value="Caja:" />
+                            <p:inputText id="IdCaja" class="campoFormulario" value="#{cajaMB.nombreCaja}"/> 
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:commandButton value="Guardar" icon="ui-icon-disk"  actionListener="#{cajaMB.crearCaja}"/>
+                            &nbsp;
+                            <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{cajaMB.cancelar}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>    
+            <br/>
+            <p:dataTable id="IdDataCaja" emptyMessage="No se econtraron cajas" style="width: 70%;margin: 0 auto" value="#{cajaMB.listaCajas}" rows="10" paginator="true" paginatorPosition="bottom" var="caja">
+                <f:facet name="header">Cajas de la Sede</f:facet>
+                <p:column headerText="Sede">
+                    #{caja.cfgempresasedeidSede.nomSede}
+                </p:column>
+                <p:column headerText="Codigo">
+                    #{caja.codigoCaja}
+                </p:column>
+                <p:column headerText="Caja">
+                    #{caja.nomCaja}
+                </p:column>                    
+            </p:dataTable>
+        </div>
+
+        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalEmpresa">
+                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cajaMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
+                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
+                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{cajaMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="IdModalSede" widgetVar="dlgSede" header="BUSCAR SEDE" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalSede">
+                <p:dataTable value="#{cajaMB.listaSedes}" var="sede" emptyMessage="No hay sedes registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cajaMB.sedeSeleccionada}" rowKey="#{sede.idSede}" selectionMode="single">
+                    <p:column headerText="Codigo">#{sede.codSede}</p:column>
+                    <p:column headerText="Empresa">#{sede.nomSede}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{cajaMB.cargarInformacionSede}" onclick="PF('dlgSede').hide()"/>
+            </h:form>
+        </p:dialog>            
+    </h:body>
+</html>
+
