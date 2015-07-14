@@ -131,6 +131,7 @@
                             <p:outputLabel class="labelFormulario" value="Caja:" />
                             <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idCaja}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{usuarioMB.listaCajas}" var="caja" itemLabel="#{caja.nomCaja}" itemValue="#{caja.idCaja}"/>
                             </p:selectOneMenu>
                             <p:outputLabel class="labelFormulario" value="Activo:" style="display: #{usuarioMB.displayActivoControl}"/>
                             <p:inputSwitch value="#{usuarioMB.usuarioActivo}" class="campoFormulario" style="display: #{usuarioMB.displayActivoControl}" offLabel="No" onLabel="Si"/>

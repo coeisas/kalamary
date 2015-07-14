@@ -8,11 +8,13 @@ package managedBeans.configuracion;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgRol;
+import entities.FacCaja;
 import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.CfgRolFacade;
 import facades.CfgTipoidentificacionFacade;
+import facades.FacCajaFacade;
 import facades.SegUsuarioFacade;
 import java.io.ByteArrayInputStream;
 import javax.faces.bean.ManagedBean;
@@ -67,6 +69,7 @@ public class UsuarioMB implements Serializable {
 
     private List<CfgEmpresasede> listaSedes;
     private List<SegUsuario> listaUsuarios;
+    private List<FacCaja> listaCajas;
 
     private String opcion;
     private boolean nombreUsuarioValidado;
@@ -92,10 +95,14 @@ public class UsuarioMB implements Serializable {
 
     @EJB
     CfgTipoidentificacionFacade tipoidentificacionFacade;
+    
+    @EJB
+    FacCajaFacade cajaFacade;
 
     @PostConstruct
     private void init() {
         listaSedes = new ArrayList();
+        listaCajas = new ArrayList();
         opcion = "creacion";
         background = "#e0e0e0";
 
@@ -201,7 +208,7 @@ public class UsuarioMB implements Serializable {
         if (getSedeSeleccionada() != null) {
             setCodSede(sedeSeleccionada.getCodSede());
             setNomSede(getSedeSeleccionada().getNomSede());
-
+            listaCajas = cajaFacade.buscarCajasPorSede(sedeSeleccionada);
         } else {
             setNomSede(null);
         }
@@ -289,10 +296,12 @@ public class UsuarioMB implements Serializable {
                 setNomEmpresa(usuarioSeleccionado.getCfgempresasedeidSede().getCfgempresaidEmpresa().getNomEmpresa());
                 setCodSede(usuarioSeleccionado.getCfgempresasedeidSede().getCodSede());
                 setNomSede(usuarioSeleccionado.getCfgempresasedeidSede().getNomSede());
+                listaCajas = cajaFacade.buscarCajasPorSede(sedeSeleccionada);
             } else {
                 setEmpresaSeleccionada(null);
                 setSedeSeleccionada(null);
                 setCodEmpresa(null);
+                listaCajas.clear();
                 setNomEmpresa(null);
                 setCodSede(null);
                 setNomSede(null);
@@ -762,6 +771,14 @@ public class UsuarioMB implements Serializable {
 
     public void setBackground(String bakground) {
         this.background = bakground;
+    }
+
+    public List<FacCaja> getListaCajas() {
+        return listaCajas;
+    }
+
+    public void setListaCajas(List<FacCaja> listaCajas) {
+        this.listaCajas = listaCajas;
     }
 
 }
