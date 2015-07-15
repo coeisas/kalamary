@@ -67,6 +67,7 @@ public class CfgReferenciaproducto implements Serializable {
     @JoinColumn(name = "cfg_categoriaproducto_idCategoria", referencedColumnName = "idCategoria", nullable = false)
     @ManyToOne(optional = false)
     private CfgCategoriaproducto cfgcategoriaproductoidCategoria;
+    @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgreferenciaproductoidReferencia")

@@ -46,7 +46,7 @@
                         <p:submenu label="Configuracion" icon="ui-icon-wrench" style="height: auto" expanded="false" >
                             <p:menuitem icon="ui-icon-suitcase" value="Empresa" actionListener="#{sesionMB.determinarPath('configuraciones/empresa')}"/>
                             <p:menuitem icon="ui-icon-home" value="Sedes" actionListener="#{sesionMB.determinarPath('configuraciones/sede')}" />
-                            <p:menuitem icon="ui-icon-pin-s" value="Productos" actionListener="#{sesionMB.determinarPath('nada')}" />
+                            <p:menuitem icon="ui-icon-pin-s" value="Productos" actionListener="#{sesionMB.determinarPath('configuraciones/producto')}" />
                             <p:menuitem icon="ui-icon-star" value="Kit" actionListener="#{sesionMB.determinarPath('nada')}" />
                             <p:menuitem icon="ui-icon-tag" value="Cajas" actionListener="#{sesionMB.determinarPath('configuraciones/caja')}"/>
                             <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{sesionMB.determinarPath('configuraciones/usuario')}" />
@@ -59,7 +59,7 @@
             </p:layoutUnit>
             <p:layoutUnit position="center">
                 <h:form id="IdFormMain">
-                    <iframe src="#{sesionMB.path}" style="width: 99%;height: 500px;border: none"/>
+                    <iframe src="#{sesionMB.path}" style="width: 99%;height: 590px;border: none"/>
                 </h:form>
             </p:layoutUnit>
         </p:layout>

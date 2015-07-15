@@ -1,0 +1,165 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <div style="text-align: center">
+            <h:form id="IdFormProducto">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column>Producto</p:column>
+                        </p:row>
+                    </f:facet>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdCodEmpresa" class="labelFormulario" value="Empresa:"/>
+                            <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{productoMB.codigoEmpresa}">
+                                <p:ajax event="blur" listener="#{productoMB.buscarEmpresa}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{productoMB.nombreEmpresa}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Categoria:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.codigoCategoria}">
+                                <p:ajax event="blur" listener="#{productoMB.buscarCategoria}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCategoria').show()"/>
+                            <p:outputLabel class="labelFormulario" value="Referencia:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.codigoReferencia}">
+                                <p:ajax event="blur" listener="#{productoMB.buscarReferencia}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgReferencia').show()"/>
+                            <p:outputLabel class="labelFormulario" value="Marca:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.codigoMarca}">
+                                <p:ajax event="blur" listener="#{productoMB.buscarMarca}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgMarca').show()"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Codigo Producto:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.codigoProducto}">
+                                <p:ajax event="blur" listener="#{productoMB.buscarProducto}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{productoMB.cargarProductos}"/>
+                            <p:outputLabel class="labelFormulario" value="Codigo Barras:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.codigoBarra}"/>
+                            <p:outputLabel class="labelFormulario" value="Color:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.color}"/>
+                            <p:outputLabel class="labelFormulario" value="Talla:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.talla}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Producto:"/>
+                            <p:inputText class="campoFormulario" size="100" value="#{productoMB.nombreProducto}"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Stock Min:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.stockMin}"/>
+                            <p:outputLabel class="labelFormulario" value="Costo Adq:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.costoAdq}"/>
+                            <p:outputLabel class="labelFormulario" value="IVA %:"/>
+                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.iva}"/>
+                            <p:outputLabel class="labelFormulario" value="FLETE %:"/>
+                            <p:inputText class="campoFormulario" size="3"  value="#{productoMB.flete}"/>
+                           <p:outputLabel class="labelFormulario" value="Costos IND %:"/>
+                           <p:inputText class="campoFormulario" size="3" value="#{productoMB.costoInd}"/>                           
+                       </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Costo Final:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.costoFinal}"/>
+                            <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
+                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}"/>
+                            <p:outputLabel class="labelFormulario" value="Precio:"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.precio}"/>
+                            <p:outputLabel class="labelFormulario" value="Activo:"/>
+                            <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
+                       </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-disk" value="Guardar"/>
+                            &nbsp;
+                            <p:commandButton icon="ui-icon-cancel" value="Cancelar"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </div>
+        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalEmpresa">
+                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
+                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
+                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
+            </h:form>
+        </p:dialog> 
+        <p:dialog id="IdModalCategoria" widgetVar="dlgCategoria" header="BUSCAR CATEGORIA" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalCategoria">
+                <p:dataTable value="#{productoMB.listaCategoria}" var="categoria" emptyMessage="No hay categorias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.categoriaSeleccionada}" rowKey="#{categoria.idCategoria}" selectionMode="single">
+                    <p:column headerText="Empresa">#{categoria.cfgempresaidEmpresa.nomEmpresa}</p:column>
+                    <p:column headerText="Codigo">#{categoria.codigoCategoria}</p:column>
+                    <p:column headerText="Categoria">#{categoria.nombreCategoria}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionCategoria}" onclick="PF('dlgCategoria').hide()"/>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="IdModalReferencia" widgetVar="dlgReferencia" header="BUSCAR REFERENCIA" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalReferencia">
+                <p:dataTable value="#{productoMB.listaReferencia}" var="referencia" emptyMessage="No hay referencias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.referenciaSeleccionada}" rowKey="#{referencia.idReferencia}" selectionMode="single">
+                    <p:column headerText="Empresa">#{referencia.cfgempresaidEmpresa.nomEmpresa}</p:column>
+                    <p:column headerText="Categoria">#{referencia.cfgcategoriaproductoidCategoria.nombreCategoria}</p:column>
+                    <p:column headerText="Referencia">#{referencia.nombreReferencia}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionReferencia}" onclick="PF('dlgReferencia').hide()"/>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="IdModalMarca" widgetVar="dlgMarca" header="BUSCAR MARCA" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalMarca">
+                <p:dataTable value="#{productoMB.listaMarca}" var="marca" emptyMessage="No hay marcas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.marcaSeleccionada}" rowKey="#{marca.idMarca}" selectionMode="single">
+                    <p:column headerText="Empresa">#{marca.cfgempresaidEmpresa.nomEmpresa}</p:column>
+                    <p:column headerText="Categoria">#{marca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria.nombreCategoria}</p:column>
+                    <p:column headerText="Referencia">#{marca.cfgreferenciaproductoidReferencia.nombreReferencia}</p:column>
+                    <p:column headerText="Marca">#{marca.nombreMarca}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionMarca}" onclick="PF('dlgMarca').hide()"/>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{productoMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionProducto}" onclick="PF('dlgProducto').hide()"/>
+            </h:form>
+        </p:dialog>          
+    </h:body>
+</html>
+

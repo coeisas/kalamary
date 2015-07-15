@@ -6,9 +6,12 @@
 package facades;
 
 import entities.CfgMarcaproducto;
+import entities.CfgReferenciaproducto;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -27,5 +31,26 @@ public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
     public CfgMarcaproductoFacade() {
         super(CfgMarcaproducto.class);
     }
-    
+
+    public List<CfgMarcaproducto> buscarPorReferencia(CfgReferenciaproducto referenciaproducto) {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgreferenciaproductoidReferencia = ?1");
+            query.setParameter(1, referenciaproducto);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgMarcaproducto buscarPorReferenciaAndCodigo(CfgReferenciaproducto referenciaproducto, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgreferenciaproductoidReferencia = ?1 AND m.codigoMarca = ?2");
+            query.setParameter(1, referenciaproducto);
+            query.setParameter(2, codigo);
+            return (CfgMarcaproducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

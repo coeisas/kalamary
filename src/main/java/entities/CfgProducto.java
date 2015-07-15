@@ -95,6 +95,12 @@ public class CfgProducto implements Serializable {
     @Column(name = "fecCrea")
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
+    @Lob
+    @Column(name = "color", length = 65535)
+    private String color;
+    @Lob
+    @Column(name = "talla", length = 65535)
+    private String talla;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -243,7 +249,23 @@ public class CfgProducto implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
+    
+    public String getColor() {
+        return color;
+    }
 
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getTalla() {
+        return talla;
+    }
+
+    public void setTalla(String talla) {
+        this.talla = talla;
+    }
+    
     @XmlTransient
     public List<CfgKitproductodetalle> getCfgKitproductodetalleList() {
         return cfgKitproductodetalleList;
