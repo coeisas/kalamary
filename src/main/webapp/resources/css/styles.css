@@ -27,7 +27,7 @@ body {
 }
 
 .labelFormulario{
-    float: left; padding: .4em; margin: 0px;  margin-right: .1em;border-radius: 0 1em 1em 0;background: #3c667c; font-weight: bold;color: #e0e0e0;box-shadow: .25px .25px .5em #14262f;   
+    float: left; padding: .4em; margin: 0px;  margin-right: .1em;border-radius:.45em;background: #3c667c; font-weight: bold;color: #e0e0e0;box-shadow: 0px .25px .25em black;   
 }
 
 .labelFormularioInformativa{
