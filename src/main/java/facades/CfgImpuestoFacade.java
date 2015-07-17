@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
 import javax.ejb.Stateless;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class CfgImpuestoFacade extends AbstractFacade<CfgImpuesto> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -26,6 +30,28 @@ public class CfgImpuestoFacade extends AbstractFacade<CfgImpuesto> {
 
     public CfgImpuestoFacade() {
         super(CfgImpuesto.class);
+    }
+
+    public List<CfgImpuesto> buscarImpuestoPorSede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgempresasedeidSede = ?1");
+            query.setParameter(1, sede);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    
+    public CfgImpuesto buscarImpuestoPorSedeAndCodigo(CfgEmpresasede sede, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgempresasedeidSede = ?1 AND i.codImpuesto = ?2");
+            query.setParameter(1, sede);
+            query.setParameter(2, codigo);
+            return (CfgImpuesto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
 }

@@ -10,6 +10,8 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -34,13 +36,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfgImpuesto.findByIdImpuesto", query = "SELECT c FROM CfgImpuesto c WHERE c.idImpuesto = :idImpuesto"),
     @NamedQuery(name = "CfgImpuesto.findByNomImpuesto", query = "SELECT c FROM CfgImpuesto c WHERE c.nomImpuesto = :nomImpuesto"),
     @NamedQuery(name = "CfgImpuesto.findByPorcentaje", query = "SELECT c FROM CfgImpuesto c WHERE c.porcentaje = :porcentaje"),
-    @NamedQuery(name = "CfgImpuesto.findByTipoEmpresa", query = "SELECT c FROM CfgImpuesto c WHERE c.tipoEmpresa = :tipoEmpresa"),
-    @NamedQuery(name = "CfgImpuesto.findByFecCrea", query = "SELECT c FROM CfgImpuesto c WHERE c.fecCrea = :fecCrea")})
+    @NamedQuery(name = "CfgImpuesto.findByFecCrea", query = "SELECT c FROM CfgImpuesto c WHERE c.fecCrea = :fecCrea"),
+    @NamedQuery(name = "CfgImpuesto.findByCodImpuesto", query = "SELECT c FROM CfgImpuesto c WHERE c.codImpuesto = :codImpuesto")})
 public class CfgImpuesto implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "idImpuesto", nullable = false)
     private Integer idImpuesto;
     @Basic(optional = false)
@@ -54,17 +57,17 @@ public class CfgImpuesto implements Serializable {
     private float porcentaje;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 1)
-    @Column(name = "tipoEmpresa", nullable = false, length = 1)
-    private String tipoEmpresa;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
+    @Column(name = "codImpuesto", length = 10)
+    private String codImpuesto;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
+    @JoinColumn(name = "cfg_tipoempresa_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgTipoempresa cfgTipoempresaId;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
@@ -80,7 +83,6 @@ public class CfgImpuesto implements Serializable {
         this.idImpuesto = idImpuesto;
         this.nomImpuesto = nomImpuesto;
         this.porcentaje = porcentaje;
-        this.tipoEmpresa = tipoEmpresa;
         this.fecCrea = fecCrea;
     }
 
@@ -108,14 +110,6 @@ public class CfgImpuesto implements Serializable {
         this.porcentaje = porcentaje;
     }
 
-    public String getTipoEmpresa() {
-        return tipoEmpresa;
-    }
-
-    public void setTipoEmpresa(String tipoEmpresa) {
-        this.tipoEmpresa = tipoEmpresa;
-    }
-
     public Date getFecCrea() {
         return fecCrea;
     }
@@ -124,12 +118,28 @@ public class CfgImpuesto implements Serializable {
         this.fecCrea = fecCrea;
     }
 
+    public String getCodImpuesto() {
+        return codImpuesto;
+    }
+
+    public void setCodImpuesto(String codImpuesto) {
+        this.codImpuesto = codImpuesto;
+    }
+    
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
     }
 
     public void setCfgempresasedeidSede(CfgEmpresasede cfgempresasedeidSede) {
         this.cfgempresasedeidSede = cfgempresasedeidSede;
+    }
+
+    public CfgTipoempresa getCfgTipoempresaId() {
+        return cfgTipoempresaId;
+    }
+
+    public void setCfgTipoempresaId(CfgTipoempresa cfgTipoempresaId) {
+        this.cfgTipoempresaId = cfgTipoempresaId;
     }
 
     public SegUsuario getSegusuarioidUsuario() {
@@ -164,5 +174,5 @@ public class CfgImpuesto implements Serializable {
     public String toString() {
         return "entities.CfgImpuesto[ idImpuesto=" + idImpuesto + " ]";
     }
-    
+
 }

@@ -58,7 +58,9 @@ public class CfgTipoempresa implements Serializable {
     @Column(name = "abreviatura", length = 5)
     private String abreviatura;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgTipoempresaId")
-    private List<CfgCliente> cfgClienteList;    
+    private List<CfgCliente> cfgClienteList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgTipoempresaId")
+    private List<CfgImpuesto> cfgImpuestoList;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgTipoempresaId")
     private List<CfgEmpresa> cfgEmpresaList;
 
@@ -115,6 +117,16 @@ public class CfgTipoempresa implements Serializable {
     public void setCfgClienteList(List<CfgCliente> cfgClienteList) {
         this.cfgClienteList = cfgClienteList;
     }
+    
+    @XmlTransient
+    public List<CfgImpuesto> getCfgImpuestoList() {
+        return cfgImpuestoList;
+    }
+
+    public void setCfgImpuestoList(List<CfgImpuesto> cfgImpuestoList) {
+        this.cfgImpuestoList = cfgImpuestoList;
+    }
+    
     @XmlTransient
     public List<CfgEmpresa> getCfgEmpresaList() {
         return cfgEmpresaList;
