@@ -165,7 +165,7 @@ public class ImpuestoMB implements Serializable {
     }
 
     public void accion() {
-        if (sedeSeleccionada == null) {
+        if (impuestoSeleccionado == null) {
             crearInpuesto();
         } else {
             editarImpuesto();
