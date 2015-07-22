@@ -34,10 +34,10 @@ public class DefaultPhaseListener implements PhaseListener {
     public void afterPhase(PhaseEvent event) {
         facesContext = event.getFacesContext();
         paginaActual = facesContext.getViewRoot().getViewId();
-        if (!paginaActual.endsWith("xhtml")) {//si no es xhtml no procesar(ejemplo pagina inicial: index.html)
-            //System.out.println("1) NO ES XHTML: "+paginaActual);
-            return;
-        }
+//        if (!paginaActual.endsWith("xhtml")) {//si no es xhtml no procesar(ejemplo pagina inicial: index.html)
+//            //System.out.println("1) NO ES XHTML: "+paginaActual);
+//            return;
+//        }
         try {//System.out.println("salida del programa por que sesion es null" + ctxPath);
             ext = facesContext.getExternalContext();
             //verificar que solo sea la pagina login o home
@@ -71,30 +71,18 @@ public class DefaultPhaseListener implements PhaseListener {
             HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
             if (!paginaActual.endsWith("index.xhtml")) {//System.out.println("5) pagina diferente de login.xhtml"+paginaActual);                
                 if (session == null) { //System.out.println("6) sesion http esta en null");
-                    sesionMB.setAutenticado(false);
+//                    sesionMB.setAutenticado(false);
 //                    aplicacionMB.removeSession(loginMB.getIdSession());
-                    if (paginaActual.contains("main.xhtml")) {//si la pagina es home se redirecciona a pagina inicial
-                        ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/index.html?v=timeout");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
-                    } else {//si la pagina no es home se redirecciona a mensaje de inactividad
-                        ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/index.html");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
-                    }
+//                    if (paginaActual.contains("main.xhtml")) {//si la pagina es home se redirecciona a pagina inicial
+                    ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/?v=timeout");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
+//                    } else {//si la pagina no es home se redirecciona a mensaje de inactividad
+//                        ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/index.html");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
+//                    }
                 }
-                else {//System.out.println("7) sesion http esta correcta");
-//                    Object currentUser = session.getAttribute("username");
-//                    if (currentUser == null || currentUser == "") {//System.out.println("8) hay sesion pero no se ha logueado");
-//                        sesionMB.setAutenticado(false);
-//                        aplicacionGeneralMB.removeSession(loginMB.getIdSession());
-                        if (!paginaActual.contains("main.xhtml")) {//si la pagina es home se redirecciona a pagina inicial
-//                            ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/index.html?v=nosession");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
-//                        } else {//si la pagina no es home se redirecciona a mensaje de inactividad
-                            ext.redirect(((ServletContext) ext.getContext()).getContextPath() + paginaActual);//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
-                        }
-////                    }
-                }
-            } 
+            }
 //            else {//es la pagina de login
 //                if (session == null) {//finalizo la sesion
-//                    ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/index.html?v=timeout");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
+//                    ext.redirect(((ServletContext) ext.getContext()).getContextPath() + "/");//System.out.println("enviado a: " + ctxPath + "/index.html?v=timeout");
 //                }
 //            }
         } catch (ELException | IOException t) {//System.out.println("Fallo al expirar sesion " + t.toString());

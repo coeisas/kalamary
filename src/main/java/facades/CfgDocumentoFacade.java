@@ -6,9 +6,12 @@
 package facades;
 
 import entities.CfgDocumento;
+import entities.CfgEmpresasede;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -27,5 +31,16 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
     public CfgDocumentoFacade() {
         super(CfgDocumento.class);
     }
-    
+
+    public CfgDocumento buscarDocumentoPorSedeAndCodigo(CfgEmpresasede sede, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.codDocumento = ?2");
+            query.setParameter(1, sede);
+            query.setParameter(2, codigo);
+            return (CfgDocumento) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }       
+    }
+
 }

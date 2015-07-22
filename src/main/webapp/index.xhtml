@@ -7,9 +7,11 @@
     <h:head>
         <title>Kalamary</title>
         <h:outputStylesheet library="css" name="styles.css"/>
+        <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=#{request.contextPath}/"/>
     </h:head>
     <h:body>
         <p:growl id="message" autoUpdate="false" showDetail="true"/>
+        #{session.maxInactiveInterval}
         <h:form>
 
             <div style="padding: 5em 10em">
@@ -39,32 +41,32 @@
                     <p:row>
                         <p:column><p:outputLabel for="IdEmpresa" value="Empresa:"/></p:column>
                         <p:column>
-                            <p:selectOneMenu id="IdEmpresa" style="width: 150px" value="#{sesionMB.idEmpresa}">
+                            <p:selectOneMenu id="IdEmpresa" style="width: 150px" value="#{loginMB.idEmpresa}">
                                 <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaEmpresas}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.nomEmpresa}" />
-                                <p:ajax event="change" listener="#{sesionMB.cargarSedes}" update="IdSede"/>
+                                <p:ajax event="change" listener="#{loginMB.cargarSedes}" update="IdSede"/>
                             </p:selectOneMenu>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column><p:outputLabel for="IdSede" value="Sede:"/></p:column>
                         <p:column>
-                            <p:selectOneMenu id="IdSede" style="width: 150px" value="#{sesionMB.idSede}">
+                            <p:selectOneMenu id="IdSede" style="width: 150px" value="#{loginMB.idSede}">
                                 <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
-                                <f:selectItems value="#{sesionMB.listaSedes}" var="sede" itemValue="#{sede.idSede}" itemLabel="#{sede.nomSede}"/>
+                                <f:selectItems value="#{loginMB.listaSedes}" var="sede" itemValue="#{sede.idSede}" itemLabel="#{sede.nomSede}"/>
                             </p:selectOneMenu>
                         </p:column>
                     </p:row>                                        
                     <p:row>
                         <p:column><p:outputLabel for="IdUsuario" value="Usuario:"/></p:column>
-                        <p:column><p:inputText id="IdUsuario" value="#{sesionMB.usuario}" size="25"/></p:column>
+                        <p:column><p:inputText id="IdUsuario" value="#{loginMB.usuario}" size="25"/></p:column>
                     </p:row>
                     <p:row>
                         <p:column><p:outputLabel  for="IdPassword" value="Contraseña:"/></p:column>
-                        <p:column><p:password id="IdPassword" value="#{sesionMB.password}" size="25"/></p:column>
+                        <p:column><p:password id="IdPassword" value="#{loginMB.password}" size="25"/></p:column>
                     </p:row>
                     <p:row>
-                        <p:column colspan="2" style="text-align: center"><p:commandButton value="Entrar" action="#{sesionMB.iniciarSesion}"/></p:column>
+                        <p:column colspan="2" style="text-align: center"><p:commandButton value="Entrar" action="#{loginMB.iniciarSesion}"/></p:column>
                     </p:row>
                 </p:panelGrid>
             </h:form>

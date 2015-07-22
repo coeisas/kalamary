@@ -6,6 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Kalamary</title>
+        <!--meta http-equiv="refresh" content="# {session.maxInactiveInterval};url=# {request.contextPath}/"/-->
         <h:outputStylesheet library="css" name="styles.css"/>
     </h:head>
     <h:body>
@@ -52,7 +53,7 @@
                             <p:menuitem icon="ui-icon-person" value="Usuarios" actionListener="#{sesionMB.determinarPath('configuraciones/usuario')}" />
                             <p:menuitem icon="ui-icon-contact" value="Clientes" actionListener="#{sesionMB.determinarPath('configuraciones/cliente')}" />
                             <p:menuitem icon="ui-icon-document" value="Impuestos" actionListener="#{sesionMB.determinarPath('configuraciones/impuesto')}" />
-                            <p:menuitem icon="ui-icon-note" value="Documentos" actionListener="#{sesionMB.determinarPath('nada')}" />
+                            <p:menuitem icon="ui-icon-note" value="Documentos" actionListener="#{sesionMB.determinarPath('configuraciones/documento')}" />
                         </p:submenu>
                     </p:menu>
                 </h:form>   

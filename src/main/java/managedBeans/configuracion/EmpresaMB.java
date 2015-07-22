@@ -56,8 +56,8 @@ public class EmpresaMB implements Serializable {
     private String mail;
     private UploadedFile file;
     private String nombreArchivo;
-    private Integer tipoDocEmpresa;
-    private Integer tipoEmpresa;
+    private int tipoDocEmpresa;
+    private int tipoEmpresa;
 
     private CfgEmpresa empresaSeleccionada;
     private List<CfgMunicipio> listaMuncipios;
@@ -152,8 +152,8 @@ public class EmpresaMB implements Serializable {
         setIdMunicipio(null);
         setNumDocumento(null);
         setNombre(null);
-        setTipoDocEmpresa(null);
-        setTipoEmpresa(null);
+        setTipoDocEmpresa(0);
+        setTipoEmpresa(0);
         setDireccion(null);
         setTelefono1(null);
         setTelefono2(null);
@@ -372,19 +372,19 @@ public class EmpresaMB implements Serializable {
         this.image = image;
     }
 
-    public Integer getTipoDocEmpresa() {
+    public int getTipoDocEmpresa() {
         return tipoDocEmpresa;
     }
 
-    public void setTipoDocEmpresa(Integer tipoDocEmpresa) {
+    public void setTipoDocEmpresa(int tipoDocEmpresa) {
         this.tipoDocEmpresa = tipoDocEmpresa;
     }
 
-    public Integer getTipoEmpresa() {
+    public int getTipoEmpresa() {
         return tipoEmpresa;
     }
 
-    public void setTipoEmpresa(Integer tipoEmpresa) {
+    public void setTipoEmpresa(int tipoEmpresa) {
         this.tipoEmpresa = tipoEmpresa;
     }
 

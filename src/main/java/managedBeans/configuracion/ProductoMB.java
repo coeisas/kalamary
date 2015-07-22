@@ -45,14 +45,14 @@ public class ProductoMB implements Serializable {
     private String color;
     private String talla;
     private String nombreProducto;
-    private Float stockMin;
-    private Float costoAdq;
-    private Float iva;
-    private Float flete;
-    private Float costoInd;
-    private Float costoFinal;
-    private Float utilidad;
-    private Float precio;
+    private float stockMin;
+    private float costoAdq;
+    private float iva;
+    private float flete;
+    private float costoInd;
+    private float costoFinal;
+    private float utilidad;
+    private float precio;
     private boolean activo;
 
     private String nombreEmpresa;
@@ -136,14 +136,14 @@ public class ProductoMB implements Serializable {
         color = null;
         talla = null;
         nombreProducto = null;
-        stockMin = null;
-        costoAdq = null;
-        iva = null;
-        flete = null;
-        costoInd = null;
-        costoFinal = null;
-        utilidad = null;
-        precio = null;
+        stockMin = 0;
+        costoAdq = 0;
+        iva = 0;
+        flete = 0;
+        costoInd = 0;
+        costoFinal = 0;
+        utilidad = 0;
+        precio = 0;
         activo = false;
     }
 
@@ -262,14 +262,14 @@ public class ProductoMB implements Serializable {
             setColor(productoSeleccionado.getColor());
             setTalla(productoSeleccionado.getTalla());
             setNombreProducto(productoSeleccionado.getNomProducto());
-            setStockMin(productoSeleccionado.getStockMin());
-            setCostoAdq(productoSeleccionado.getCostoAdquisicion());
-            setIva(productoSeleccionado.getIva());
-            setFlete(productoSeleccionado.getFlete());
-            setCostoInd(productoSeleccionado.getCostoIndirecto());
-            setCostoFinal(productoSeleccionado.getCosto());
-            setUtilidad(productoSeleccionado.getUtilidad());
-            setPrecio(productoSeleccionado.getPrecio());
+            setStockMin(determinarValor(productoSeleccionado.getStockMin()));
+            setCostoAdq(determinarValor(productoSeleccionado.getCostoAdquisicion()));
+            setIva(determinarValor(productoSeleccionado.getIva()));
+            setFlete(determinarValor(productoSeleccionado.getFlete()));
+            setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));
+            setCostoFinal(determinarValor(productoSeleccionado.getCosto()));
+            setUtilidad(determinarValor(productoSeleccionado.getUtilidad()));
+            setPrecio(determinarValor(productoSeleccionado.getPrecio()));
             setActivo(productoSeleccionado.getActivo());
 
         } else {
@@ -277,18 +277,22 @@ public class ProductoMB implements Serializable {
             setColor(null);
             setTalla(null);
             setNombreProducto(null);
-            setStockMin(null);
-            setCostoAdq(null);
-            setIva(null);
-            setFlete(null);
-            setCostoInd(null);
-            setCostoFinal(null);
-            setUtilidad(null);
-            setPrecio(null);
+            setStockMin(0);
+            setCostoAdq(0);
+            setIva(0);
+            setFlete(0);
+            setCostoInd(0);
+            setCostoFinal(0);
+            setUtilidad(0);
+            setPrecio(0);
             setActivo(false);
         }
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
+    }
+    
+    private Float determinarValor(Float valor) {
+        return valor == null ?  0 : valor;
     }
 
     public String getCodigoEmpresa() {
@@ -363,59 +367,59 @@ public class ProductoMB implements Serializable {
         this.nombreProducto = nombreProducto;
     }
 
-    public Float getCostoAdq() {
+    public float getCostoAdq() {
         return costoAdq;
     }
 
-    public void setCostoAdq(Float costoAdq) {
+    public void setCostoAdq(float costoAdq) {
         this.costoAdq = costoAdq;
     }
 
-    public Float getIva() {
+    public float getIva() {
         return iva;
     }
 
-    public void setIva(Float iva) {
+    public void setIva(float iva) {
         this.iva = iva;
     }
 
-    public Float getFlete() {
+    public float getFlete() {
         return flete;
     }
 
-    public void setFlete(Float flete) {
+    public void setFlete(float flete) {
         this.flete = flete;
     }
 
-    public Float getCostoInd() {
+    public float getCostoInd() {
         return costoInd;
     }
 
-    public void setCostoInd(Float costoInd) {
+    public void setCostoInd(float costoInd) {
         this.costoInd = costoInd;
     }
 
-    public Float getCostoFinal() {
+    public float getCostoFinal() {
         return costoFinal;
     }
 
-    public void setCostoFinal(Float costoFinal) {
+    public void setCostoFinal(float costoFinal) {
         this.costoFinal = costoFinal;
     }
 
-    public Float getUtilidad() {
+    public float getUtilidad() {
         return utilidad;
     }
 
-    public void setUtilidad(Float utilidad) {
+    public void setUtilidad(float utilidad) {
         this.utilidad = utilidad;
     }
 
-    public Float getPrecio() {
+    public float getPrecio() {
         return precio;
     }
 
-    public void setPrecio(Float precio) {
+    public void setPrecio(float precio) {
         this.precio = precio;
     }
 
@@ -427,11 +431,11 @@ public class ProductoMB implements Serializable {
         this.activo = activo;
     }
 
-    public Float getStockMin() {
+    public float getStockMin() {
         return stockMin;
     }
 
-    public void setStockMin(Float stockMin) {
+    public void setStockMin(float stockMin) {
         this.stockMin = stockMin;
     }
 

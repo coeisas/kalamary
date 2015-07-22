@@ -48,9 +48,9 @@ public class ClienteMB implements Serializable {
     private String codigoCliente;
     private String idDepartamento;
     private String idMunicipio;
-    private Integer idIdentificacion;
+    private int idIdentificacion;
     private String numIdentificacion;
-    private Integer idTipoCliente;
+    private int idTipoCliente;
     private String primerNombre;
     private String segundoNombre;
     private String primerApellido;
@@ -61,7 +61,7 @@ public class ClienteMB implements Serializable {
     private String mail;
     private Date fechaNacimiento;
     private String tarjetaMembresia;
-    private Float cupoCredito;
+    private float cupoCredito;
     private StreamedContent image;
 
     private String opcion;
@@ -139,17 +139,17 @@ public class ClienteMB implements Serializable {
     }
 
     private void limpiarFormulario() {
-        setIdIdentificacion(null);
+        setIdIdentificacion(0);
 //        setNombreEmpresa(null);
         setNumIdentificacion(null);
         setPrimerNombre(null);
         setIdDepartamento(null);
-        setIdTipoCliente(null);
+        setIdTipoCliente(0);
         setSegundoNombre(null);
         setPrimerApellido(null);
         setSegundoApellido(null);
         setDireccion(null);
-        setCupoCredito(null);
+        setCupoCredito(0);
         setTarjetaMembresia(null);
         setTelefono(null);
         setMail(null);
@@ -330,7 +330,7 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un codigo al cliente"));
             return false;
         }
-        if (idIdentificacion == null) {
+        if (idIdentificacion == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de identificacion"));
             return false;
         }
@@ -376,11 +376,11 @@ public class ClienteMB implements Serializable {
         this.codEmpresa = codEmpresa;
     }
 
-    public Integer getIdIdentificacion() {
+    public int getIdIdentificacion() {
         return idIdentificacion;
     }
 
-    public void setIdIdentificacion(Integer idIdentificacion) {
+    public void setIdIdentificacion(int idIdentificacion) {
         this.idIdentificacion = idIdentificacion;
     }
 
@@ -472,11 +472,11 @@ public class ClienteMB implements Serializable {
         this.tarjetaMembresia = tarjetaMembresia;
     }
 
-    public Float getCupoCredito() {
+    public float getCupoCredito() {
         return cupoCredito;
     }
 
-    public void setCupoCredito(Float cupoCredito) {
+    public void setCupoCredito(float cupoCredito) {
         this.cupoCredito = cupoCredito;
     }
 
@@ -565,11 +565,11 @@ public class ClienteMB implements Serializable {
         this.codigoCliente = codigoCliente;
     }
 
-    public Integer getIdTipoCliente() {
+    public int getIdTipoCliente() {
         return idTipoCliente;
     }
 
-    public void setIdTipoCliente(Integer idTipoCliente) {
+    public void setIdTipoCliente(int idTipoCliente) {
         this.idTipoCliente = idTipoCliente;
     }
 

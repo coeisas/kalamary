@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="css" name="styles.css"/>
+    </h:head>
+    <h:body>
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <div style="text-align: center">
+            <h:form id="IdFormDocumento">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;width: 80%">
+                    <f:facet name="header">
+                        <p:row>
+                            <p:column>Documento</p:column>
+                        </p:row>
+                    </f:facet>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Codigo Empresa:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.codigoEmpresa}">
+                                <p:ajax event="blur" listener="#{documentoMB.buscarEmpresa}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{documentoMB.nombreEmpresa}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Codigo Sede:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.codigoSede}">
+                                <p:ajax event="blur" listener="${documentoMB.buscarSede}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{documentoMB.nombreSede}"/>                           
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Codigo Documento:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.codigoDocumento}" maxlength="10">
+                                <p:ajax event="blur" listener="#{documentoMB.buscarDocumento}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:outputLabel class="labelFormulario" value="Tipo Empresa:"/>
+                            <p:selectOneMenu value="#{documentoMB.tipoEmpresa}" class="campoFormulario">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoEmpresa" itemLabel="#{tipoEmpresa.descripcion}" itemValue="#{tipoEmpresa.id}"/>
+                            </p:selectOneMenu>                            
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Documento:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.nombreDocumento}" maxlength="25" size="30"/>                            
+                            <p:outputLabel class="labelFormulario" value="Abreviatura:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.abreviatura}" maxlength="3" size="3"/>                            
+                            <p:outputLabel class="labelFormulario" value="Prefijo:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.prefijo}" maxlength="5" size="5"/>
+                            <p:outputLabel class="labelFormulario" value="Activo:"/>
+                            <p:inputSwitch class="campoFormulario" value="#{documentoMB.activo}" onLabel="Si" offLabel="No"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                           <p:outputLabel class="labelFormulario" value="Rango Incial:"/>
+                           <p:inputText class="campoFormulario" value="#{documentoMB.rangoInicial}"/>                            
+                            <p:outputLabel class="labelFormulario" value="Rango Final:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.rangoFinal }"/>                            
+                            <p:outputLabel class="labelFormulario" value="Num Actual:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.numActual}" disabled="true" style="color: black"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="ResDian:"/>
+                            <p:inputText class="campoFormulario" value="#{documentoMB.resDian}" maxlength="200" size="135"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Observaciones:"/>
+                            <div style="clear: left"/>
+                            <p:inputTextarea class="campoFormulario" value="#{documentoMB.observacion}" style="width: 99%" maxlength="65535"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{documentoMB.accion}"/>
+                            &nbsp;
+                            <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{documentoMB.cancelar}"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </div>
+    </h:body>
+</html>
+

@@ -48,14 +48,14 @@ public class UsuarioMB implements Serializable {
     private String nomEmpresa;
     private String codSede;
     private String nomSede;
-    private Integer idIdentificacion;
+    private int idIdentificacion;
     private String numIdentificacion;
     private String primerNombre;
     private String segundoNombre;
     private String primerApellido;
     private String segundoApellido;
     private UploadedFile file;
-    private Float comision;
+    private float comision;
     private String direccion;
     private String telefono;
     private String mail;
@@ -63,8 +63,8 @@ public class UsuarioMB implements Serializable {
     private String usuario;
     private String contrasenia;
     private String contraseniaR;
-    private Integer idRole;
-    private Integer idCaja;
+    private int idRole;
+    private int idCaja;
     private boolean usuarioActivo;
 
     private List<CfgEmpresasede> listaSedes;
@@ -95,7 +95,7 @@ public class UsuarioMB implements Serializable {
 
     @EJB
     CfgTipoidentificacionFacade tipoidentificacionFacade;
-    
+
     @EJB
     FacCajaFacade cajaFacade;
 
@@ -169,7 +169,7 @@ public class UsuarioMB implements Serializable {
     public void limpiarFormulario() {
         setNumIdentificacion(null);
         setFile(null);
-        setIdIdentificacion(null);
+        setIdIdentificacion(0);
         setUsuario(null);
         setPrimerNombre(null);
         setSegundoNombre(null);
@@ -178,9 +178,9 @@ public class UsuarioMB implements Serializable {
         setContrasenia(null);
         setContraseniaR(null);
         setFechaNacimiento(null);
-        setComision(null);
-        setIdCaja(null);
-        setIdRole(null);
+        setComision(0);
+        setIdCaja(0);
+        setIdRole(0);
         setDireccion(null);
         setTelefono(null);
         setMail(null);
@@ -314,11 +314,11 @@ public class UsuarioMB implements Serializable {
             setSegundoApellido(usuarioSeleccionado.getApellido2());
             setDireccion(usuarioSeleccionado.getDirUsuario());
             setTelefono(usuarioSeleccionado.getTel1());
-            setComision(usuarioSeleccionado.getComisionVenta());
+            setComision(determinarValor(usuarioSeleccionado.getComisionVenta()));
             setMail(usuarioSeleccionado.getMail());
             setFechaNacimiento(usuarioSeleccionado.getFecNacimiento());
             setUsuario(usuarioSeleccionado.getUsuario());
-            setIdCaja(usuarioSeleccionado.getIdCaja());
+            setIdCaja(determinarValor(usuarioSeleccionado.getIdCaja()));
             if (usuarioSeleccionado.getFoto() != null) {
                 setImage(new DefaultStreamedContent(new ByteArrayInputStream(usuarioSeleccionado.getFoto())));
             } else {
@@ -335,6 +335,14 @@ public class UsuarioMB implements Serializable {
         }
         RequestContext.getCurrentInstance().execute("PF('dlgUsuario').hide()");
         RequestContext.getCurrentInstance().update("IdFormUsuario");
+    }
+
+    private Float determinarValor(Float valor) {
+        return valor == null ? 0 : valor;
+    }
+    
+     private Integer determinarValor(Integer valor) {
+        return valor == null ? 0 : valor;
     }
 
     public void cancelar() {
@@ -455,7 +463,7 @@ public class UsuarioMB implements Serializable {
     }
 
     private boolean validarCamposFormulario() {
-        if (idRole == null) {
+        if (idRole == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asignacion de rol necesaria"));
             return false;
         }
@@ -473,7 +481,7 @@ public class UsuarioMB implements Serializable {
                 return false;
             }
         }
-        if (idIdentificacion == null) {
+        if (idIdentificacion == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de identificacion"));
             return false;
         }
@@ -552,11 +560,11 @@ public class UsuarioMB implements Serializable {
         this.nomSede = nomSede;
     }
 
-    public Integer getIdIdentificacion() {
+    public int getIdIdentificacion() {
         return idIdentificacion;
     }
 
-    public void setIdIdentificacion(Integer idIdentificacion) {
+    public void setIdIdentificacion(int idIdentificacion) {
         this.idIdentificacion = idIdentificacion;
     }
 
@@ -608,11 +616,11 @@ public class UsuarioMB implements Serializable {
         this.file = file;
     }
 
-    public Float getComision() {
+    public float getComision() {
         return comision;
     }
 
-    public void setComision(Float comision) {
+    public void setComision(float comision) {
         this.comision = comision;
     }
 
@@ -672,19 +680,19 @@ public class UsuarioMB implements Serializable {
         this.contraseniaR = contraseniaR;
     }
 
-    public Integer getIdRole() {
+    public int getIdRole() {
         return idRole;
     }
 
-    public void setIdRole(Integer idRole) {
+    public void setIdRole(int idRole) {
         this.idRole = idRole;
     }
 
-    public Integer getIdCaja() {
+    public int getIdCaja() {
         return idCaja;
     }
 
-    public void setIdCaja(Integer idCaja) {
+    public void setIdCaja(int idCaja) {
         this.idCaja = idCaja;
     }
 

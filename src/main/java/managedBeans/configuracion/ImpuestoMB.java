@@ -38,8 +38,8 @@ public class ImpuestoMB implements Serializable {
     private String codigoSede;
     private String codigoImpuesto;
     private String nombreImpuesto;
-    private Float porcentajeImpuesto;
-    private Integer tipoEmpresa;
+    private float porcentajeImpuesto;
+    private int tipoEmpresa;
 
     private String nombreEmpresa;
     private String nombreSede;
@@ -159,8 +159,8 @@ public class ImpuestoMB implements Serializable {
         setNombreSede(null);
         setCodigoImpuesto(null);
         setNombreImpuesto(null);
-        setPorcentajeImpuesto(null);
-        setTipoEmpresa(null);
+        setPorcentajeImpuesto(0);
+        setTipoEmpresa(0);
         listaImpuestos.clear();
     }
 
@@ -190,11 +190,11 @@ public class ImpuestoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Impuesto requerido"));
             return;
         }
-        if (porcentajeImpuesto == null) {
+        if (porcentajeImpuesto == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Porcentaje impuesto requerido"));
             return;
         }
-        if (tipoEmpresa == null) {
+        if (tipoEmpresa == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Tipo Empresa requerido"));
         }
     }
@@ -286,11 +286,11 @@ public class ImpuestoMB implements Serializable {
         this.nombreImpuesto = nombreImpuesto;
     }
 
-    public Float getPorcentajeImpuesto() {
+    public float getPorcentajeImpuesto() {
         return porcentajeImpuesto;
     }
 
-    public void setPorcentajeImpuesto(Float porcentajeImpuesto) {
+    public void setPorcentajeImpuesto(float porcentajeImpuesto) {
         this.porcentajeImpuesto = porcentajeImpuesto;
     }
 
@@ -342,11 +342,11 @@ public class ImpuestoMB implements Serializable {
         this.listaImpuestos = listaImpuestos;
     }
 
-    public Integer getTipoEmpresa() {
+    public int getTipoEmpresa() {
         return tipoEmpresa;
     }
 
-    public void setTipoEmpresa(Integer tipoEmpresa) {
+    public void setTipoEmpresa(int tipoEmpresa) {
         this.tipoEmpresa = tipoEmpresa;
     }
 

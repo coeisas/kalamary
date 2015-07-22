@@ -7,7 +7,6 @@ package managedBeans.seguridad;
 
 import entities.CfgDepartamento;
 import entities.CfgEmpresa;
-import entities.CfgEmpresasede;
 import entities.CfgRol;
 import entities.CfgTipodocempresa;
 import entities.CfgTipoempresa;
@@ -59,7 +58,7 @@ public class AplicacionMB implements Serializable {
 
     @EJB
     CfgEmpresaFacade empresaFacade;
-    
+
     @EJB
     CfgRolFacade rolFacade;
 
@@ -79,11 +78,10 @@ public class AplicacionMB implements Serializable {
         }
 
     }
-    
-    public void actualizarListaEmpresas(){
+
+    public void actualizarListaEmpresas() {
         listaEmpresas = empresaFacade.findAll();
     }
-    
 
     public AplicacionMB() {
 
@@ -99,9 +97,25 @@ public class AplicacionMB implements Serializable {
 //        System.out.println("cerro sesion => " + usuario.getUsuario() + " idSession => " + usuario.getRememberToken());
     }
 
-    public void comprobarSesionAbierta() {
-
-    }
+//    public void comprobarSesionAbierta(SegUsuario usuario) {
+//        SegUsuario user = buscarUsuario(usuario);
+//        FacesContext context = FacesContext.getCurrentInstance();
+////        Map<String, Object> applicationMap = context.getExternalContext().getApplicationMap();
+//        ExternalContext extCtx = context.getExternalContext();
+//        Map<String, Object> sessionMap = extCtx.getSessionMap();
+//        Object objetosession = sessionMap.get(user.getRememberToken());
+//    }
+//
+//    private SegUsuario buscarUsuario(SegUsuario usuario) {
+//        SegUsuario user = null;
+//        for (SegUsuario u : listaUsuariosActivos) {
+//            if (u.equals(usuario)) {
+//                user = u;
+//                break;
+//            }
+//        }
+//        return user;
+//    }
 
     public List<String> getImagenes() {
         return imagenes;
