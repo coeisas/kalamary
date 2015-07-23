@@ -40,7 +40,16 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
             return (CfgDocumento) query.getSingleResult();
         } catch (Exception e) {
             return null;
-        }       
+        }
     }
 
+    public List<CfgDocumento> buscarDocumentoPorSede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1");
+            query.setParameter(1, sede);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

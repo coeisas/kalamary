@@ -24,7 +24,7 @@
                             <p:inputText class="campoFormulario" value="#{documentoMB.codigoEmpresa}">
                                 <p:ajax event="blur" listener="#{documentoMB.buscarEmpresa}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
                             <p:outputLabel class="labelFormularioInformativa" value="#{documentoMB.nombreEmpresa}"/>
                         </p:column>
                     </p:row>
@@ -34,7 +34,7 @@
                             <p:inputText class="campoFormulario" value="#{documentoMB.codigoSede}">
                                 <p:ajax event="blur" listener="${documentoMB.buscarSede}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{documentoMB.cargarListaSedes}"/>
                             <p:outputLabel class="labelFormularioInformativa" value="#{documentoMB.nombreSede}"/>                           
                         </p:column>
                     </p:row>
@@ -44,7 +44,7 @@
                             <p:inputText class="campoFormulario" value="#{documentoMB.codigoDocumento}" maxlength="10">
                                 <p:ajax event="blur" listener="#{documentoMB.buscarDocumento}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{documentoMB.cargarListaDocumento}"/>
                             <p:outputLabel class="labelFormulario" value="Tipo Empresa:"/>
                             <p:selectOneMenu value="#{documentoMB.tipoEmpresa}" class="campoFormulario">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
@@ -97,6 +97,38 @@
                 </p:panelGrid>
             </h:form>
         </div>
+        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalEmpresa">
+                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{documentoMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
+                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
+                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{documentoMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="IdModalSede" widgetVar="dlgSede" header="BUSCAR SEDE" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalSede">
+                <p:dataTable value="#{documentoMB.listaSede}" var="sede" emptyMessage="No hay sedes registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{documentoMB.sedeSeleccionada}" rowKey="#{sede.idSede}" selectionMode="single">
+                    <p:column headerText="Codigo">#{sede.codSede}</p:column>
+                    <p:column headerText="Empresa">#{sede.nomSede}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{documentoMB.cargarInformacionSede}" onclick="PF('dlgSede').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="IdModalDocumento" widgetVar="dlgDocumento" header="BUSCAR DOCUMENTO" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalDocumento">
+                <p:dataTable value="#{documentoMB.listaDocumento}" var="documento" emptyMessage="No hay documentos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{documentoMB.documentoSeleccionado}" rowKey="#{documento.idDoc}" selectionMode="single">
+                    <p:column headerText="Codigo">#{documento.codDocumento}</p:column>
+                    <p:column headerText="Documento">#{documento.nomDoc}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{documentoMB.cargarInformacionDocumento}" onclick="PF('dlgDocumento').hide()"/>
+            </h:form>
+        </p:dialog>                             
     </h:body>
 </html>
 

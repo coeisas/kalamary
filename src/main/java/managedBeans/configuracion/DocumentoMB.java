@@ -16,6 +16,8 @@ import facades.CfgTipoempresaFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.ejb.EJB;
+import java.util.List;
+import java.util.ArrayList;
 import org.primefaces.context.RequestContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
@@ -50,6 +52,9 @@ public class DocumentoMB implements Serializable {
     private String nombreSede;
 
     private SesionMB sesionMB;
+
+    private List<CfgEmpresasede> listaSede;
+    private List<CfgDocumento> listaDocumento;
 
     private CfgEmpresa empresaSeleccionada;
     private CfgEmpresasede sedeSeleccionada;
@@ -113,6 +118,16 @@ public class DocumentoMB implements Serializable {
         }
     }
 
+    public void cargarListaSedes() {
+        if (empresaSeleccionada != null) {
+            listaSede = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
+            RequestContext.getCurrentInstance().update("FormModalSede");
+            RequestContext.getCurrentInstance().execute("PF('dlgSede').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
+        }
+    }
+
     public void cargarInformacionSede() {
         if (sedeSeleccionada != null) {
             setCodigoSede(sedeSeleccionada.getCodSede());
@@ -134,6 +149,17 @@ public class DocumentoMB implements Serializable {
             limpiarInformacionDocumento();
             RequestContext.getCurrentInstance().update("IdFormDocumento");
         }
+    }
+
+    public void cargarListaDocumento() {
+        if (sedeSeleccionada != null) {
+            listaDocumento = documentoFacade.buscarDocumentoPorSede(sedeSeleccionada);
+            RequestContext.getCurrentInstance().update("FormModalDocumento");
+            RequestContext.getCurrentInstance().execute("PF('dlgDocumento').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la sede"));
+        }
+
     }
 
     public void cargarInformacionDocumento() {
@@ -239,7 +265,7 @@ public class DocumentoMB implements Serializable {
     }
 
     private void crearDocumento() {
-        if(!validacion()){
+        if (!validacion()) {
             return;
         }
         try {
@@ -269,10 +295,10 @@ public class DocumentoMB implements Serializable {
     }
 
     private void editarDocumento() {
-        if(!validacion()){
+        if (!validacion()) {
             return;
         }
-        if(documentoSeleccionado == null){
+        if (documentoSeleccionado == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija un documento"));
             return;
         }
@@ -438,6 +464,22 @@ public class DocumentoMB implements Serializable {
 
     public void setDocumentoSeleccionado(CfgDocumento documentoSeleccionado) {
         this.documentoSeleccionado = documentoSeleccionado;
+    }
+
+    public List<CfgEmpresasede> getListaSede() {
+        return listaSede;
+    }
+
+    public void setListaSede(List<CfgEmpresasede> listaSede) {
+        this.listaSede = listaSede;
+    }
+
+    public List<CfgDocumento> getListaDocumento() {
+        return listaDocumento;
+    }
+
+    public void setListaDocumento(List<CfgDocumento> listaDocumento) {
+        this.listaDocumento = listaDocumento;
     }
 
 }
