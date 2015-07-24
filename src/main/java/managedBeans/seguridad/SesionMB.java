@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -44,7 +45,11 @@ public class SesionMB implements Serializable {
 
     @PreDestroy
     private void finish() {
-        aplicacionMB.descartarUsuario(usuarioActual);
+        if (usuarioActual != null) {
+//            System.out.println("LOGOUT: " + usuarioActual.getUsuario());
+            aplicacionMB.descartarHttpSession(usuarioActual.getSession());
+            aplicacionMB.descartarUsuario(usuarioActual);
+        }
     }
 
     public SesionMB() {
@@ -53,23 +58,14 @@ public class SesionMB implements Serializable {
 
     public void determinarPath(String file) {
         path = file + ".xhtml";
-//        System.out.println(path);
-        RequestContext.getCurrentInstance().update("IdFormMain");
-//        RequestContext.getCurrentInstance().update("contentPanel");
-//        System.out.println(path);
-//        RequestContext.getCurrentInstance().update("IdFormEmpresa");        
+        RequestContext.getCurrentInstance().update("IdFormMain"); 
     }
 
     public String cerrarSesion() {
-//        FacesContext context = FacesContext.getCurrentInstance();
-//        AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
-        aplicacionMB.descartarUsuario(usuarioActual);
-//        System.out.println("cerrando sesion " + FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));
         ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
 //        String contextPath = ((ServletContext) context.getContext()).getContextPath();
         setAutenticado(false);
         econtext.invalidateSession();
-
 //        context.redirect(contextPath  + "/index.xhtml");        
         return "index?faces-redirect=true";
     }
@@ -89,7 +85,10 @@ public class SesionMB implements Serializable {
     }
 
     public void tokenSession() {
-        usuarioActual.setRememberToken(idSesion);
+        HttpSession httpSession = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false);
+        usuarioActual.setSession(httpSession);
+//        System.out.println("LOGIN: " + usuarioActual.getUsuario());
+        aplicacionMB.insertarHttpSession(httpSession);        
     }
 
     public String getPath() {

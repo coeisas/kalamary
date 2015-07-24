@@ -40,9 +40,9 @@ public class LoginMB implements Serializable {
 
     @EJB
     CfgEmpresasedeFacade empresasedeFacade;
-    
+
     @PostConstruct
-    private void init(){
+    private void init() {
         listaSedes = new ArrayList();
     }
 
@@ -78,31 +78,36 @@ public class LoginMB implements Serializable {
 //        ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
         AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
         SegUsuario usuarioActual = usuarioFacade.buscarUsuarioSuper(usuario, password);
-        if (usuarioActual != null) {
-            if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {
-//                usuarioActual.setRememberToken(econtext.getSessionId(false));
+        if (usuarioActual != null) {//corresponde a un usuario con el rol de superusuario
+            if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {//se crea sesion para el nuevo usuario autenticado
+//                usuarioActual.setRememberToken(econtext.getSessionId(false));               
                 aplicacionMB.insertarUsuario(usuarioActual);
                 SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
                 sesionMB.setUsuarioActual(usuarioActual);
                 sesionMB.tokenSession();
                 sesionMB.setAutenticado(true);
+//                sesionMB.insertarItemSession(usuarioActual);
                 return "main?faces-redirect=true";
-            } else {
+            } else {//el usuario ya posee una sesion activa
 //                aplicacionMB.comprobarSesionAbierta(usuarioActual);
                 SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-                if (sesionMB.getUsuarioActual() != null) {
+                if (sesionMB.getUsuarioActual() != null) {//Se reutiliza la sesion previa cuando existe en el actual navegador
                     return "main?faces-redirect=true";
-                } else {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "El usuario tiene una sesion activa"));
-                    RequestContext.getCurrentInstance().execute("PF('dlgLogin').hide()");
-                    RequestContext.getCurrentInstance().update("message");
-                    sesionMB.cerrarSession();
-                    return "";
+                } else {//cuando la sesion existe en otro dispositivo o navegador. Se crea una nueva y se cierra la anterior
+                    String path = aplicacionMB.descartarSession(usuarioActual);
+                    if (!path.isEmpty()) {
+                        sesionMB.setUsuarioActual(usuarioActual);
+                        sesionMB.tokenSession();
+                        sesionMB.setAutenticado(true);
+//                        sesionMB.insertarItemSession(usuarioActual);
+                        aplicacionMB.insertarUsuario(usuarioActual);
+                    }
+                    return path;
                 }
             }
 //        System.out.println("creada sesion " + FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));
 
-        } else {
+        } else {//sesion para usuarios con rol distinto a superusuario
             if (idSede == null) {
 //                FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
@@ -123,17 +128,22 @@ public class LoginMB implements Serializable {
                         sesionMB.setUsuarioActual(usuarioActual);
                         sesionMB.tokenSession();
                         sesionMB.setAutenticado(true);
+//                        sesionMB.insertarItemSession(usuarioActual);
                         return "main?faces-redirect=true";
                     } else {
                         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
                         if (sesionMB.getUsuarioActual() != null) {
                             return "main?faces-redirect=true";
                         } else {
-                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "El usuario tiene una sesion activa"));
-                            RequestContext.getCurrentInstance().execute("PF('dlgLogin').hide()");
-                            RequestContext.getCurrentInstance().update("message");
-                            sesionMB.cerrarSession();
-                            return "";
+                            String path = aplicacionMB.descartarSession(usuarioActual);
+                            if (!path.isEmpty()) {
+                                sesionMB.setUsuarioActual(usuarioActual);
+                                sesionMB.tokenSession();
+                                sesionMB.setAutenticado(true);
+//                                sesionMB.insertarItemSession(usuarioActual);
+                                aplicacionMB.insertarUsuario(usuarioActual);
+                            }
+                            return path;
                         }
                     }
 //        System.out.println("creada sesion " + FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));

@@ -25,6 +25,7 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ApplicationScoped;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -36,6 +37,7 @@ public class AplicacionMB implements Serializable {
 
     private List<String> imagenes;//contiene las imagenes que aparecen en el index
     private List<SegUsuario> listaUsuariosActivos;
+    private List<HttpSession> listaSesiones;
 
     private List<CfgDepartamento> listaDepartementos;
     private List<CfgTipodocempresa> listaTipodocempresa;
@@ -65,6 +67,7 @@ public class AplicacionMB implements Serializable {
     @PostConstruct
     private void init() {
         imagenes = new ArrayList();
+        listaSesiones = new ArrayList();
         setListaDepartementos(departamentoFacade.buscarDepartamentosOrdenado());
         setListaTipoIdentificacion(tipoidentificacionFacade.findAll());
         setListaTipodocempresa(tipodocempresaFacade.findAll());
@@ -97,25 +100,35 @@ public class AplicacionMB implements Serializable {
 //        System.out.println("cerro sesion => " + usuario.getUsuario() + " idSession => " + usuario.getRememberToken());
     }
 
-//    public void comprobarSesionAbierta(SegUsuario usuario) {
-//        SegUsuario user = buscarUsuario(usuario);
-//        FacesContext context = FacesContext.getCurrentInstance();
-////        Map<String, Object> applicationMap = context.getExternalContext().getApplicationMap();
-//        ExternalContext extCtx = context.getExternalContext();
-//        Map<String, Object> sessionMap = extCtx.getSessionMap();
-//        Object objetosession = sessionMap.get(user.getRememberToken());
-//    }
-//
-//    private SegUsuario buscarUsuario(SegUsuario usuario) {
-//        SegUsuario user = null;
-//        for (SegUsuario u : listaUsuariosActivos) {
-//            if (u.equals(usuario)) {
-//                user = u;
-//                break;
-//            }
-//        }
-//        return user;
-//    }
+    public String descartarSession(SegUsuario usuario) {
+        SegUsuario user = buscarUsuario(usuario);
+        if (user == null) {
+            return "";
+        }
+        user.getSession().invalidate();
+        return "main?faces-redirect=true";
+    }
+
+    public void insertarHttpSession(HttpSession session) {
+        listaSesiones.add(session);
+//        System.out.println("sesiones activas =>" + listaSesiones.size());
+    }
+
+    public void descartarHttpSession(HttpSession session) {
+        listaSesiones.remove(session);
+//        System.out.println("sesiones activas =>" + listaSesiones.size());
+    }
+
+    private SegUsuario buscarUsuario(SegUsuario usuario) {
+        SegUsuario user = null;
+        for (SegUsuario u : listaUsuariosActivos) {
+            if (u.equals(usuario)) {
+                user = u;
+                break;
+            }
+        }
+        return user;
+    }
 
     public List<String> getImagenes() {
         return imagenes;
@@ -175,6 +188,14 @@ public class AplicacionMB implements Serializable {
 
     public void setListaRoles(List<CfgRol> listaRoles) {
         this.listaRoles = listaRoles;
+    }
+
+    public List<HttpSession> getListaSesiones() {
+        return listaSesiones;
+    }
+
+    public void setListaSesiones(List<HttpSession> listaSesiones) {
+        this.listaSesiones = listaSesiones;
     }
 
 }

@@ -60,7 +60,7 @@
                         <p:row>
                             <p:column>
                                 <p:outputLabel for="nomEmpresa" value="Empresa:" class="labelFormulario"/>
-                                <p:inputText id="nomEmpresa"  size="50" value="#{empresaMB.nombre}" class="campoFormulario"/>
+                                <p:inputText id="nomEmpresa"  size="50" value="#{empresaMB.nombre}" class="campoFormulario upperCase"/>
                                 <p:commandButton icon="ui-icon-image" value="Logo" onclick="PF('dlgLogo').show()" class="campoFormulario"/>
                                 <p:outputLabel id="nombreImagen" value="#{empresaMB.nombreArchivo}" class="labelFormularioInformativa"/>
                             </p:column>
@@ -68,7 +68,7 @@
                         <p:row>
                             <p:column>
                                 <p:outputLabel for="idDireccion" value="Direccion:" class="labelFormulario"/>
-                                <p:inputText id="idDireccion" value="#{empresaMB.direccion}" class="campoFormulario"/>
+                                <p:inputText id="idDireccion" value="#{empresaMB.direccion}" class="campoFormulario upperCase"/>
                                 <p:outputLabel for="idTelefono1" value="Telefono 1:" class="labelFormulario"/>
                                 <p:inputText id="idTelefono1" value="#{empresaMB.telefono1}" class="campoFormulario"/>
                                 <p:outputLabel for="idTelefono2" value="Telefono 2:" class="labelFormulario"/>
@@ -78,9 +78,9 @@
                         <p:row>
                             <p:column>
                                 <p:outputLabel for="idWebsite" class="labelFormulario" value="WebSite:"/>
-                                <p:inputText id="idWebsite" class="campoFormulario" size="40" value="#{empresaMB.website}"/>
+                                <p:inputText id="idWebsite" class="campoFormulario upperCase" size="40" value="#{empresaMB.website}"/>
                                 <p:outputLabel for="idMail" class="labelFormulario" value="Mail:"/>
-                                <p:inputText id="idMail"  class="campoFormulario" size="40" value="#{empresaMB.mail}"/>                                    
+                                <p:inputText id="idMail"  class="campoFormulario upperCase" size="40" value="#{empresaMB.mail}"/>                                    
                             </p:column>                        
                         </p:row>
                         <p:row>

@@ -69,18 +69,18 @@
                     <p:row>
                         <p:column>
                             <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
-                            <p:inputText id="IdPrimerNombre" class="campoFormulario" size="25" value="#{usuarioMB.primerNombre}"/>
+                            <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerNombre}"/>
                             <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
-                            <p:inputText id="IdSegundoNombre" class="campoFormulario" size="25" value="#{usuarioMB.segundoNombre}"/>                        
+                            <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoNombre}"/>                        
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
                             <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
-                            <p:inputText id="IdPrimerApellido" class="campoFormulario" size="25" value="#{usuarioMB.primerApellido}" />
+                            <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerApellido}" />
                             <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
-                            <p:inputText id="IdSegundoApellido" class="campoFormulario" size="25" value="#{usuarioMB.segundoApellido}" />                                                
+                            <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoApellido}" />                                                
                         </p:column>
                     </p:row>
 
@@ -89,7 +89,7 @@
                             <p:outputLabel for="IdComision" class="labelFormulario" value="Comision Venta %:"/>
                             <p:spinner id="IdComision" class="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>
                             <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
-                            <p:inputText id="IdDireccion" class="campoFormulario" size="80" value="#{usuarioMB.direccion}"/>
+                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{usuarioMB.direccion}"/>
                         </p:column>
                     </p:row>
 
@@ -98,7 +98,7 @@
                             <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
                             <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>
                             <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                            <p:inputText id="IdMail" class="campoFormulario" size="50" value="#{usuarioMB.mail}"/>
+                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{usuarioMB.mail}"/>
                             <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
                             <p:calendar id="IdFechaNacimiento" class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{usuarioMB.fechaNacimiento}"/>
                         </p:column>
@@ -107,7 +107,7 @@
                     <p:row>
                         <p:column colspan="2">
                             <p:outputLabel class="labelFormulario" value="Usuario:"/>
-                            <p:inputText class="campoFormulario" value="#{usuarioMB.usuario}">
+                            <p:inputText class="campoFormulario lowerCase" value="#{usuarioMB.usuario}">
                                 <p:ajax event="blur" listener="#{usuarioMB.validarUsuario}" update="@none"/>
                             </p:inputText>
                             <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormulario" value="Contraseña:" style="color: #{usuarioMB.background}"/>

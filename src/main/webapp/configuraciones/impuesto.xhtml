@@ -45,7 +45,7 @@
                                 <p:ajax event="blur" listener="#{impuestoMB.buscarImpuesto}" update="@none"/>
                             </p:inputText>
                             <p:outputLabel class="labelFormulario" value="Impuesto:"/>
-                            <p:inputText class="campoFormulario" value="#{impuestoMB.nombreImpuesto}"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{impuestoMB.nombreImpuesto}"/>
                             <p:outputLabel class="labelFormulario" value="% Impuesto:"/>
                             <p:inputText class="campoFormulario" value="#{impuestoMB.porcentajeImpuesto}"/>
                         </p:column>

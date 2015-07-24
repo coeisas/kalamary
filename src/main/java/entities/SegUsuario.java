@@ -24,6 +24,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -157,6 +159,8 @@ public class SegUsuario implements Serializable {
     private List<CfgProducto> cfgProductoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<FacDocumentosmaster> facDocumentosmasterList;
+    @Transient
+    private HttpSession session;
 
     public SegUsuario() {
     }
@@ -466,6 +470,14 @@ public class SegUsuario implements Serializable {
     @Override
     public String toString() {
         return "entities.SegUsuario[ idUsuario=" + idUsuario + " ]";
+    }
+
+    public HttpSession getSession() {
+        return session;
+    }
+
+    public void setSession(HttpSession session) {
+        this.session = session;
     }
     
 }

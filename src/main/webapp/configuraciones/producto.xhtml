@@ -57,15 +57,15 @@
                             <p:outputLabel class="labelFormulario" value="Codigo Barras:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoBarra}"/>
                             <p:outputLabel class="labelFormulario" value="Color:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.color}"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.color}"/>
                             <p:outputLabel class="labelFormulario" value="Talla:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.talla}"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.talla}"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Producto:"/>
-                            <p:inputText class="campoFormulario" size="100" value="#{productoMB.nombreProducto}"/>
+                            <p:inputText class="campoFormulario upperCase" size="100" value="#{productoMB.nombreProducto}"/>
                             <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen"/>
                         </p:column>
                     </p:row>
@@ -118,7 +118,6 @@
         <p:dialog id="IdModalCategoria" widgetVar="dlgCategoria" header="BUSCAR CATEGORIA" resizable="false" width="500px" modal="true">
             <h:form id="FormModalCategoria">
                 <p:dataTable value="#{productoMB.listaCategoria}" var="categoria" emptyMessage="No hay categorias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.categoriaSeleccionada}" rowKey="#{categoria.idCategoria}" selectionMode="single">
-                    <p:column headerText="Empresa">#{categoria.cfgempresaidEmpresa.nomEmpresa}</p:column>
                     <p:column headerText="Codigo">#{categoria.codigoCategoria}</p:column>
                     <p:column headerText="Categoria">#{categoria.nombreCategoria}</p:column>
                 </p:dataTable>
@@ -129,8 +128,7 @@
         <p:dialog id="IdModalReferencia" widgetVar="dlgReferencia" header="BUSCAR REFERENCIA" resizable="false" width="700px" modal="true">
             <h:form id="FormModalReferencia">
                 <p:dataTable value="#{productoMB.listaReferencia}" var="referencia" emptyMessage="No hay referencias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.referenciaSeleccionada}" rowKey="#{referencia.idReferencia}" selectionMode="single">
-                    <p:column headerText="Empresa">#{referencia.cfgempresaidEmpresa.nomEmpresa}</p:column>
-                    <p:column headerText="Categoria">#{referencia.cfgcategoriaproductoidCategoria.nombreCategoria}</p:column>
+                    <p:column headerText="Codigo">#{referencia.codigoReferencia}</p:column>
                     <p:column headerText="Referencia">#{referencia.nombreReferencia}</p:column>
                 </p:dataTable>
                 <p:separator/>
@@ -140,9 +138,7 @@
         <p:dialog id="IdModalMarca" widgetVar="dlgMarca" header="BUSCAR MARCA" resizable="false" width="700px" modal="true">
             <h:form id="FormModalMarca">
                 <p:dataTable value="#{productoMB.listaMarca}" var="marca" emptyMessage="No hay marcas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.marcaSeleccionada}" rowKey="#{marca.idMarca}" selectionMode="single">
-                    <p:column headerText="Empresa">#{marca.cfgempresaidEmpresa.nomEmpresa}</p:column>
-                    <p:column headerText="Categoria">#{marca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria.nombreCategoria}</p:column>
-                    <p:column headerText="Referencia">#{marca.cfgreferenciaproductoidReferencia.nombreReferencia}</p:column>
+                    <p:column headerText="Codigo">#{marca.codigoMarca}</p:column>
                     <p:column headerText="Marca">#{marca.nombreMarca}</p:column>
                 </p:dataTable>
                 <p:separator/>

@@ -17,7 +17,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.ejb.EJB;
 import java.util.List;
-import java.util.ArrayList;
 import org.primefaces.context.RequestContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
@@ -132,6 +131,7 @@ public class DocumentoMB implements Serializable {
         if (sedeSeleccionada != null) {
             setCodigoSede(sedeSeleccionada.getCodSede());
             setNombreSede(sedeSeleccionada.getNomSede());
+            buscarDocumento();
         } else {
             setCodigoSede(null);
             setNombreSede(null);
@@ -176,8 +176,6 @@ public class DocumentoMB implements Serializable {
             setNumActual(documentoSeleccionado.getActDocumento());
             setResDian(documentoSeleccionado.getResDian());
             setObservacion(documentoSeleccionado.getObsDocumento());
-        } else {
-            limpiarInformacionDocumento();
         }
         RequestContext.getCurrentInstance().update("IdFormDocumento");
     }
