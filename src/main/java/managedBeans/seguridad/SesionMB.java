@@ -15,6 +15,7 @@ import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -61,20 +62,22 @@ public class SesionMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormMain"); 
     }
 
-    public String cerrarSesion() {
+    public void cerrarSesion() throws IOException {
         ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
-//        String contextPath = ((ServletContext) context.getContext()).getContextPath();
+        String contextPath = ((ServletContext) econtext.getContext()).getContextPath();
         setAutenticado(false);
         econtext.invalidateSession();
-//        context.redirect(contextPath  + "/index.xhtml");        
-        return "index?faces-redirect=true";
+        econtext.redirect(contextPath  + "/");        
+//        return "index?faces-redirect=true";
+//        return "index";
     }
 
     public void controlSesion() throws IOException {
         if (!isAutenticado()) {
 
-            ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-            context.redirect("index.xhtml");
+            ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
+            String contextPath = ((ServletContext) econtext.getContext()).getContextPath();
+            econtext.redirect(contextPath  + "/");
 
         }
     }

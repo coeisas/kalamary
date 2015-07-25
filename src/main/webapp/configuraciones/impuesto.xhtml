@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-    <h:head>
-        <title>Facelet Title</title>
-        <h:outputStylesheet library="css" name="styles.css"/>
-    </h:head>
-    <h:body>
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../templates/layout.xhtml">
+    <ui:define name="title">Impuesto</ui:define>
+    <ui:define name="content">        
         <p:growl autoUpdate="true" showDetail="true" />
         <div style="text-align: center">
             <h:form id="IdFormImpuesto">
@@ -98,7 +98,7 @@
                 <p:separator/>
                 <p:commandButton value="Aceptar" actionListener="#{impuestoMB.cargarInformacionSede}" onclick="PF('dlgSede').hide()"/>
             </h:form>
-        </p:dialog>   
-    </h:body>
-</html>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
 
