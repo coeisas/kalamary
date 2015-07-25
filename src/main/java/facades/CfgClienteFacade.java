@@ -6,10 +6,12 @@
 package facades;
 
 import entities.CfgCliente;
+import entities.CfgEmpresa;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.List;
 
 /**
  *
@@ -41,4 +43,13 @@ public class CfgClienteFacade extends AbstractFacade<CfgCliente> {
         }
     }
 
+    public List<CfgCliente> buscarPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

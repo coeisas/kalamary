@@ -32,7 +32,7 @@
                             <p:inputText id="idCodigoCliente" class="campoFormulario" value="#{clienteMB.codigoCliente}">
                                 <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarUsuarios}"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
                             <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
                             <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario">
                                 <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       

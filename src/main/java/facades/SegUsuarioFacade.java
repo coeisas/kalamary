@@ -5,6 +5,8 @@
  */
 package facades;
 
+import entities.CfgEmpresa;
+import java.util.List;
 import entities.SegUsuario;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -74,5 +76,15 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
         }catch(Exception e){
             return null;
         }
+    }
+    
+    public List<SegUsuario> buscarPorEmpresa(CfgEmpresa empresa){
+        try{
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresasedeidSede.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        }catch(Exception e){
+            return null;
+        }        
     }
 }

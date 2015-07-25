@@ -280,9 +280,13 @@ public class UsuarioMB implements Serializable {
     }
 
     public void cargarUsuarios() {
-        listaUsuarios = usuarioFacade.findAll();
-        RequestContext.getCurrentInstance().update("FormBuscarUsuario");
-        RequestContext.getCurrentInstance().execute("PF('dlgUsuario').show()");
+        if (empresaSeleccionada != null) {
+            listaUsuarios = usuarioFacade.buscarPorEmpresa(empresaSeleccionada);
+            RequestContext.getCurrentInstance().update("FormBuscarUsuario");
+            RequestContext.getCurrentInstance().execute("PF('dlgUsuario').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
+        }
     }
 
     public void cargarInformacionUsuario() {
@@ -340,8 +344,8 @@ public class UsuarioMB implements Serializable {
     private Float determinarValor(Float valor) {
         return valor == null ? 0 : valor;
     }
-    
-     private Integer determinarValor(Integer valor) {
+
+    private Integer determinarValor(Integer valor) {
         return valor == null ? 0 : valor;
     }
 

@@ -92,13 +92,18 @@ public class ClienteMB implements Serializable {
     private void init() {
         opcion = "creacion";
         listaMunicipios = new ArrayList();
+        listaClientes = new ArrayList();
 
     }
 
-    public void cargarUsuarios() {
-        setListaClientes(clienteFacade.findAll());
-        RequestContext.getCurrentInstance().update("FormBuscarCliente");
-        RequestContext.getCurrentInstance().execute("PF('dlgCliente').show()");
+    public void cargarClientes() {
+        if (empresaSeleccionada != null) {
+            listaClientes = clienteFacade.buscarPorEmpresa(empresaSeleccionada);
+            RequestContext.getCurrentInstance().update("FormBuscarCliente");
+            RequestContext.getCurrentInstance().execute("PF('dlgCliente').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
+        }
     }
 
     public void cargarInformacionCliente() {
@@ -196,7 +201,7 @@ public class ClienteMB implements Serializable {
         if (getEmpresaSeleccionada() != null) {
             setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
             setNombreEmpresa(empresaSeleccionada.getNomEmpresa());
-            if(codigoCliente != null){
+            if (codigoCliente != null) {
                 buscarCliente();
             }
         } else {
@@ -334,9 +339,9 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de identificacion"));
             return false;
         }
-        if(numIdentificacion.isEmpty()){
+        if (numIdentificacion.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Numero identificacion requerido"));
-            return false;            
+            return false;
         }
         if (primerNombre.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Primer Nombre necesario"));

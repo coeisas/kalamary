@@ -11,7 +11,14 @@
     <ui:define name="content">        
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormUsuario">
-            <p:commandButton value="Cargar Usuario" icon="ui-icon-person" actionListener="#{usuarioMB.cargarUsuarios}"/>
+            <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
+            <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{usuarioMB.codEmpresa}">
+                <p:ajax event="blur" listener="#{usuarioMB.buscarEmpresa}" update="@none"/>
+            </p:inputText>
+            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
+            <p:outputLabel id="LabelNombreEmpresa" class="labelFormularioInformativa" value="#{usuarioMB.nomEmpresa}"/>
+            <br style="clear: left"/>            
+            <p:commandButton style=" margin-top: .5em;" value="Cargar Usuario" icon="ui-icon-person" actionListener="#{usuarioMB.cargarUsuarios}"/>
             <p:separator/>
             <div style="text-align: center">
                 <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
@@ -21,14 +28,9 @@
                     </f:facet>
 
                     <p:row>
-                        <p:column>
-                            <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
-                            <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{usuarioMB.codEmpresa}">
-                                <p:ajax event="blur" listener="#{usuarioMB.buscarEmpresa}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
-                            <p:outputLabel id="LabelNombreEmpresa" class="labelFormularioInformativa" value="#{usuarioMB.nomEmpresa}"/>
-                        </p:column>
+                        <!--p:column>
+
+                        </p:column-->
                         <p:column rowspan="5">
                             <div style="text-align: center">
                                 <p:panel rendered="#{usuarioMB.usuarioSeleccionado != null}">
