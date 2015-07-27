@@ -44,8 +44,11 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgKitproductomaestro.findByCosto", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.costo = :costo"),
     @NamedQuery(name = "CfgKitproductomaestro.findByUtilidad", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.utilidad = :utilidad"),
     @NamedQuery(name = "CfgKitproductomaestro.findByActivo", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.activo = :activo"),
-    @NamedQuery(name = "CfgKitproductomaestro.findByFecCrea", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.fecCrea = :fecCrea")})
+    @NamedQuery(name = "CfgKitproductomaestro.findByFecCrea", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.fecCrea = :fecCrea"),
+    @NamedQuery(name = "CfgKitproductomaestro.findByCodKit", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.codKit = :codKit"),
+    @NamedQuery(name = "CfgKitproductomaestro.findByPrecio", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.precio = :precio")})
 public class CfgKitproductomaestro implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +66,7 @@ public class CfgKitproductomaestro implements Serializable {
     private int idUnidad;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "costo", nullable = false)
+    @Column(name = "costo")
     private float costo;
     @Basic(optional = false)
     @NotNull
@@ -81,6 +84,11 @@ public class CfgKitproductomaestro implements Serializable {
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
+    @Basic(optional = false)
+    @Column(name = "codKit", nullable = false, length = 10)
+    private String codKit;
+    @Column(name = "precio")
+    private float precio;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgKitproductomaestro")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -172,7 +180,23 @@ public class CfgKitproductomaestro implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
+    
+    public String getCodKit() {
+        return codKit;
+    }
 
+    public void setCodKit(String codKit) {
+        this.codKit = codKit;
+    }
+
+    public float getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(float precio) {
+        this.precio = precio;
+    }
+    
     @XmlTransient
     public List<CfgKitproductodetalle> getCfgKitproductodetalleList() {
         return cfgKitproductodetalleList;
@@ -231,5 +255,5 @@ public class CfgKitproductomaestro implements Serializable {
     public String toString() {
         return "entities.CfgKitproductomaestro[ idKit=" + idKit + " ]";
     }
-    
+
 }
