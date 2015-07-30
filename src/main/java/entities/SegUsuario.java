@@ -51,12 +51,12 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "SegUsuario.findByDirUsuario", query = "SELECT s FROM SegUsuario s WHERE s.dirUsuario = :dirUsuario"),
     @NamedQuery(name = "SegUsuario.findByTel1", query = "SELECT s FROM SegUsuario s WHERE s.tel1 = :tel1"),
     @NamedQuery(name = "SegUsuario.findByMail", query = "SELECT s FROM SegUsuario s WHERE s.mail = :mail"),
-    @NamedQuery(name = "SegUsuario.findByIdCaja", query = "SELECT s FROM SegUsuario s WHERE s.idCaja = :idCaja"),
     @NamedQuery(name = "SegUsuario.findByActivo", query = "SELECT s FROM SegUsuario s WHERE s.activo = :activo"),
     @NamedQuery(name = "SegUsuario.findByFecCrea", query = "SELECT s FROM SegUsuario s WHERE s.fecCrea = :fecCrea"),
     @NamedQuery(name = "SegUsuario.findByUsrCrea", query = "SELECT s FROM SegUsuario s WHERE s.usrCrea = :usrCrea"),
     @NamedQuery(name = "SegUsuario.findByFecNacimiento", query = "SELECT s FROM SegUsuario s WHERE s.fecNacimiento = :fecNacimiento")})
 public class SegUsuario implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -114,8 +114,6 @@ public class SegUsuario implements Serializable {
     @Lob
     @Column(name = "foto")
     private byte[] foto;
-    @Column(name = "idCaja")
-    private Integer idCaja;
     @Basic(optional = false)
     @NotNull
     @Column(name = "activo", nullable = false)
@@ -127,13 +125,9 @@ public class SegUsuario implements Serializable {
     private Date fecCrea;
     @Column(name = "usrCrea")
     private Integer usrCrea;
-    @Lob
-    @Size(max = 65535)
-    @Column(name = "remember_token", length = 65535)
-    private String rememberToken;
     @Column(name = "fecNacimiento")
     @Temporal(TemporalType.DATE)
-    private Date fecNacimiento;    
+    private Date fecNacimiento;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<CfgCliente> cfgClienteList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
@@ -147,8 +141,15 @@ public class SegUsuario implements Serializable {
     @JoinColumn(name = "cfg_tipoidentificacion_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private CfgTipoidentificacion cfgTipoidentificacionId;
+    @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja")
+    @ManyToOne
+    private FacCaja faccajaidCaja;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<CfgImpuesto> cfgImpuestoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
+    private List<FacMovcaja> facMovcajaList;//usuario que abren caja
+    @OneToMany(mappedBy = "segusuarioidUsuario1")
+    private List<FacMovcaja> facMovcajaList1;//usuario que cierran caja    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<CfgDocumento> cfgDocumentoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
@@ -198,7 +199,7 @@ public class SegUsuario implements Serializable {
         }
         return strNombre;
     }
-    
+
     public Integer getIdUsuario() {
         return idUsuario;
     }
@@ -303,14 +304,6 @@ public class SegUsuario implements Serializable {
         this.foto = foto;
     }
 
-    public Integer getIdCaja() {
-        return idCaja;
-    }
-
-    public void setIdCaja(Integer idCaja) {
-        this.idCaja = idCaja;
-    }
-
     public boolean getActivo() {
         return activo;
     }
@@ -335,21 +328,13 @@ public class SegUsuario implements Serializable {
         this.usrCrea = usrCrea;
     }
 
-    public String getRememberToken() {
-        return rememberToken;
-    }
-
-    public void setRememberToken(String rememberToken) {
-        this.rememberToken = rememberToken;
-    }
-    
     public Date getFecNacimiento() {
         return fecNacimiento;
     }
 
     public void setFecNacimiento(Date fecNacimiento) {
         this.fecNacimiento = fecNacimiento;
-    }    
+    }
 
     @XmlTransient
     public List<CfgCliente> getCfgClienteList() {
@@ -393,6 +378,14 @@ public class SegUsuario implements Serializable {
         this.cfgTipoidentificacionId = cfgTipoidentificacionId;
     }
 
+    public FacCaja getFaccajaidCaja() {
+        return faccajaidCaja;
+    }
+
+    public void setFaccajaidCaja(FacCaja faccajaidCaja) {
+        this.faccajaidCaja = faccajaidCaja;
+    }
+
     @XmlTransient
     public List<CfgImpuesto> getCfgImpuestoList() {
         return cfgImpuestoList;
@@ -400,6 +393,24 @@ public class SegUsuario implements Serializable {
 
     public void setCfgImpuestoList(List<CfgImpuesto> cfgImpuestoList) {
         this.cfgImpuestoList = cfgImpuestoList;
+    }
+
+    @XmlTransient
+    public List<FacMovcaja> getFacMovcajaList() {
+        return facMovcajaList;
+    }
+
+    public void setFacMovcajaList(List<FacMovcaja> facMovcajaList) {
+        this.facMovcajaList = facMovcajaList;
+    }
+
+    @XmlTransient
+    public List<FacMovcaja> getFacMovcajaList1() {
+        return facMovcajaList1;
+    }
+
+    public void setFacMovcajaList1(List<FacMovcaja> facMovcajaList1) {
+        this.facMovcajaList1 = facMovcajaList1;
     }
 
     @XmlTransient
@@ -479,5 +490,5 @@ public class SegUsuario implements Serializable {
     public void setSession(HttpSession session) {
         this.session = session;
     }
-    
+
 }

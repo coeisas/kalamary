@@ -74,30 +74,44 @@
                             <p:outputLabel class="labelFormulario" value="Stock Min:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.stockMin}"/>
                             <p:outputLabel class="labelFormulario" value="Costo Adq:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.costoAdq}"/>
+                            <p:inputText class="campoFormulario" value="#{productoMB.costoAdq}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
                             <p:outputLabel class="labelFormulario" value="IVA %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.iva}"/>
+                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.iva}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
                             <p:outputLabel class="labelFormulario" value="FLETE %:"/>
-                            <p:inputText class="campoFormulario" size="3"  value="#{productoMB.flete}"/>
+                            <p:inputText class="campoFormulario" size="3"  value="#{productoMB.flete}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
                             <p:outputLabel class="labelFormulario" value="Costos IND %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.costoInd}"/>                           
+                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.costoInd}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Costo Final:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.costoFinal}"/>
+                            <p:outputLabel id="IdCostoFinal" class="labelFormularioInformativa" value="#{productoMB.stringCostoFinal}">
+                                <!--f:convertNumber maxIntegerDigits="10"/-->
+                            </p:outputLabel>
                             <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}"/>
+                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.precio}"/>
+                            <p:outputLabel id="IdPrecio" class="labelFormularioInformativa" value="#{productoMB.stringPrecio}">
+                                <!--f:convertNumber  maxIntegerDigits="10"/-->
+                            </p:outputLabel>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column style="text-align: center">
-                            <p:commandButton icon="ui-icon-disk" value="Guardar"/>
+                            <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{productoMB.determinarAccion}"/>
                             &nbsp;
                             <p:commandButton icon="ui-icon-cancel" value="Cancelar"/>
                         </p:column>

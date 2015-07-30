@@ -59,13 +59,16 @@ public class FacMovcajadetalle implements Serializable {
     @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false)
     @ManyToOne(optional = false)
     private CfgDocumento cfgdocumentoidDoc;
-    @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja", nullable = false)
+    @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false)
     @ManyToOne(optional = false)
-    private FacCaja faccajaidCaja;
+    private CfgFormapago cfgformapagoidFormaPago;   
     @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false)
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmasterIddocumentomaster;
-
+    @JoinColumn(name = "fac_movcaja_idMovimiento", referencedColumnName = "idMovimiento", nullable = false)
+    @ManyToOne(optional = false)
+    private FacMovcaja facmovcajaidMovimiento;
+    
     public FacMovcajadetalle() {
     }
 
@@ -119,13 +122,13 @@ public class FacMovcajadetalle implements Serializable {
     public void setCfgdocumentoidDoc(CfgDocumento cfgdocumentoidDoc) {
         this.cfgdocumentoidDoc = cfgdocumentoidDoc;
     }
-
-    public FacCaja getFaccajaidCaja() {
-        return faccajaidCaja;
+    
+    public CfgFormapago getCfgformapagoidFormaPago() {
+        return cfgformapagoidFormaPago;
     }
 
-    public void setFaccajaidCaja(FacCaja faccajaidCaja) {
-        this.faccajaidCaja = faccajaidCaja;
+    public void setCfgformapagoidFormaPago(CfgFormapago cfgformapagoidFormaPago) {
+        this.cfgformapagoidFormaPago = cfgformapagoidFormaPago;
     }
 
     public FacDocumentosmaster getFacDocumentosmasterIddocumentomaster() {
@@ -136,6 +139,14 @@ public class FacMovcajadetalle implements Serializable {
         this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
     }
 
+    public FacMovcaja getFacmovcajaidMovimiento() {
+        return facmovcajaidMovimiento;
+    }
+
+    public void setFacmovcajaidMovimiento(FacMovcaja facmovcajaidMovimiento) {
+        this.facmovcajaidMovimiento = facmovcajaidMovimiento;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

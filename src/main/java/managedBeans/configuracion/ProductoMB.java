@@ -22,6 +22,7 @@ import org.primefaces.context.RequestContext;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
+import java.text.DecimalFormat;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -56,6 +57,8 @@ public class ProductoMB implements Serializable {
     private boolean activo;
 
     private String nombreEmpresa;
+    private String stringCostoFinal;
+    private String stringPrecio;
 
     private List<CfgCategoriaproducto> listaCategoria;
     private List<CfgReferenciaproducto> listaReferencia;
@@ -89,6 +92,10 @@ public class ProductoMB implements Serializable {
 
     @PostConstruct
     private void init() {
+        precio = 0;
+        stringPrecio = formatearFloat(precio);
+        costoFinal = 0;
+        stringCostoFinal = formatearFloat(costoFinal);
         listaCategoria = new ArrayList();
         listaReferencia = new ArrayList();
         listaMarca = new ArrayList();
@@ -97,6 +104,7 @@ public class ProductoMB implements Serializable {
         listFormsModal.add("FormModalReferencia");
         listFormsModal.add("FormModalMarca");
         listFormsModal.add("FormModalProducto");
+        activo = true;
     }
 
     public void buscarEmpresa() {
@@ -218,7 +226,7 @@ public class ProductoMB implements Serializable {
 
     public void cargarProductos() {
         listaProducto = new LazyProductosModel(empresaSeleccionada, marcaSeleccionada, referenciaSeleccionada, categoriaSeleccionada, productoFacade);
-        if (empresaSeleccionada != null) {                        
+        if (empresaSeleccionada != null) {
             RequestContext.getCurrentInstance().update("FormModalProducto");
             RequestContext.getCurrentInstance().execute("PF('dlgProducto').show()");
         } else {
@@ -239,9 +247,9 @@ public class ProductoMB implements Serializable {
                 productoSeleccionado = productoFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, codigoProducto.trim());
             }
             cargarInformacionProducto();
-            if (productoSeleccionado == null && !codigoProducto.trim().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro el producto"));
-            }
+//            if (productoSeleccionado == null && !codigoProducto.trim().isEmpty()) {
+//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro el producto"));
+//            }
         } else {
             productoSeleccionado = null;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la empresa"));
@@ -266,10 +274,12 @@ public class ProductoMB implements Serializable {
             setCostoAdq(determinarValor(productoSeleccionado.getCostoAdquisicion()));
             setIva(determinarValor(productoSeleccionado.getIva()));
             setFlete(determinarValor(productoSeleccionado.getFlete()));
-            setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));
-            setCostoFinal(determinarValor(productoSeleccionado.getCosto()));
+            setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));            
+            costoFinal = productoSeleccionado.getCosto();
+            setStringCostoFinal(formatearFloat(costoFinal));
             setUtilidad(determinarValor(productoSeleccionado.getUtilidad()));
-            setPrecio(determinarValor(productoSeleccionado.getPrecio()));
+            precio = productoSeleccionado.getPrecio();
+            setStringPrecio(formatearFloat(precio));
             setActivo(productoSeleccionado.getActivo());
 
         } else {
@@ -282,17 +292,144 @@ public class ProductoMB implements Serializable {
             setIva(0);
             setFlete(0);
             setCostoInd(0);
-            setCostoFinal(0);
+            costoFinal = 0;
+            setStringCostoFinal(formatearFloat(costoFinal));
             setUtilidad(0);
-            setPrecio(0);
+            precio = 0;
+            setStringPrecio(formatearFloat(precio));
             setActivo(false);
         }
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
     }
-    
+
+    public void determinarAccion() {
+        if (productoSeleccionado != null) {
+            editarProducto();
+        } else {
+            crearProducto();
+        }
+    }
+
+    private void editarProducto() {
+        if (!validacion()) {
+            return;
+        }
+        try {
+            productoSeleccionado.setCfgmarcaproductoidMarca(marcaSeleccionada);
+            productoSeleccionado.setNomProducto(nombreProducto);
+            productoSeleccionado.setStockMin(stockMin);
+            productoSeleccionado.setCostoAdquisicion(costoAdq);
+            productoSeleccionado.setIva(iva);
+            productoSeleccionado.setFlete(flete);
+            productoSeleccionado.setCostoIndirecto(costoInd);
+            productoSeleccionado.setCosto(costoFinal);
+            productoSeleccionado.setUtilidad(utilidad);
+            productoSeleccionado.setPrecio(precio);
+            productoFacade.edit(productoSeleccionado);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto modificado"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no Modificado"));
+        }
+
+    }
+
+    public void determinarCostoFinalAndPrecio() {
+        costoFinal = 0;
+        precio = 0;
+        if (validarValores()) {
+            costoFinal = costoAdq + (costoAdq * (iva / 100));
+            costoFinal = costoFinal + (costoFinal * (flete / 100));
+            costoFinal = costoFinal + (costoFinal * (costoInd / 100));
+            precio = costoFinal + (costoFinal * (utilidad / 100));
+        }
+        stringCostoFinal = formatearFloat(costoFinal);
+        stringPrecio = formatearFloat(precio);
+        RequestContext.getCurrentInstance().update("IdFormProducto:IdCostoFinal");
+        RequestContext.getCurrentInstance().update("IdFormProducto:IdPrecio");
+    }
+
+    private String formatearFloat(float valor) {
+        DecimalFormat df = new DecimalFormat("##########.##");
+        return df.format(valor);
+    }
+
+    private void crearProducto() {
+        if (!validacion()) {
+            return;
+        }
+        try {
+            CfgProducto producto = new CfgProducto();
+            producto.setCfgmarcaproductoidMarca(marcaSeleccionada);
+            producto.setNomProducto(nombreProducto);
+            producto.setStockMin(stockMin);
+            producto.setCostoAdquisicion(costoAdq);
+            producto.setIva(iva);
+            producto.setFlete(flete);
+            producto.setCostoIndirecto(costoInd);
+            producto.setCosto(costoFinal);
+            producto.setUtilidad(utilidad);
+            producto.setPrecio(precio);
+            productoFacade.create(producto);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
+        }
+    }
+
+    private boolean validacion() {
+        if (empresaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la empresa"));
+            return false;
+        }
+        if (marcaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la marca del producto"));
+            return false;
+        }
+        if (codigoProducto == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de producto necesario"));
+            return false;
+        }
+        if (nombreProducto == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Nombre producto obligatorio"));
+            return false;
+        }
+        boolean ban = validarValores();
+        return ban;
+    }
+
+    private boolean validarValores() {
+        boolean ban = true;
+        if (stockMin < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Stock Min no valido"));
+            return false;
+
+        }
+        if (costoAdq < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Costo de adquisicion no valido"));
+            return false;
+        }
+        if (iva < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "%IVA no valido"));
+            return false;
+        }
+        if (flete < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "%flete no valido"));
+            return false;
+        }
+        if (costoInd < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "%Costo Ind no valido"));
+            return false;
+        }
+        if (utilidad < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "%utilidad incorrecto"));
+            return false;
+        }
+        return ban;
+    }
+
     private Float determinarValor(Float valor) {
-        return valor == null ?  0 : valor;
+        return valor == null ? 0 : valor;
     }
 
     public String getCodigoEmpresa() {
@@ -399,14 +536,13 @@ public class ProductoMB implements Serializable {
         this.costoInd = costoInd;
     }
 
-    public float getCostoFinal() {
-        return costoFinal;
-    }
-
-    public void setCostoFinal(float costoFinal) {
-        this.costoFinal = costoFinal;
-    }
-
+//    public float getCostoFinal() {
+//        return costoFinal;
+//    }
+//
+//    public void setCostoFinal(float costoFinal) {
+//        this.costoFinal = costoFinal;
+//    }
     public float getUtilidad() {
         return utilidad;
     }
@@ -415,14 +551,13 @@ public class ProductoMB implements Serializable {
         this.utilidad = utilidad;
     }
 
-    public float getPrecio() {
-        return precio;
-    }
-
-    public void setPrecio(float precio) {
-        this.precio = precio;
-    }
-
+//    public float getPrecio() {
+//        return precio;
+//    }
+//
+//    public void setPrecio(float precio) {
+//        this.precio = precio;
+//    }
     public boolean isActivo() {
         return activo;
     }
@@ -517,6 +652,22 @@ public class ProductoMB implements Serializable {
 
     public void setListaProducto(LazyDataModel<CfgProducto> listaProducto) {
         this.listaProducto = listaProducto;
+    }
+
+    public String getStringCostoFinal() {
+        return stringCostoFinal;
+    }
+
+    public void setStringCostoFinal(String stringCostoFinal) {
+        this.stringCostoFinal = stringCostoFinal;
+    }
+
+    public String getStringPrecio() {
+        return stringPrecio;
+    }
+
+    public void setStringPrecio(String stringPrecio) {
+        this.stringPrecio = stringPrecio;
     }
 
 }

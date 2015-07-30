@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
 import javax.ejb.Stateless;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +29,16 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
 
     public FacMovcajadetalleFacade() {
         super(FacMovcajadetalle.class);
+    }
+    
+    public List<FacMovcajadetalle> buscarMovDetallePorMovCaja(FacMovcaja movcaja){
+        try {
+            Query query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facmovcajaidMovimiento = ?1");
+            query.setParameter(1, movcaja);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
 }

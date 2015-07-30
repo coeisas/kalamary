@@ -7,7 +7,9 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,11 +19,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -33,14 +37,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "FacMovcaja.findAll", query = "SELECT f FROM FacMovcaja f"),
     @NamedQuery(name = "FacMovcaja.findByIdMovimiento", query = "SELECT f FROM FacMovcaja f WHERE f.idMovimiento = :idMovimiento"),
-    @NamedQuery(name = "FacMovcaja.findByIdusuario", query = "SELECT f FROM FacMovcaja f WHERE f.idusuario = :idusuario"),
     @NamedQuery(name = "FacMovcaja.findByBase", query = "SELECT f FROM FacMovcaja f WHERE f.base = :base"),
     @NamedQuery(name = "FacMovcaja.findByTrm", query = "SELECT f FROM FacMovcaja f WHERE f.trm = :trm"),
     @NamedQuery(name = "FacMovcaja.findByFecApertura", query = "SELECT f FROM FacMovcaja f WHERE f.fecApertura = :fecApertura"),
     @NamedQuery(name = "FacMovcaja.findByFecCierre", query = "SELECT f FROM FacMovcaja f WHERE f.fecCierre = :fecCierre"),
     @NamedQuery(name = "FacMovcaja.findByValorCierre", query = "SELECT f FROM FacMovcaja f WHERE f.valorCierre = :valorCierre"),
     @NamedQuery(name = "FacMovcaja.findByFeccrea", query = "SELECT f FROM FacMovcaja f WHERE f.feccrea = :feccrea"),
-    @NamedQuery(name = "FacMovcaja.findByUsrcrea", query = "SELECT f FROM FacMovcaja f WHERE f.usrcrea = :usrcrea")})
+    @NamedQuery(name = "FacMovcaja.findByAbierta", query = "SELECT f FROM FacMovcaja f WHERE f.abierta = :abierta")})
 public class FacMovcaja implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,16 +53,11 @@ public class FacMovcaja implements Serializable {
     private Integer idMovimiento;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "idusuario", nullable = false)
-    private int idusuario;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "base", nullable = false)
     private float base;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "trm", nullable = false)
-    private int trm;
+    private float trm;
     @Basic(optional = false)
     @NotNull
     @Column(name = "fecApertura", nullable = false)
@@ -72,17 +70,24 @@ public class FacMovcaja implements Serializable {
     @Column(name = "valorCierre", precision = 12)
     private Float valorCierre;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "feccrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date feccrea;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "usrcrea", nullable = false)
-    private int usrcrea;
+    @Column(name = "abierta", nullable = false)
+    private boolean abierta;    
     @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja", nullable = false)
     @ManyToOne(optional = false)
     private FacCaja faccajaidCaja;
+    @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
+    @ManyToOne(optional = false)
+    private SegUsuario segusuarioidUsuario;
+    @JoinColumn(name = "seg_usuario_idUsuario1", referencedColumnName = "idUsuario")
+    @ManyToOne
+    private SegUsuario segusuarioidUsuario1;    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facmovcajaidMovimiento")
+    private List<FacMovcajadetalle> facMovcajadetalleList;
+    
 
     public FacMovcaja() {
     }
@@ -91,14 +96,13 @@ public class FacMovcaja implements Serializable {
         this.idMovimiento = idMovimiento;
     }
 
-    public FacMovcaja(Integer idMovimiento, int idusuario, float base, int trm, Date fecApertura, Date feccrea, int usrcrea) {
+    public FacMovcaja(Integer idMovimiento, int idusuario, float base, float trm, Date fecApertura, Date feccrea, boolean abierta) {
         this.idMovimiento = idMovimiento;
-        this.idusuario = idusuario;
         this.base = base;
         this.trm = trm;
         this.fecApertura = fecApertura;
         this.feccrea = feccrea;
-        this.usrcrea = usrcrea;
+        this.abierta = abierta;
     }
 
     public Integer getIdMovimiento() {
@@ -109,14 +113,6 @@ public class FacMovcaja implements Serializable {
         this.idMovimiento = idMovimiento;
     }
 
-    public int getIdusuario() {
-        return idusuario;
-    }
-
-    public void setIdusuario(int idusuario) {
-        this.idusuario = idusuario;
-    }
-
     public float getBase() {
         return base;
     }
@@ -125,11 +121,11 @@ public class FacMovcaja implements Serializable {
         this.base = base;
     }
 
-    public int getTrm() {
+    public float getTrm() {
         return trm;
     }
 
-    public void setTrm(int trm) {
+    public void setTrm(float trm) {
         this.trm = trm;
     }
 
@@ -165,14 +161,14 @@ public class FacMovcaja implements Serializable {
         this.feccrea = feccrea;
     }
 
-    public int getUsrcrea() {
-        return usrcrea;
+    public boolean getAbierta() {
+        return abierta;
     }
 
-    public void setUsrcrea(int usrcrea) {
-        this.usrcrea = usrcrea;
+    public void setAbierta(boolean abierta) {
+        this.abierta = abierta;
     }
-
+    
     public FacCaja getFaccajaidCaja() {
         return faccajaidCaja;
     }
@@ -181,6 +177,32 @@ public class FacMovcaja implements Serializable {
         this.faccajaidCaja = faccajaidCaja;
     }
 
+
+    public SegUsuario getSegusuarioidUsuario() {
+        return segusuarioidUsuario;
+    }
+
+    public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
+        this.segusuarioidUsuario = segusuarioidUsuario;
+    }
+
+    public SegUsuario getSegusuarioidUsuario1() {
+        return segusuarioidUsuario1;
+    }
+
+    public void setSegusuarioidUsuario1(SegUsuario segusuarioidUsuario1) {
+        this.segusuarioidUsuario1 = segusuarioidUsuario1;
+    }
+    
+    @XmlTransient
+    public List<FacMovcajadetalle> getFacMovcajadetalleList() {
+        return facMovcajadetalleList;
+    }
+
+    public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
+        this.facMovcajadetalleList = facMovcajadetalleList;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

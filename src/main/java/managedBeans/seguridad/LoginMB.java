@@ -87,12 +87,12 @@ public class LoginMB implements Serializable {
                 sesionMB.tokenSession();
                 sesionMB.setAutenticado(true);
 //                sesionMB.insertarItemSession(usuarioActual);
-                return "main?faces-redirect=true";
+                return "procesos/main?faces-redirect=true";
             } else {//el usuario ya posee una sesion activa
 //                aplicacionMB.comprobarSesionAbierta(usuarioActual);
                 SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
                 if (sesionMB.getUsuarioActual() != null) {//Se reutiliza la sesion previa cuando existe en el actual navegador
-                    return "main?faces-redirect=true";
+                    return "procesos/main?faces-redirect=true";
                 } else {//cuando la sesion existe en otro dispositivo o navegador. Se crea una nueva y se cierra la anterior
                     String path = aplicacionMB.descartarSession(usuarioActual);
                     if (!path.isEmpty()) {
@@ -129,11 +129,11 @@ public class LoginMB implements Serializable {
                         sesionMB.tokenSession();
                         sesionMB.setAutenticado(true);
 //                        sesionMB.insertarItemSession(usuarioActual);
-                        return "main?faces-redirect=true";
+                        return "procesos/main?faces-redirect=true";
                     } else {
                         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
                         if (sesionMB.getUsuarioActual() != null) {
-                            return "main?faces-redirect=true";
+                            return "procesos/main?faces-redirect=true";
                         } else {
                             String path = aplicacionMB.descartarSession(usuarioActual);
                             if (!path.isEmpty()) {

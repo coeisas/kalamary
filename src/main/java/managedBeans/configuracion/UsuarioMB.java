@@ -322,7 +322,9 @@ public class UsuarioMB implements Serializable {
             setMail(usuarioSeleccionado.getMail());
             setFechaNacimiento(usuarioSeleccionado.getFecNacimiento());
             setUsuario(usuarioSeleccionado.getUsuario());
-            setIdCaja(determinarValor(usuarioSeleccionado.getIdCaja()));
+            if (usuarioSeleccionado.getFaccajaidCaja() != null) {
+                setIdCaja(usuarioSeleccionado.getFaccajaidCaja().getIdCaja());
+            }
             if (usuarioSeleccionado.getFoto() != null) {
                 setImage(new DefaultStreamedContent(new ByteArrayInputStream(usuarioSeleccionado.getFoto())));
             } else {
@@ -393,7 +395,10 @@ public class UsuarioMB implements Serializable {
             if (file != null) {
                 user.setFoto(file.getContents());
             }
-            user.setIdCaja(idCaja);
+            if (idCaja != 0) {
+                FacCaja caja = cajaFacade.find(idCaja);
+                user.setFaccajaidCaja(caja);
+            }
             user.setMail(mail.trim().toUpperCase());
             user.setNom1Usuario(primerNombre.trim().toUpperCase());
             user.setNom2Usuario(segundoNombre.trim().toUpperCase());
@@ -438,7 +443,12 @@ public class UsuarioMB implements Serializable {
             if (file != null) {
                 usuarioSeleccionado.setFoto(file.getContents());
             }
-            usuarioSeleccionado.setIdCaja(idCaja);
+            if (idCaja != 0) {
+                FacCaja caja = cajaFacade.find(idCaja);
+                usuarioSeleccionado.setFaccajaidCaja(caja);
+            } else {
+                usuarioSeleccionado.setFaccajaidCaja(null);
+            }
             usuarioSeleccionado.setMail(mail.trim().toUpperCase());
             usuarioSeleccionado.setNom1Usuario(primerNombre.trim().toUpperCase());
             usuarioSeleccionado.setNom2Usuario(segundoNombre.trim().toUpperCase());

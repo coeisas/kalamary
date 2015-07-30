@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -79,6 +80,8 @@ public class CfgFormapago implements Serializable {
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
+    @Transient
+    private float subtotal;
 
     public CfgFormapago() {
     }
@@ -160,7 +163,15 @@ public class CfgFormapago implements Serializable {
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
+    
+    public float getSubtotal() {
+        return subtotal;
+    }
 
+    public void setSubtotal(float subtotal) {
+        this.subtotal = subtotal;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -185,5 +196,5 @@ public class CfgFormapago implements Serializable {
     public String toString() {
         return "entities.CfgFormapago[ idFormaPago=" + idFormaPago + " ]";
     }
-    
+   
 }

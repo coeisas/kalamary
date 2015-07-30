@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.FacCaja;
 import entities.FacMovcaja;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import java.util.Date;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class FacMovcajaFacade extends AbstractFacade<FacMovcaja> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -27,5 +31,16 @@ public class FacMovcajaFacade extends AbstractFacade<FacMovcaja> {
     public FacMovcajaFacade() {
         super(FacMovcaja.class);
     }
-    
+
+    public FacMovcaja buscarMovimientoCaja(FacCaja caja) {
+        try {
+            Query query = em.createQuery("SELECT mc FROM FacMovcaja mc WHERE mc.faccajaidCaja = ?1 ORDER BY mc.idMovimiento DESC");
+            query.setParameter(1, caja);
+            query.setMaxResults(1);
+            return (FacMovcaja) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

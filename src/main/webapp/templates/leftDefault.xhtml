@@ -1,35 +1,31 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
-    <h:head>
-        <title>Facelet Title</title>
-    </h:head>
-    <h:body>
-        <ui:composition>
-            <h:form id="IdFormMenu">
-                <p:menu style="width: 95%" toggleable="true">
-                    <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/main.xhtml"/>
-                    <p:menuitem icon="ui-icon-cancel" value="Anular Factura" outcome="/main.xhtml"/>
-                    <p:menuitem icon="ui-icon-key" value="Abrir/Cerrar Caja" outcome="/main.xhtml" />
-                    <p:menuitem icon="ui-icon-search" value="Consultar Precios" outcome="/main.xhtml" />
-                    <p:menuitem icon="ui-icon-script" value="Inventario" outcome="/main.xhtml"/>
-                    <p:submenu label="Configuracion" icon="ui-icon-wrench" style="height: auto" expanded="false" >
-                        <p:menuitem icon="ui-icon-suitcase" value="Empresa" outcome="/configuraciones/empresa.xhtml"/>
-                        <p:menuitem icon="ui-icon-home" value="Sedes" outcome="/configuraciones/sede.xhtml" />
-                        <p:menuitem icon="ui-icon-pin-s" value="Productos" outcome="/configuraciones/producto.xhtml" />
-                        <p:menuitem icon="ui-icon-star" value="Kit" outcome="/configuraciones/kit.xhtml" />
-                        <p:menuitem icon="ui-icon-tag" value="Cajas" outcome="/configuraciones/caja.xhtml"/>
-                        <p:menuitem icon="ui-icon-person" value="Usuarios" outcome="/configuraciones/usuario.xhtml" />
-                        <p:menuitem icon="ui-icon-contact" value="Clientes" outcome="/configuraciones/cliente.xhtml" />
-                        <p:menuitem icon="ui-icon-document" value="Impuestos" outcome="/configuraciones/impuesto.xhtml" />
-                        <p:menuitem icon="ui-icon-note" value="Documentos" outcome="/configuraciones/documento.xhtml" />
-                    </p:submenu>
-                </p:menu>
-            </h:form>              
-        </ui:composition>
-    </h:body>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+    <h:form id="IdFormMenu">
+        <p:menu style="width: 95%" toggleable="true">
+            <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/procesos/main.xhtml"/>
+            <p:menuitem icon="ui-icon-cancel" value="Anular Factura" outcome="/procesos/main.xhtml"/>
+            <p:menuitem icon="ui-icon-search" value="Consultar Precios" outcome="/procesos/main.xhtml" />
+            <p:menuitem icon="ui-icon-script" value="Inventario" outcome="/procesos/main.xhtml"/>
+            <p:submenu label="Movimiento Caja" icon="ui-icon-wrench" style="height: auto" expanded="false" >
+                <p:menuitem icon="ui-icon-suitcase" value="Abrir Caja" outcome="/procesos/abrirCaja.xhtml"/>
+                <p:menuitem icon="ui-icon-home" value="Cerrar Caja" outcome="/procesos/cerrarCaja.xhtml"/>                       
+            </p:submenu>
+            <p:submenu label="Configuracion" icon="ui-icon-wrench" style="height: auto" expanded="false" >
+                <p:menuitem icon="ui-icon-suitcase" value="Empresa" outcome="/configuraciones/empresa.xhtml"/>
+                <p:menuitem icon="ui-icon-home" value="Sedes" outcome="/configuraciones/sede.xhtml" />
+                <p:menuitem icon="ui-icon-pin-s" value="Productos" outcome="/configuraciones/producto.xhtml" />
+                <p:menuitem icon="ui-icon-star" value="Kit" outcome="/configuraciones/kit.xhtml" />
+                <p:menuitem icon="ui-icon-tag" value="Cajas" outcome="/configuraciones/caja.xhtml"/>
+                <p:menuitem icon="ui-icon-person" value="Usuarios" outcome="/configuraciones/usuario.xhtml" />
+                <p:menuitem icon="ui-icon-contact" value="Clientes" outcome="/configuraciones/cliente.xhtml" />
+                <p:menuitem icon="ui-icon-document" value="Impuestos" outcome="/configuraciones/impuesto.xhtml" />
+                <p:menuitem icon="ui-icon-note" value="Documentos" outcome="/configuraciones/documento.xhtml" />
+            </p:submenu>
+        </p:menu>
+    </h:form>              
+</ui:composition>
 

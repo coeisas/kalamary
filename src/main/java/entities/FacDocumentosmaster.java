@@ -39,10 +39,13 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "FacDocumentosmaster.findAll", query = "SELECT f FROM FacDocumentosmaster f"),
     @NamedQuery(name = "FacDocumentosmaster.findByNumDocumento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.numDocumento = :numDocumento"),
-    @NamedQuery(name = "FacDocumentosmaster.findByValorFactura", query = "SELECT f FROM FacDocumentosmaster f WHERE f.valorFactura = :valorFactura"),
+    @NamedQuery(name = "FacDocumentosmaster.findByTotalFactura", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFactura = :totalFactura"),
     @NamedQuery(name = "FacDocumentosmaster.findByFecCrea", query = "SELECT f FROM FacDocumentosmaster f WHERE f.fecCrea = :fecCrea"),
     @NamedQuery(name = "FacDocumentosmaster.findByEstado", query = "SELECT f FROM FacDocumentosmaster f WHERE f.estado = :estado"),
-    @NamedQuery(name = "FacDocumentosmaster.findByIddocumentomaster", query = "SELECT f FROM FacDocumentosmaster f WHERE f.iddocumentomaster = :iddocumentomaster")})
+    @NamedQuery(name = "FacDocumentosmaster.findByIddocumentomaster", query = "SELECT f FROM FacDocumentosmaster f WHERE f.iddocumentomaster = :iddocumentomaster"),
+    @NamedQuery(name = "FacDocumentosmaster.findByTotalFacturaUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFacturaUSD = :totalFacturaUSD"),
+    @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
+    @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
 public class FacDocumentosmaster implements Serializable {
     private static final long serialVersionUID = 1L;
     @Basic(optional = false)
@@ -50,9 +53,8 @@ public class FacDocumentosmaster implements Serializable {
     @Column(name = "numDocumento", nullable = false)
     private int numDocumento;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "valorFactura", nullable = false)
-    private float valorFactura;
+    @Column(name = "totalFactura", nullable = false)
+    private float totalFactura;
     @Lob
     @Size(max = 65535)
     @Column(name = "observaciones", length = 65535)
@@ -62,22 +64,29 @@ public class FacDocumentosmaster implements Serializable {
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
-    @Column(name = "estado", nullable = false, length = 10)
+    @Column(name = "estado", length = 10)
     private String estado;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "iddocumentomaster", nullable = false)
     private Long iddocumentomaster;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "totalFacturaUSD", precision = 12)
+    private Float totalFacturaUSD;
+    @Column(name = "subtotal", precision = 12)
+    private Float subtotal;
+    @Column(name = "descuento", precision = 12)
+    private Float descuento;
     @JoinColumn(name = "cfg_cliente_idCliente", referencedColumnName = "idCliente", nullable = false)
     @ManyToOne(optional = false)
     private CfgCliente cfgclienteidCliente;
     @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false)
     @ManyToOne(optional = false)
     private CfgDocumento cfgdocumentoidDoc;
+    @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgEmpresasede cfgempresasedeidSede;
     @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit")
     @ManyToOne
     private CfgKitproductomaestro cfgkitproductomaestroidKit;
@@ -96,12 +105,11 @@ public class FacDocumentosmaster implements Serializable {
         this.iddocumentomaster = iddocumentomaster;
     }
 
-    public FacDocumentosmaster(Long iddocumentomaster, int numDocumento, float valorFactura, Date fecCrea, String estado) {
+    public FacDocumentosmaster(Long iddocumentomaster, int numDocumento, float totalFactura, Date fecCrea) {
         this.iddocumentomaster = iddocumentomaster;
         this.numDocumento = numDocumento;
-        this.valorFactura = valorFactura;
+        this.totalFactura = totalFactura;
         this.fecCrea = fecCrea;
-        this.estado = estado;
     }
 
     public int getNumDocumento() {
@@ -112,12 +120,12 @@ public class FacDocumentosmaster implements Serializable {
         this.numDocumento = numDocumento;
     }
 
-    public float getValorFactura() {
-        return valorFactura;
+    public float getTotalFactura() {
+        return totalFactura;
     }
 
-    public void setValorFactura(float valorFactura) {
-        this.valorFactura = valorFactura;
+    public void setTotalFactura(float totalFactura) {
+        this.totalFactura = totalFactura;
     }
 
     public String getObservaciones() {
@@ -152,6 +160,30 @@ public class FacDocumentosmaster implements Serializable {
         this.iddocumentomaster = iddocumentomaster;
     }
 
+    public Float getTotalFacturaUSD() {
+        return totalFacturaUSD;
+    }
+
+    public void setTotalFacturaUSD(Float totalFacturaUSD) {
+        this.totalFacturaUSD = totalFacturaUSD;
+    }
+
+    public Float getSubtotal() {
+        return subtotal;
+    }
+
+    public void setSubtotal(Float subtotal) {
+        this.subtotal = subtotal;
+    }
+
+    public Float getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(Float descuento) {
+        this.descuento = descuento;
+    }
+
     public CfgCliente getCfgclienteidCliente() {
         return cfgclienteidCliente;
     }
@@ -166,6 +198,14 @@ public class FacDocumentosmaster implements Serializable {
 
     public void setCfgdocumentoidDoc(CfgDocumento cfgdocumentoidDoc) {
         this.cfgdocumentoidDoc = cfgdocumentoidDoc;
+    }
+
+    public CfgEmpresasede getCfgempresasedeidSede() {
+        return cfgempresasedeidSede;
+    }
+
+    public void setCfgempresasedeidSede(CfgEmpresasede cfgempresasedeidSede) {
+        this.cfgempresasedeidSede = cfgempresasedeidSede;
     }
 
     public CfgKitproductomaestro getCfgkitproductomaestroidKit() {

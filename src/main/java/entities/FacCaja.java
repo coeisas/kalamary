@@ -39,12 +39,12 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacCaja.findAll", query = "SELECT f FROM FacCaja f"),
     @NamedQuery(name = "FacCaja.findByIdCaja", query = "SELECT f FROM FacCaja f WHERE f.idCaja = :idCaja"),
     @NamedQuery(name = "FacCaja.findByNomCaja", query = "SELECT f FROM FacCaja f WHERE f.nomCaja = :nomCaja"),
-    @NamedQuery(name = "FacCaja.findByBase", query = "SELECT f FROM FacCaja f WHERE f.base = :base"),
     @NamedQuery(name = "FacCaja.findByFeccrea", query = "SELECT f FROM FacCaja f WHERE f.feccrea = :feccrea"),
     @NamedQuery(name = "FacCaja.findByUsrcrea", query = "SELECT f FROM FacCaja f WHERE f.usrcrea = :usrcrea"),
     @NamedQuery(name = "FacCaja.findByCodigoCaja", query = "SELECT f FROM FacCaja f WHERE f.codigoCaja = :codigoCaja"),
-    @NamedQuery(name = "FacCaja.findByCerrada", query = "SELECT f FROM FacCaja f WHERE f.cerrada = :cerrada")})
+    @NamedQuery(name = "FacCaja.findByActiva", query = "SELECT f FROM FacCaja f WHERE f.activa = :activa")})
 public class FacCaja implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,10 +56,6 @@ public class FacCaja implements Serializable {
     @Size(min = 1, max = 100)
     @Column(name = "nomCaja", nullable = false, length = 100)
     private String nomCaja;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "base", nullable = false)
-    private float base;
     @Basic(optional = false)
     @NotNull
     @Column(name = "feccrea", nullable = false)
@@ -74,15 +70,15 @@ public class FacCaja implements Serializable {
     @Size(min = 1, max = 5)
     @Column(name = "codigoCaja", nullable = false, length = 5)
     private String codigoCaja;
-    @Column(name = "cerrada")
-    private Boolean cerrada;
+    @Column(name = "activa")
+    private Boolean activa;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
+    @OneToMany(mappedBy = "faccajaidCaja")
+    private List<SegUsuario> segUsuarioList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "faccajaidCaja")
     private List<FacMovcaja> facMovcajaList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "faccajaidCaja")
-    private List<FacMovcajadetalle> facMovcajadetalleList;
 
     public FacCaja() {
     }
@@ -94,7 +90,6 @@ public class FacCaja implements Serializable {
     public FacCaja(Integer idCaja, String nomCaja, float base, Date feccrea, int usrcrea, String codigoCaja) {
         this.idCaja = idCaja;
         this.nomCaja = nomCaja;
-        this.base = base;
         this.feccrea = feccrea;
         this.usrcrea = usrcrea;
         this.codigoCaja = codigoCaja;
@@ -114,14 +109,6 @@ public class FacCaja implements Serializable {
 
     public void setNomCaja(String nomCaja) {
         this.nomCaja = nomCaja;
-    }
-
-    public float getBase() {
-        return base;
-    }
-
-    public void setBase(float base) {
-        this.base = base;
     }
 
     public Date getFeccrea() {
@@ -148,12 +135,12 @@ public class FacCaja implements Serializable {
         this.codigoCaja = codigoCaja;
     }
 
-    public Boolean getCerrada() {
-        return cerrada;
+    public Boolean getActiva() {
+        return activa;
     }
 
-    public void setCerrada(Boolean cerrada) {
-        this.cerrada = cerrada;
+    public void setCerrada(Boolean activa) {
+        this.activa = activa;
     }
 
     public CfgEmpresasede getCfgempresasedeidSede() {
@@ -165,21 +152,21 @@ public class FacCaja implements Serializable {
     }
 
     @XmlTransient
+    public List<SegUsuario> getSegUsuarioList() {
+        return segUsuarioList;
+    }
+
+    public void setSegUsuarioList(List<SegUsuario> segUsuarioList) {
+        this.segUsuarioList = segUsuarioList;
+    }
+
+    @XmlTransient
     public List<FacMovcaja> getFacMovcajaList() {
         return facMovcajaList;
     }
 
     public void setFacMovcajaList(List<FacMovcaja> facMovcajaList) {
         this.facMovcajaList = facMovcajaList;
-    }
-
-    @XmlTransient
-    public List<FacMovcajadetalle> getFacMovcajadetalleList() {
-        return facMovcajadetalleList;
-    }
-
-    public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
-        this.facMovcajadetalleList = facMovcajadetalleList;
     }
 
     @Override
@@ -206,5 +193,5 @@ public class FacCaja implements Serializable {
     public String toString() {
         return "entities.FacCaja[ idCaja=" + idCaja + " ]";
     }
-    
+
 }
