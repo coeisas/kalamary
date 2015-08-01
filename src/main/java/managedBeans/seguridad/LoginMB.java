@@ -73,84 +73,59 @@ public class LoginMB implements Serializable {
             RequestContext.getCurrentInstance().update("message");
             return "";
         }
-        //se comprueba si es un superusuario
+        if (idSede == null) {
+//                FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
+            RequestContext.getCurrentInstance().update("message");
+            return "";
+        }
         FacesContext context = FacesContext.getCurrentInstance();
 //        ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
         AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
+        //comprueba primero si es un superusuario
         SegUsuario usuarioActual = usuarioFacade.buscarUsuarioSuper(usuario, password);
-        if (usuarioActual != null) {//corresponde a un usuario con el rol de superusuario
-            if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {//se crea sesion para el nuevo usuario autenticado
-//                usuarioActual.setRememberToken(econtext.getSessionId(false));               
+        if (usuarioActual == null) {
+            usuarioActual = usuarioFacade.buscarUsuario(usuario, password, idSede);
+        }
+        if (usuarioActual == null) {
+//                    FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Revice las credenciales"));
+            RequestContext.getCurrentInstance().update("message");
+            return "";
+        } else {
+            CfgEmpresasede sede = empresasedeFacade.find(idSede);
+            if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {
+//                        usuarioActual.setRememberToken(econtext.getSessionId(false));
                 aplicacionMB.insertarUsuario(usuarioActual);
                 SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
                 sesionMB.setUsuarioActual(usuarioActual);
                 sesionMB.tokenSession();
                 sesionMB.setAutenticado(true);
-//                sesionMB.insertarItemSession(usuarioActual);
+                sesionMB.setSedeActual(sede);
+//                        sesionMB.insertarItemSession(usuarioActual);
                 return "procesos/main?faces-redirect=true";
-            } else {//el usuario ya posee una sesion activa
-//                aplicacionMB.comprobarSesionAbierta(usuarioActual);
+            } else {
                 SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-                if (sesionMB.getUsuarioActual() != null) {//Se reutiliza la sesion previa cuando existe en el actual navegador
+                if (sesionMB.getUsuarioActual() != null) {
                     return "procesos/main?faces-redirect=true";
-                } else {//cuando la sesion existe en otro dispositivo o navegador. Se crea una nueva y se cierra la anterior
+                } else {
                     String path = aplicacionMB.descartarSession(usuarioActual);
                     if (!path.isEmpty()) {
                         sesionMB.setUsuarioActual(usuarioActual);
                         sesionMB.tokenSession();
                         sesionMB.setAutenticado(true);
-//                        sesionMB.insertarItemSession(usuarioActual);
+//                                sesionMB.insertarItemSession(usuarioActual);
                         aplicacionMB.insertarUsuario(usuarioActual);
+                        sesionMB.setSedeActual(sede);
                     }
                     return path;
                 }
             }
 //        System.out.println("creada sesion " + FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));
 
-        } else {//sesion para usuarios con rol distinto a superusuario
-            if (idSede == null) {
-//                FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
-                RequestContext.getCurrentInstance().update("message");
-                return "";
-            } else {
-                usuarioActual = usuarioFacade.buscarUsuario(usuario, password, idSede);
-                if (usuarioActual == null) {
-//                    FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Revice las credenciales"));
-                    RequestContext.getCurrentInstance().update("message");
-                    return "";
-                } else {
-                    if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {
-//                        usuarioActual.setRememberToken(econtext.getSessionId(false));
-                        aplicacionMB.insertarUsuario(usuarioActual);
-                        SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-                        sesionMB.setUsuarioActual(usuarioActual);
-                        sesionMB.tokenSession();
-                        sesionMB.setAutenticado(true);
-//                        sesionMB.insertarItemSession(usuarioActual);
-                        return "procesos/main?faces-redirect=true";
-                    } else {
-                        SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-                        if (sesionMB.getUsuarioActual() != null) {
-                            return "procesos/main?faces-redirect=true";
-                        } else {
-                            String path = aplicacionMB.descartarSession(usuarioActual);
-                            if (!path.isEmpty()) {
-                                sesionMB.setUsuarioActual(usuarioActual);
-                                sesionMB.tokenSession();
-                                sesionMB.setAutenticado(true);
-//                                sesionMB.insertarItemSession(usuarioActual);
-                                aplicacionMB.insertarUsuario(usuarioActual);
-                            }
-                            return path;
-                        }
-                    }
-//        System.out.println("creada sesion " + FacesContext.getCurrentInstance().getExternalContext().getSessionId(false));
-
-                }
-            }
         }
+//            }
+//        }
     }
 
     public String getUsuario() {

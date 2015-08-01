@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -71,6 +72,8 @@ public class CfgImpuesto implements Serializable {
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
+    @Transient
+    private float totalImpuesto;//variable empleada principalmente en facturacion para almacenar el valor del impuesto correspondiente a la compra
 
     public CfgImpuesto() {
     }
@@ -149,7 +152,15 @@ public class CfgImpuesto implements Serializable {
     public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
         this.segusuarioidUsuario = segusuarioidUsuario;
     }
+    
+    public float getTotalImpuesto() {
+        return totalImpuesto;
+    }
 
+    public void setTotalImpuesto(float totalImpuesto) {
+        this.totalImpuesto = totalImpuesto;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

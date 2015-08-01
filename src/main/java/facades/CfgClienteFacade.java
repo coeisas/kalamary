@@ -7,6 +7,7 @@ package facades;
 
 import entities.CfgCliente;
 import entities.CfgEmpresa;
+import entities.CfgEmpresasede;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -42,6 +43,17 @@ public class CfgClienteFacade extends AbstractFacade<CfgCliente> {
             return null;
         }
     }
+    
+    public CfgCliente buscarPorIdentificacionAndIdEmpresa(String identificacion, CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1 AND c.numDoc = ?2");
+            query.setParameter(1, empresa);
+            query.setParameter(2, identificacion);
+            return (CfgCliente) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 
     public List<CfgCliente> buscarPorEmpresa(CfgEmpresa empresa) {
         try {
@@ -52,4 +64,24 @@ public class CfgClienteFacade extends AbstractFacade<CfgCliente> {
             return null;
         }
     }
+    
+    public List<CfgCliente> buscarPorEmpresaMenosClienteDefault(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1 AND c.codigoCliente <> '1'");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public CfgCliente buscarClienteDefault(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1 AND c.codigoCliente = '1'");
+            query.setParameter(1, empresa);
+            return (CfgCliente) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }       
 }

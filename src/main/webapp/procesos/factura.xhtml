@@ -1,0 +1,114 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"               
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Factura</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormFactura">
+            <div>
+                <p:outputLabel value="Cliente:" class="labelFormulario"/>
+                <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
+                    <p:ajax event="blur" listener="#{facturaMB.buscarCliente}" update="@none"/> 
+                </p:inputText>
+                <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
+                <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
+            </div>
+            <div style="clear: left">
+                <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" onclick="PF('dlgProducto').show()"/>
+            </div>
+            <p:dataTable
+                id="IdTableItemFactura"
+                value="#{facturaMB.listaDetalle}"
+                var="itemFactura"
+                style="width: 70%;margin-top: .5em;margin: 0 auto"
+                rows="15"
+                rowKey="#{itemFactura.facDocumentodetallePK}"
+                editable="true" editMode="cell"
+                emptyMessage="No se han insertado items a la factura">
+                <p:ajax event="cellEdit" listener="#{facturaMB.onCellEdit}" update="@none"/>
+                <f:facet name="header">Items Factura</f:facet>
+                <p:column headerText="Producto" width="45%">
+                    #{itemFactura.cfgProducto.nomProducto}
+                </p:column>
+                <p:column headerText="Cantidad">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{itemFactura.cantidad}" /></f:facet>
+                        <f:facet name="input"><p:spinner value="#{itemFactura.cantidad}" min="1"  size="5"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Valor Unit">
+                    #{itemFactura.valorUnitario}
+                </p:column>
+                <p:column headerText="%Descuento">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{itemFactura.descuento}"/></f:facet>
+                        <f:facet name="input"><p:spinner value="#{itemFactura.descuento}" min="0" size="5"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column width="6%" style="text-align: center">
+                    <p:commandButton icon=" ui-icon-circle-minus" title="Quitar Item" actionListener="#{facturaMB.quitarItem}">
+                        <f:attribute name="item" value="#{itemFactura}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:panel id="IdSubTotal" style="width: 70%;margin: 0 auto;padding: 0;border: none">
+                <div style="background: #3c667c;color: #e0e0e0;padding: .25em;border-radius:.45em;width: 20%;float: right;">
+                    <p:outputLabel value="Subtotal:"/> &nbsp;<p:outputLabel value="#{facturaMB.subtotal}"/>
+                </div>
+                <div class="divSalto"/>
+                <div class="divContent">
+                    <p:outputLabel value="Descuento:"/> &nbsp;<p:outputLabel value="#{facturaMB.totalDescuento}"/>
+                </div>
+                <c:forEach items="#{facturaMB.listaImpuestos}" var="impuesto">
+                    <div class="divSalto"/>
+                    <div class="divContent">
+                        <p:outputLabel value="#{impuesto.nomImpuesto}:"/> &nbsp;<p:outputLabel value="#{impuesto.totalImpuesto}"/>
+                    </div>                
+                </c:forEach>
+                <div class="divSalto"/>
+                <div class="divContent">
+                    <p:outputLabel value="TOTAL:"/> &nbsp;<p:outputLabel value="#{facturaMB.totalFactura}"/>
+                </div>                
+            </p:panel>
+        </h:form>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{facturaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" selection="#{facturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Empresa">
+                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{facturaMB.cargarInformacionCliente}" />&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{facturaMB.deseleccionarCliente}"/>
+                </div>
+            </h:form>                                
+        </p:dialog>
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Insertar" actionListener="#{facturaMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+

@@ -5,6 +5,7 @@
  */
 package managedBeans.seguridad;
 
+import entities.CfgEmpresasede;
 import entities.SegUsuario;
 import java.io.IOException;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ public class SesionMB implements Serializable {
     private boolean autenticado = false;
     private String idSesion;
     private SegUsuario usuarioActual;
+    private CfgEmpresasede sedeActual;
 
     private AplicacionMB aplicacionMB;
 
@@ -124,6 +126,14 @@ public class SesionMB implements Serializable {
 
     public void setIdSesion(String idSesion) {
         this.idSesion = idSesion;
+    }
+
+    public CfgEmpresasede getSedeActual() {
+        return sedeActual;
+    }
+
+    public void setSedeActual(CfgEmpresasede sedeActual) {
+        this.sedeActual = sedeActual;
     }
 
 }

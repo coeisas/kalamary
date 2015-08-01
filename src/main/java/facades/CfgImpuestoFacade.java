@@ -7,6 +7,8 @@ package facades;
 
 import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
+import entities.CfgTipoempresa;
+import java.util.ArrayList;
 import javax.ejb.Stateless;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -51,6 +53,17 @@ public class CfgImpuestoFacade extends AbstractFacade<CfgImpuesto> {
             return (CfgImpuesto) query.getSingleResult();
         } catch (Exception e) {
             return null;
+        }
+    }
+    
+    public List<CfgImpuesto> buscarImpuestosPorTipoEmpresaAndSede(CfgTipoempresa tipoempresa, CfgEmpresasede sede){
+        try {
+            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgTipoempresaId = ?1 AND i.cfgempresasedeidSede = ?2");
+            query.setParameter(1, tipoempresa);
+            query.setParameter(2, sede);
+            return query.getResultList();
+        } catch (Exception e) {
+            return new ArrayList();
         }
     }
     

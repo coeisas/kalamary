@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -40,7 +41,7 @@ public class FacDocumentodetalle implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "cantidad", nullable = false)
-    private float cantidad;
+    private int cantidad;
     @Basic(optional = false)
     @NotNull
     @Column(name = "valorUnitario", nullable = false)
@@ -59,6 +60,8 @@ public class FacDocumentodetalle implements Serializable {
     @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmaster;
+    @Transient
+    private float valorDescuento;
 
     public FacDocumentodetalle() {
     }
@@ -67,7 +70,7 @@ public class FacDocumentodetalle implements Serializable {
         this.facDocumentodetallePK = facDocumentodetallePK;
     }
 
-    public FacDocumentodetalle(FacDocumentodetallePK facDocumentodetallePK, float cantidad, float valorUnitario, float valorTotal, int descuento) {
+    public FacDocumentodetalle(FacDocumentodetallePK facDocumentodetallePK, int cantidad, float valorUnitario, float valorTotal, int descuento) {
         this.facDocumentodetallePK = facDocumentodetallePK;
         this.cantidad = cantidad;
         this.valorUnitario = valorUnitario;
@@ -87,11 +90,11 @@ public class FacDocumentodetalle implements Serializable {
         this.facDocumentodetallePK = facDocumentodetallePK;
     }
 
-    public float getCantidad() {
+    public int getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(float cantidad) {
+    public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
 
@@ -135,6 +138,14 @@ public class FacDocumentodetalle implements Serializable {
         this.facDocumentosmaster = facDocumentosmaster;
     }
 
+    public float getValorDescuento() {
+        return valorDescuento;
+    }
+
+    public void setValorDescuento(float valorDescuento) {
+        this.valorDescuento = valorDescuento;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -159,5 +170,5 @@ public class FacDocumentodetalle implements Serializable {
     public String toString() {
         return "entities.FacDocumentodetalle[ facDocumentodetallePK=" + facDocumentodetallePK + " ]";
     }
-    
+   
 }

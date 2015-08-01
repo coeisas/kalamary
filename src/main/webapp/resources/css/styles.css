@@ -41,3 +41,10 @@ body {
 .labelFormularioInformativa{
     float: left; padding: .25em; margin: 0px;  margin-right: .5em; font-weight: bold;font-style: italic;width: auto
 }
+
+.divSalto{
+    clear: right;margin-bottom: .125em
+}
+.divContent{
+    background: #3c667c;color: #e0e0e0;padding: .25em;border-radius:.45em;width: 20%;float: right;
+}

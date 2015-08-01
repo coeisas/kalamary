@@ -133,7 +133,7 @@ public class CfgCliente implements Serializable {
     private SegUsuario segusuarioidUsuario;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgclienteidCliente")
     private List<FacDocumentosmaster> facDocumentosmasterList;
-
+   
     public CfgCliente() {
     }
 
