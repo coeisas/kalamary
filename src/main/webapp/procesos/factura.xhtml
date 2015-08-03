@@ -43,7 +43,9 @@
                     </p:cellEditor>
                 </p:column>
                 <p:column headerText="Valor Unit">
-                    #{itemFactura.valorUnitario}
+                    <h:outputText value="#{itemFactura.valorUnitario}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>                    
                 </p:column>
                 <p:column headerText="%Descuento">
                     <p:cellEditor>
@@ -59,21 +61,33 @@
             </p:dataTable>
             <p:panel id="IdSubTotal" style="width: 70%;margin: 0 auto;padding: 0;border: none">
                 <div style="background: #3c667c;color: #e0e0e0;padding: .25em;border-radius:.45em;width: 20%;float: right;">
-                    <p:outputLabel value="Subtotal:"/> &nbsp;<p:outputLabel value="#{facturaMB.subtotal}"/>
+                    <p:outputLabel value="Subtotal:"/> &nbsp;
+                    <p:outputLabel value="#{facturaMB.subtotal}">
+                        <f:convertNumber type="currency"/>
+                    </p:outputLabel>
                 </div>
                 <div class="divSalto"/>
                 <div class="divContent">
-                    <p:outputLabel value="Descuento:"/> &nbsp;<p:outputLabel value="#{facturaMB.totalDescuento}"/>
+                    <p:outputLabel value="Descuento:"/> &nbsp;
+                    <p:outputLabel value="#{facturaMB.totalDescuento}">
+                        <f:convertNumber type="currency"/>
+                    </p:outputLabel>
                 </div>
                 <c:forEach items="#{facturaMB.listaImpuestos}" var="impuesto">
                     <div class="divSalto"/>
                     <div class="divContent">
-                        <p:outputLabel value="#{impuesto.nomImpuesto}:"/> &nbsp;<p:outputLabel value="#{impuesto.totalImpuesto}"/>
+                        <p:outputLabel value="#{impuesto.nomImpuesto}:"/> &nbsp;
+                        <p:outputLabel value="#{impuesto.totalImpuesto}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
                     </div>                
                 </c:forEach>
                 <div class="divSalto"/>
                 <div class="divContent">
-                    <p:outputLabel value="TOTAL:"/> &nbsp;<p:outputLabel value="#{facturaMB.totalFactura}"/>
+                    <p:outputLabel value="TOTAL:"/> &nbsp;
+                    <p:outputLabel value="#{facturaMB.totalFactura}">
+                        <f:convertNumber type="currency"/>
+                    </p:outputLabel>
                 </div>                
             </p:panel>
         </h:form>
@@ -100,9 +114,9 @@
         </p:dialog>
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
-                <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
-                    <p:column headerText="Codigo">#{producto.codProducto}</p:column>
-                    <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
+                <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
                 </p:dataTable>
                 <p:separator/>

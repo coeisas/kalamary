@@ -38,7 +38,7 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
     }
 
     @Override
-    public CfgProducto getRowData(String rowKey) {        
+    public CfgProducto getRowData(String rowKey) {
         return productoFacade.find(Integer.parseInt(rowKey));
     }
 
@@ -50,7 +50,12 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
     @Override
     public List<CfgProducto> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
         //filter
-        List<CfgProducto> data = loadProductos(first, pageSize, filters);
+        List<CfgProducto> data;
+        if (filters.isEmpty()) {
+            data = loadProductos(first, pageSize);
+        } else {
+            data = loadProductos(first, pageSize, filters);
+        }
         //rowCount
         int dataSize = data.size();
 
@@ -66,7 +71,7 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
         }
     }
 
-    private List<CfgProducto> loadProductos(int first, int pageSize, Map<String, Object> filters) {
+    private List<CfgProducto> loadProductos(int first, int pageSize) {
         List<CfgProducto> data = new ArrayList();
         if (empresa != null) {
             if (marcaproducto != null) {
@@ -86,6 +91,35 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
         } else {
             return data;
         }
+    }
+
+    private List<CfgProducto> loadProductos(int first, int pageSize, Map<String, Object> filters) {
+        List<CfgProducto> data = new ArrayList();
+        if (empresa != null) {
+            String sqlFilters = "";
+            String codProducto = "";
+            String nomProducto = "";
+            for (Map.Entry<String, Object> entry : filters.entrySet()) {
+                String filterProperty = entry.getKey();                
+                switch (filterProperty) {
+                    case "codProducto":                        
+                        codProducto = entry.getValue().toString().trim();
+                        if(!codProducto.isEmpty()){
+                            sqlFilters = sqlFilters.concat(" AND p.codProducto LIKE CONCAT(?2, '%')");
+                        }
+                        break;
+                    case "nomProducto":
+                        nomProducto = entry.getValue().toString().trim();
+                        if(!nomProducto.isEmpty()){
+                            sqlFilters = sqlFilters.concat(" AND p.nomProducto LIKE CONCAT('%', ?3, '%')");
+                        }
+                        break;
+                }
+            }
+            data = productoFacade.buscarPorEmpresaFilter(empresa, first, pageSize, sqlFilters, codProducto, nomProducto);
+            this.setRowCount(productoFacade.totalProductosPorEmpresaFilter(empresa, sqlFilters, codProducto, nomProducto));
+        }
+        return data;
     }
 
 }
