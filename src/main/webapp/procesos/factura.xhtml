@@ -90,6 +90,9 @@
                     </p:outputLabel>
                 </div>                
             </p:panel>
+            <div style="text-align: center;clear: right">
+                <p:commandButton icon="ui-icon-disk" value="Guardar Factura" actionListener="#{facturaMB.guardarFactura}" title="Guardar Factura"/>
+            </div>
         </h:form>
 
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">

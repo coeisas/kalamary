@@ -98,7 +98,10 @@ public class CfgDocumento implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
     @Column(name = "codDocumento", nullable = false, length = 10)
-    private String codDocumento;    
+    private String codDocumento;
+    @JoinColumn(name = "cfg_aplicaciondocumento_idaplicacion", referencedColumnName = "idaplicacion")
+    @ManyToOne
+    private CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion;    
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
@@ -226,6 +229,14 @@ public class CfgDocumento implements Serializable {
     public void setCodDocumento(String codDocumento) {
         this.codDocumento = codDocumento;
     }
+
+    public CfgAplicaciondocumento getCfgAplicaciondocumentoIdaplicacion() {
+        return cfgAplicaciondocumentoIdaplicacion;
+    }
+
+    public void setCfgAplicaciondocumentoIdaplicacion(CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion) {
+        this.cfgAplicaciondocumentoIdaplicacion = cfgAplicaciondocumentoIdaplicacion;
+    }
     
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
@@ -293,5 +304,5 @@ public class CfgDocumento implements Serializable {
     public String toString() {
         return "entities.CfgDocumento[ idDoc=" + idDoc + " ]";
     }
-    
+   
 }

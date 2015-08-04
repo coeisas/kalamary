@@ -7,7 +7,9 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,6 +27,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -63,6 +67,8 @@ public class CfgImpuesto implements Serializable {
     private Date fecCrea;
     @Column(name = "codImpuesto", length = 10)
     private String codImpuesto;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgImpuesto")
+    private List<FacDocumentoimpuesto> facDocumentoimpuestoList;    
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
@@ -128,6 +134,15 @@ public class CfgImpuesto implements Serializable {
     public void setCodImpuesto(String codImpuesto) {
         this.codImpuesto = codImpuesto;
     }
+    
+    @XmlTransient
+    public List<FacDocumentoimpuesto> getFacDocumentoimpuestoList() {
+        return facDocumentoimpuestoList;
+    }
+
+    public void setFacDocumentoimpuestoList(List<FacDocumentoimpuesto> facDocumentoimpuestoList) {
+        this.facDocumentoimpuestoList = facDocumentoimpuestoList;
+    }  
     
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;

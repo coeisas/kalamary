@@ -6,20 +6,29 @@
 package managedBeans.proceso;
 
 import entities.CfgCliente;
+import entities.CfgDocumento;
 import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
 import entities.CfgProducto;
 import entities.FacDocumentodetalle;
 import entities.FacDocumentodetallePK;
+import entities.FacDocumentoimpuesto;
+import entities.FacDocumentoimpuestoPK;
+import entities.FacDocumentosmaster;
 import entities.SegUsuario;
 import facades.CfgClienteFacade;
+import facades.CfgDocumentoFacade;
 import facades.CfgImpuestoFacade;
 import facades.CfgProductoFacade;
+import facades.FacDocumentodetalleFacade;
+import facades.FacDocumentoimpuestoFacade;
+import facades.FacDocumentosmasterFacade;
 import java.util.List;
 import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
+import java.util.Date;
 import javax.annotation.PostConstruct;
 import org.primefaces.context.RequestContext;
 import javax.faces.context.FacesContext;
@@ -60,7 +69,15 @@ public class FacturaMB implements Serializable {
     @EJB
     CfgImpuestoFacade impuestoFacade;
     @EJB
+    CfgDocumentoFacade documentoFacade;
+    @EJB
     CfgProductoFacade productoFacade;
+    @EJB
+    FacDocumentosmasterFacade documentosmasterFacade;
+    @EJB
+    FacDocumentodetalleFacade documentodetalleFacade;
+    @EJB
+    FacDocumentoimpuestoFacade documentoimpuestoFacade;
 
     public FacturaMB() {
 
@@ -207,8 +224,61 @@ public class FacturaMB implements Serializable {
     private void calcularTotalFactura() {
         totalFactura = subtotal - totalDescuento;
         for (CfgImpuesto impuesto : listaImpuestos) {
-            totalFactura +=impuesto.getTotalImpuesto();
+            totalFactura += impuesto.getTotalImpuesto();
         }
+    }
+
+    public void guardarFactura() {
+        if (clienteSeleccionado == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay cliente seleccionado"));
+            return;
+        }
+        if (listaDetalle.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
+            return;
+        }
+        CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+        if(documento == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplicado a factura"));
+            return;
+        }
+        try {
+            documento.setActDocumento(documento.getActDocumento() + 1);
+            FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
+            documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
+            documentosmaster.setCfgdocumentoidDoc(documento);
+            documentosmaster.setNumDocumento(documento.getActDocumento());
+            documentosmaster.setCfgempresasedeidSede(sedeActual);
+            documentosmaster.setDescuento(totalDescuento);
+            documentosmaster.setFecCrea(new Date());
+            documentosmaster.setSegusuarioidUsuario(usuarioActual);
+            documentosmaster.setSubtotal(subtotal);
+            documentosmaster.setTotalFactura(totalFactura);
+            documentosmasterFacade.create(documentosmaster);
+            documentoFacade.edit(documento);
+            for (FacDocumentodetalle documentodetalle : listaDetalle) {
+                documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getIddocumentomaster()));
+                documentodetalle.setFacDocumentosmaster(documentosmaster);
+                documentodetalleFacade.create(documentodetalle);
+            }
+            for(CfgImpuesto impuesto : listaImpuestos){
+                FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
+                documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(documentosmaster.getIddocumentomaster(), impuesto.getIdImpuesto()));
+                documentoimpuesto.setCfgImpuesto(impuesto);
+                documentoimpuesto.setFacDocumentosmaster(documentosmaster);
+                documentoimpuesto.setValorImpuesto(impuesto.getTotalImpuesto());
+                documentoimpuesto.setPorcentajeImpuesto(impuesto.getPorcentaje());
+                documentoimpuestoFacade.create(documentoimpuesto);
+            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
+        }
+    }
+
+    private void limpiarFormulario() {
+        listaDetalle.clear();
+        clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
     }
 
     public List<FacDocumentodetalle> getListaDetalle() {

@@ -5,10 +5,12 @@
  */
 package managedBeans.configuracion;
 
+import entities.CfgAplicaciondocumento;
 import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgTipoempresa;
+import facades.CfgAplicaciondocumentoFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
@@ -40,6 +42,7 @@ public class DocumentoMB implements Serializable {
     private String nombreDocumento;
     private String abreviatura;
     private String prefijo;
+    private int aplicacion;
     private boolean activo;
     private int rangoInicial;
     private int rangoFinal;
@@ -51,9 +54,11 @@ public class DocumentoMB implements Serializable {
     private String nombreSede;
 
     private SesionMB sesionMB;
+    private boolean aplicacionValidada;
 
     private List<CfgEmpresasede> listaSede;
     private List<CfgDocumento> listaDocumento;
+    private List<CfgAplicaciondocumento> listaAplicacionDocumento;
 
     private CfgEmpresa empresaSeleccionada;
     private CfgEmpresasede sedeSeleccionada;
@@ -71,6 +76,9 @@ public class DocumentoMB implements Serializable {
     @EJB
     CfgTipoempresaFacade tipoempresaFacade;
 
+    @EJB
+    CfgAplicaciondocumentoFacade aplicaciondocumentoFacade;
+
     public DocumentoMB() {
     }
 
@@ -78,6 +86,7 @@ public class DocumentoMB implements Serializable {
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
+        listaAplicacionDocumento = aplicaciondocumentoFacade.findAll();
     }
 
     public void buscarEmpresa() {
@@ -170,6 +179,9 @@ public class DocumentoMB implements Serializable {
             setNombreDocumento(documentoSeleccionado.getNomDoc());
             setAbreviatura(documentoSeleccionado.getAbreviatura());
             setPrefijo(documentoSeleccionado.getPrefijoDoc());
+            if (documentoSeleccionado.getCfgAplicaciondocumentoIdaplicacion() != null) {
+                setAplicacion(documentoSeleccionado.getCfgAplicaciondocumentoIdaplicacion().getIdaplicacion());
+            }
             setActivo(documentoSeleccionado.getActivo());
             setRangoInicial(documentoSeleccionado.getIniDocumento());
             setRangoFinal(documentoSeleccionado.getFinDocumento());
@@ -212,6 +224,17 @@ public class DocumentoMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormDocumento");
     }
 
+    public void validarAplicacion() {
+        aplicacionValidada = true;
+        if (sedeSeleccionada != null && aplicacion != 0) {
+            CfgDocumento cfgDocumento = documentoFacade.buscarAplicacionDocumentoPorSede(sedeSeleccionada, aplicacion);
+            if (cfgDocumento != null) {
+                aplicacionValidada = false;
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Aplicacion ya implementada por el documento " + cfgDocumento.getNomDoc()));
+            }
+        }
+    }
+
     public void accion() {
         if (documentoSeleccionado != null) {
             editarDocumento();
@@ -246,6 +269,10 @@ public class DocumentoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Prefijo vaci0"));
             return false;
         }
+        validarAplicacion();
+        if(!aplicacionValidada){
+            return false;
+        }
         if (rangoInicial < 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "rango inicial no valido"));
             return false;
@@ -278,6 +305,9 @@ public class DocumentoMB implements Serializable {
             documento.setActivo(activo);
             documento.setIniDocumento(rangoInicial);
             documento.setFinDocumento(rangoFinal);
+            if (aplicacion != 0) {
+                documento.setCfgAplicaciondocumentoIdaplicacion(aplicaciondocumentoFacade.find(aplicacion));
+            }
             documento.setActDocumento(0);
             documento.setResDian(resDian);
             documento.setObsDocumento(observacion);
@@ -306,6 +336,9 @@ public class DocumentoMB implements Serializable {
             documentoSeleccionado.setNomDoc(nombreDocumento.trim().toUpperCase());
             documentoSeleccionado.setAbreviatura(abreviatura.trim().toUpperCase());
             documentoSeleccionado.setPrefijoDoc(prefijo.trim().toUpperCase());
+            if (aplicacion != 0) {
+                documentoSeleccionado.setCfgAplicaciondocumentoIdaplicacion(aplicaciondocumentoFacade.find(aplicacion));
+            }
             documentoSeleccionado.setActivo(activo);
             documentoSeleccionado.setIniDocumento(rangoInicial);
             documentoSeleccionado.setFinDocumento(rangoFinal);
@@ -478,6 +511,22 @@ public class DocumentoMB implements Serializable {
 
     public void setListaDocumento(List<CfgDocumento> listaDocumento) {
         this.listaDocumento = listaDocumento;
+    }
+
+    public List<CfgAplicaciondocumento> getListaAplicacionDocumento() {
+        return listaAplicacionDocumento;
+    }
+
+    public void setListaAplicacionDocumento(List<CfgAplicaciondocumento> listaAplicacionDocumento) {
+        this.listaAplicacionDocumento = listaAplicacionDocumento;
+    }
+
+    public int getAplicacion() {
+        return aplicacion;
+    }
+
+    public void setAplicacion(int aplicacion) {
+        this.aplicacion = aplicacion;
     }
 
 }

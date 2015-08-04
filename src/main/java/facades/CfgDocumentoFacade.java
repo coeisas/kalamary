@@ -52,4 +52,25 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
             return null;
         }
     }
+
+    public CfgDocumento buscarAplicacionDocumentoPorSede(CfgEmpresasede sede, int idaplicacion) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.idaplicacion = ?2");
+            query.setParameter(1, sede);
+            query.setParameter(2, idaplicacion);
+            return (CfgDocumento) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgDocumento buscarDocumentoDeFacturaBySede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'");
+            query.setParameter(1, sede);
+            return (CfgDocumento) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

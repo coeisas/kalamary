@@ -46,7 +46,7 @@
                             </p:inputText>
                             <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{documentoMB.cargarListaDocumento}"/>
                             <p:outputLabel class="labelFormulario" value="Tipo Empresa:"/>
-                            <p:selectOneMenu value="#{documentoMB.tipoEmpresa}" class="campoFormulario">
+                            <p:selectOneMenu value="#{documentoMB.tipoEmpresa}" class="campoFormulario">                               
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoEmpresa" itemLabel="#{tipoEmpresa.descripcion}" itemValue="#{tipoEmpresa.id}"/>
                             </p:selectOneMenu>                            
@@ -60,6 +60,12 @@
                             <p:inputText class="campoFormulario upperCase" value="#{documentoMB.abreviatura}" maxlength="3" size="3"/>                            
                             <p:outputLabel class="labelFormulario" value="Prefijo:"/>
                             <p:inputText class="campoFormulario upperCase" value="#{documentoMB.prefijo}" maxlength="5" size="5"/>
+                            <p:outputLabel class="labelFormulario" value="Aplica a:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{documentoMB.aplicacion}">
+                                <p:ajax event="change" listener="#{documentoMB.validarAplicacion}" update="@none"/>
+                                <f:selectItem itemValue="#{null}" itemLabel="..."/>
+                                <f:selectItems value="#{documentoMB.listaAplicacionDocumento}" var="aplicacion" itemLabel="#{aplicacion.nomaplicacion}" itemValue="#{aplicacion.idaplicacion}"/>
+                            </p:selectOneMenu>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" value="#{documentoMB.activo}" onLabel="Si" offLabel="No"/>
                         </p:column>
