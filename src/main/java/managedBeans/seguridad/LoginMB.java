@@ -60,7 +60,10 @@ public class LoginMB implements Serializable {
     }
 
     public String iniciarSesion() {
-
+        FacesContext context = FacesContext.getCurrentInstance();
+//        ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
+        AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
+        CfgEmpresasede sede = null;
         if (usuario.trim().isEmpty()) {
 //            FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese el usuario"));
@@ -73,15 +76,15 @@ public class LoginMB implements Serializable {
             RequestContext.getCurrentInstance().update("message");
             return "";
         }
-        if (idSede == null) {
+        if (!aplicacionMB.getListaEmpresas().isEmpty()) {
+            if (idSede == null) {
 //                FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
-            RequestContext.getCurrentInstance().update("message");
-            return "";
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
+                RequestContext.getCurrentInstance().update("message");
+                return "";
+            }
+            sede = empresasedeFacade.find(idSede);
         }
-        FacesContext context = FacesContext.getCurrentInstance();
-//        ExternalContext econtext = FacesContext.getCurrentInstance().getExternalContext();
-        AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
         //comprueba primero si es un superusuario
         SegUsuario usuarioActual = usuarioFacade.buscarUsuarioSuper(usuario, password);
         if (usuarioActual == null) {
@@ -93,7 +96,7 @@ public class LoginMB implements Serializable {
             RequestContext.getCurrentInstance().update("message");
             return "";
         } else {
-            CfgEmpresasede sede = empresasedeFacade.find(idSede);
+            
             if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {
 //                        usuarioActual.setRememberToken(econtext.getSessionId(false));
                 aplicacionMB.insertarUsuario(usuarioActual);
