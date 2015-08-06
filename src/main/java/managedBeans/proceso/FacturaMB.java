@@ -255,8 +255,13 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de factura. Revice la configuracion de documentos"));
             return;            
         }
+        documento.setActDocumento(documento.getActDocumento() + 1);
+        if(documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento, documento.getActDocumento()) != null ){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Concecutivo de factura replicado. Revice la configuracion de documentos"));
+            return;             
+        }
         try {
-            documento.setActDocumento(documento.getActDocumento() + 1);
+            
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
             documentosmaster.setCfgdocumentoidDoc(documento);

@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.CfgDocumento;
+import entities.CfgEmpresasede;
 import entities.FacDocumentosmaster;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +29,18 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
 
     public FacDocumentosmasterFacade() {
         super(FacDocumentosmaster.class);
+    }
+    
+    public FacDocumentosmaster buscarBySedeAndDocumentoAndNum(CfgEmpresasede sede, CfgDocumento documento, long num){
+        try {
+            Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgdocumentoidDoc = ?2 AND d.numDocumento = ?3");
+            query.setParameter(1, sede);
+            query.setParameter(2, documento);
+            query.setParameter(3, num);
+            return (FacDocumentosmaster) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
        
 }
