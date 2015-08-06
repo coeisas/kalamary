@@ -104,6 +104,7 @@ public class FacturaMB implements Serializable {
             RequestContext.getCurrentInstance().update("FormModalProducto");
             clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
             setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+            cargarInformacionCliente();
         }
     }
 
@@ -122,17 +123,21 @@ public class FacturaMB implements Serializable {
     public void cargarInformacionCliente() {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
+            setIdentificacionCliente(clienteSeleccionado.getNumDoc());
             setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
         } else {
             setNombreCliente(null);
+            listaDetalle.clear();
+            listaImpuestos.clear();
             getListaImpuestos().clear();
         }
         RequestContext.getCurrentInstance().execute("PF('dlgCliente').hide()");
         RequestContext.getCurrentInstance().update("IdFormFactura:IdNomCliente");
+        RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
     }
 
     private void actualizarListadoClientes() {
-        listaClientes = clienteFacade.buscarPorEmpresaMenosClienteDefault(sedeActual.getCfgempresaidEmpresa());
+        listaClientes = clienteFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
     }
 
     public void deseleccionarCliente() {
@@ -208,6 +213,10 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
     }
 
+    public void updateTabla() {
+        RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
+    }
+
     private void calcularTotalDescuento() {
         totalDescuento = 0;
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
@@ -238,9 +247,13 @@ public class FacturaMB implements Serializable {
             return;
         }
         CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
-        if(documento == null){
+        if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplicado a factura"));
             return;
+        }
+        if(documento.getFinDocumento() == documento.getActDocumento()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de factura. Revice la configuracion de documentos"));
+            return;            
         }
         try {
             documento.setActDocumento(documento.getActDocumento() + 1);
@@ -254,6 +267,7 @@ public class FacturaMB implements Serializable {
             documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotalFactura(totalFactura);
+            documentosmaster.setEstado("PENDIENTE");
             documentosmasterFacade.create(documentosmaster);
             documentoFacade.edit(documento);
             for (FacDocumentodetalle documentodetalle : listaDetalle) {
@@ -261,7 +275,7 @@ public class FacturaMB implements Serializable {
                 documentodetalle.setFacDocumentosmaster(documentosmaster);
                 documentodetalleFacade.create(documentodetalle);
             }
-            for(CfgImpuesto impuesto : listaImpuestos){
+            for (CfgImpuesto impuesto : listaImpuestos) {
                 FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
                 documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(documentosmaster.getIddocumentomaster(), impuesto.getIdImpuesto()));
                 documentoimpuesto.setCfgImpuesto(impuesto);

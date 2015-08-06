@@ -57,8 +57,6 @@ public class ProductoMB implements Serializable {
     private boolean activo;
 
     private String nombreEmpresa;
-    private String stringCostoFinal;
-    private String stringPrecio;
 
     private List<CfgCategoriaproducto> listaCategoria;
     private List<CfgReferenciaproducto> listaReferencia;
@@ -92,10 +90,8 @@ public class ProductoMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        precio = 0;
-        stringPrecio = formatearFloat(precio);
-        costoFinal = 0;
-        stringCostoFinal = formatearFloat(costoFinal);
+        setPrecio(0);
+        setCostoFinal(0);
         listaCategoria = new ArrayList();
         listaReferencia = new ArrayList();
         listaMarca = new ArrayList();
@@ -149,9 +145,9 @@ public class ProductoMB implements Serializable {
         iva = 0;
         flete = 0;
         costoInd = 0;
-        costoFinal = 0;
+        setCostoFinal(0);
         utilidad = 0;
-        precio = 0;
+        setPrecio(0);
         activo = false;
     }
 
@@ -275,11 +271,9 @@ public class ProductoMB implements Serializable {
             setIva(determinarValor(productoSeleccionado.getIva()));
             setFlete(determinarValor(productoSeleccionado.getFlete()));
             setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));            
-            costoFinal = productoSeleccionado.getCosto();
-            setStringCostoFinal(formatearFloat(costoFinal));
+            setCostoFinal((float) productoSeleccionado.getCosto());
             setUtilidad(determinarValor(productoSeleccionado.getUtilidad()));
-            precio = productoSeleccionado.getPrecio();
-            setStringPrecio(formatearFloat(precio));
+            setPrecio((float) productoSeleccionado.getPrecio());
             setActivo(productoSeleccionado.getActivo());
 
         } else {
@@ -292,11 +286,9 @@ public class ProductoMB implements Serializable {
             setIva(0);
             setFlete(0);
             setCostoInd(0);
-            costoFinal = 0;
-            setStringCostoFinal(formatearFloat(costoFinal));
+            setCostoFinal(0);
             setUtilidad(0);
-            precio = 0;
-            setStringPrecio(formatearFloat(precio));
+            setPrecio(0);
             setActivo(false);
         }
         RequestContext.getCurrentInstance().update("IdFormProducto");
@@ -323,9 +315,9 @@ public class ProductoMB implements Serializable {
             productoSeleccionado.setIva(iva);
             productoSeleccionado.setFlete(flete);
             productoSeleccionado.setCostoIndirecto(costoInd);
-            productoSeleccionado.setCosto(costoFinal);
+            productoSeleccionado.setCosto(getCostoFinal());
             productoSeleccionado.setUtilidad(utilidad);
-            productoSeleccionado.setPrecio(precio);
+            productoSeleccionado.setPrecio(getPrecio());
             productoFacade.edit(productoSeleccionado);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto modificado"));
         } catch (Exception e) {
@@ -335,23 +327,16 @@ public class ProductoMB implements Serializable {
     }
 
     public void determinarCostoFinalAndPrecio() {
-        costoFinal = 0;
-        precio = 0;
+        setCostoFinal(0);
+        setPrecio(0);
         if (validarValores()) {
-            costoFinal = costoAdq + (costoAdq * (iva / 100));
-            costoFinal = costoFinal + (costoFinal * (flete / 100));
-            costoFinal = costoFinal + (costoFinal * (costoInd / 100));
-            precio = costoFinal + (costoFinal * (utilidad / 100));
+            setCostoFinal(costoAdq + (costoAdq * (iva / 100)));
+            setCostoFinal(getCostoFinal() + (getCostoFinal() * (flete / 100)));
+            setCostoFinal(getCostoFinal() + (getCostoFinal() * (costoInd / 100)));
+            setPrecio(getCostoFinal() + (getCostoFinal() * (utilidad / 100)));
         }
-        stringCostoFinal = formatearFloat(costoFinal);
-        stringPrecio = formatearFloat(precio);
         RequestContext.getCurrentInstance().update("IdFormProducto:IdCostoFinal");
         RequestContext.getCurrentInstance().update("IdFormProducto:IdPrecio");
-    }
-
-    private String formatearFloat(float valor) {
-        DecimalFormat df = new DecimalFormat("##########.##");
-        return df.format(valor);
     }
 
     private void crearProducto() {
@@ -367,9 +352,9 @@ public class ProductoMB implements Serializable {
             producto.setIva(iva);
             producto.setFlete(flete);
             producto.setCostoIndirecto(costoInd);
-            producto.setCosto(costoFinal);
+            producto.setCosto(getCostoFinal());
             producto.setUtilidad(utilidad);
-            producto.setPrecio(precio);
+            producto.setPrecio(getPrecio());
             productoFacade.create(producto);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
         } catch (Exception e) {
@@ -536,13 +521,6 @@ public class ProductoMB implements Serializable {
         this.costoInd = costoInd;
     }
 
-//    public float getCostoFinal() {
-//        return costoFinal;
-//    }
-//
-//    public void setCostoFinal(float costoFinal) {
-//        this.costoFinal = costoFinal;
-//    }
     public float getUtilidad() {
         return utilidad;
     }
@@ -551,13 +529,6 @@ public class ProductoMB implements Serializable {
         this.utilidad = utilidad;
     }
 
-//    public float getPrecio() {
-//        return precio;
-//    }
-//
-//    public void setPrecio(float precio) {
-//        this.precio = precio;
-//    }
     public boolean isActivo() {
         return activo;
     }
@@ -654,20 +625,20 @@ public class ProductoMB implements Serializable {
         this.listaProducto = listaProducto;
     }
 
-    public String getStringCostoFinal() {
-        return stringCostoFinal;
+    public float getPrecio() {
+        return precio;
     }
 
-    public void setStringCostoFinal(String stringCostoFinal) {
-        this.stringCostoFinal = stringCostoFinal;
+    public void setPrecio(float precio) {
+        this.precio = precio;
     }
 
-    public String getStringPrecio() {
-        return stringPrecio;
+    public float getCostoFinal() {
+        return costoFinal;
     }
 
-    public void setStringPrecio(String stringPrecio) {
-        this.stringPrecio = stringPrecio;
+    public void setCostoFinal(float costoFinal) {
+        this.costoFinal = costoFinal;
     }
 
 }

@@ -9,6 +9,7 @@ import entities.CfgTipoempresa;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +27,16 @@ public class CfgTipoempresaFacade extends AbstractFacade<CfgTipoempresa> {
 
     public CfgTipoempresaFacade() {
         super(CfgTipoempresa.class);
+    }
+    
+    public CfgTipoempresa buscarByCodigo(String codigo){
+        try {
+            Query query = em.createQuery("SELECT t FROM CfgTipoempresa t WHERE t.codigo = ?1");
+            query.setParameter(1, codigo);
+            return (CfgTipoempresa) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
 }

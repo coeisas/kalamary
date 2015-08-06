@@ -94,16 +94,16 @@
                     <p:row>
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Costo Final:"/>
-                            <p:outputLabel id="IdCostoFinal" class="labelFormularioInformativa" value="#{productoMB.stringCostoFinal}">
-                                <!--f:convertNumber maxIntegerDigits="10"/-->
+                            <p:outputLabel id="IdCostoFinal" class="labelFormularioInformativa" value="#{productoMB.costoFinal}">
+                                <f:convertNumber  type="currency"/>
                             </p:outputLabel>
                             <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
                             <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
-                            <p:outputLabel id="IdPrecio" class="labelFormularioInformativa" value="#{productoMB.stringPrecio}">
-                                <!--f:convertNumber  maxIntegerDigits="10"/-->
+                            <p:outputLabel id="IdPrecio" class="labelFormularioInformativa" value="#{productoMB.precio}">
+                                <f:convertNumber type="currency"/>
                             </p:outputLabel>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
@@ -161,7 +161,7 @@
         </p:dialog>
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
-                <p:dataTable value="#{productoMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                <p:dataTable value="#{productoMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
                     <p:column headerText="Codigo">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>

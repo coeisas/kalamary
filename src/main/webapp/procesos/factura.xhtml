@@ -11,6 +11,7 @@
     <ui:define name="content">
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormFactura">
+            <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
             <div>
                 <p:outputLabel value="Cliente:" class="labelFormulario"/>
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
@@ -31,7 +32,7 @@
                 rowKey="#{itemFactura.facDocumentodetallePK}"
                 editable="true" editMode="cell"
                 emptyMessage="No se han insertado items a la factura">
-                <p:ajax event="cellEdit" listener="#{facturaMB.onCellEdit}" update="@none"/>
+                <p:ajax event="cellEdit" listener="#{facturaMB.onCellEdit}" oncomplete="update()" update="@none"/>
                 <f:facet name="header">Items Factura</f:facet>
                 <p:column headerText="Producto" width="45%">
                     #{itemFactura.cfgProducto.nomProducto}
@@ -53,6 +54,11 @@
                         <f:facet name="input"><p:spinner value="#{itemFactura.descuento}" min="0" size="5"/></f:facet>
                     </p:cellEditor>
                 </p:column>
+                <p:column headerText="Total">
+                    <h:outputText value="#{itemFactura.valorTotal}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>                
                 <p:column width="6%" style="text-align: center">
                     <p:commandButton icon=" ui-icon-circle-minus" title="Quitar Item" actionListener="#{facturaMB.quitarItem}">
                         <f:attribute name="item" value="#{itemFactura}"/>

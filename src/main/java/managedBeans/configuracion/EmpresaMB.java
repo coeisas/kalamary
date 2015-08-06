@@ -5,16 +5,21 @@
  */
 package managedBeans.configuracion;
 
+import entities.CfgCliente;
 import entities.CfgEmpresa;
 import entities.CfgMunicipio;
 import entities.CfgMunicipioPK;
 import entities.CfgTipodocempresa;
 import entities.CfgTipoempresa;
+import entities.CfgTipoidentificacion;
+import entities.SegUsuario;
+import facades.CfgClienteFacade;
 import facades.CfgDepartamentoFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgMunicipioFacade;
 import facades.CfgTipodocempresaFacade;
 import facades.CfgTipoempresaFacade;
+import facades.CfgTipoidentificacionFacade;
 import facades.SegUsuarioFacade;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -65,6 +70,7 @@ public class EmpresaMB implements Serializable {
     private String opcion;//opcion que contiene la accion del boton guardar: creacion, modificacion
 
     private SesionMB sesionMB;
+    private SegUsuario usuarioActual;
 
     @EJB
     CfgDepartamentoFacade departamentoFacade;
@@ -82,6 +88,12 @@ public class EmpresaMB implements Serializable {
     CfgTipodocempresaFacade tipodocempresaFacade;
 
     @EJB
+    CfgTipoidentificacionFacade tipoidentificacionFacade;
+
+    @EJB
+    CfgClienteFacade clienteFacade;
+    
+    @EJB
     SegUsuarioFacade usuarioFacade;
 
     @PostConstruct
@@ -90,6 +102,7 @@ public class EmpresaMB implements Serializable {
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         opcion = "creacion";
         listaMuncipios = new ArrayList();
+        usuarioActual = sesionMB.getUsuarioActual();
     }
 
     /**
@@ -184,8 +197,9 @@ public class EmpresaMB implements Serializable {
             if (file != null) {
                 empresa.setLogo(getFile().getContents());
             }
-            empresa.setSegusuarioidUsuario(sesionMB.getUsuarioActual());
+            empresa.setSegusuarioidUsuario(usuarioActual);
             empresaFacade.create(empresa);
+            crearClienteDefault(empresa);
             setEmpresaSeleccionada(null);
             setCodigo(null);
             limpiarFormulario();
@@ -244,6 +258,31 @@ public class EmpresaMB implements Serializable {
             RequestContext.getCurrentInstance().update("IdFormEmpresa:nombreImagen");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Logo cargado"));
             RequestContext.getCurrentInstance().execute("PF('dlgLogo').hide()");
+        }
+    }
+
+    private void crearClienteDefault(CfgEmpresa  empresa) {
+        try {
+            CfgCliente cliente = new CfgCliente();
+            cliente.setNom1Cliente("CLIENTE");
+            cliente.setApellido1("DEFAULT");
+            cliente.setNumDoc("1");
+            cliente.setCodigoCliente("1");
+            cliente.setTel1("1");
+            cliente.setDirCliente("DIRECCION CLIENTE DEFAULT");
+            cliente.setFecCrea(new Date());
+            cliente.setSegusuarioidUsuario(usuarioActual);
+            cliente.setCfgempresaidEmpresa(empresa);
+            CfgTipoidentificacion tipoidentificacion = tipoidentificacionFacade.buscarByCodigo("00009");//SIN DETERMINAR
+            cliente.setCfgTipoidentificacionId(tipoidentificacion);
+            CfgTipoempresa tipoempresa = tipoempresaFacade.buscarByCodigo("00011");//PERSONA NATURAL REGIMEN SIMPLIFICADO
+            cliente.setCfgTipoempresaId(tipoempresa);
+            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            cliente.setCfgMunicipio(municipio);
+            clienteFacade.create(cliente);
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente Defautl no creado"));
         }
     }
 

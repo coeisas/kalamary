@@ -9,6 +9,7 @@ import entities.CfgTipoidentificacion;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +27,16 @@ public class CfgTipoidentificacionFacade extends AbstractFacade<CfgTipoidentific
 
     public CfgTipoidentificacionFacade() {
         super(CfgTipoidentificacion.class);
+    }
+    
+    public CfgTipoidentificacion buscarByCodigo(String codigo){
+        try {
+            Query query = em.createQuery("SELECT i FROM CfgTipoidentificacion i WHERE i.codigo = ?1");
+            query.setParameter(1, codigo);
+            return (CfgTipoidentificacion) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
 }

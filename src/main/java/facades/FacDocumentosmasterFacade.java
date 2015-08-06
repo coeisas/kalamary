@@ -27,5 +27,5 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
     public FacDocumentosmasterFacade() {
         super(FacDocumentosmaster.class);
     }
-    
+       
 }
