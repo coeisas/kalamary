@@ -7,7 +7,9 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,6 +27,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -77,11 +81,13 @@ public class CfgFormapago implements Serializable {
     @Size(min = 1, max = 5)
     @Column(name = "codFormaPago", nullable = false, length = 5)
     private String codFormaPago;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
+    private List<FacDocuementopago> facDocuementopagoList;    
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
     @Transient
-    private float subtotal;
+    private float subtotal;//campo utilizado en factura, para guardar el monto a pagar por cada forma de pago
 
     public CfgFormapago() {
     }
@@ -155,7 +161,16 @@ public class CfgFormapago implements Serializable {
     public void setCodFormaPago(String codFormaPago) {
         this.codFormaPago = codFormaPago;
     }
+    
+    @XmlTransient
+    public List<FacDocuementopago> getFacDocuementopagoList() {
+        return facDocuementopagoList;
+    }
 
+    public void setFacDocuementopagoList(List<FacDocuementopago> facDocuementopagoList) {
+        this.facDocuementopagoList = facDocuementopagoList;
+    }
+    
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }

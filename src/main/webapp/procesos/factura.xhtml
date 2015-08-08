@@ -12,6 +12,7 @@
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormFactura">
             <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
+            <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>
             <div>
                 <p:outputLabel value="Cliente:" class="labelFormulario"/>
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
@@ -97,7 +98,8 @@
                 </div>                
             </p:panel>
             <div style="text-align: center;clear: right">
-                <p:commandButton icon="ui-icon-disk" value="Guardar Factura" actionListener="#{facturaMB.guardarFactura}" title="Guardar Factura"/>
+                <p:commandButton icon="ui-icon-disk" value="Guardar Factura" actionListener="#{facturaMB.guardarFactura}" title="Guardar Factura"/>&nbsp;
+                <p:commandButton icon="ui-icon-print" value="Facturar" actionListener="#{facturaMB.facturacion}" title="Guardar Factura"/>
             </div>
         </h:form>
 
@@ -130,6 +132,42 @@
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Insertar" actionListener="#{facturaMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="25%" resizable="false">
+            <h:form id="FormModalFactura">
+                <p:dataTable  id="IdTableFormaPago" value="#{facturaMB.listaFormapagos}" var="formaPago" editable="true" editMode="row">
+                    <p:ajax event="rowEdit" listener="#{facturaMB.onRowEdit}" update="@none" oncomplete="updateTablaFormaPago()" />
+                    <p:ajax event="rowEditCancel" listener="#{facturaMB.onRowCancel}" update="@none" oncomplete="updateTablaFormaPago()"/>
+                    <p:column headerText="Forma de Pago">
+                        #{formaPago.nomFormaPago}
+                    </p:column>
+                    <p:column headerText="Valor">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{formaPago.subtotal}">
+                                    <f:convertNumber type="currency"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input"><h:inputText value="#{formaPago.subtotal}"/></f:facet>
+                        </p:cellEditor>                        
+                    </p:column>
+                    <p:column style="width:32px">
+                        <p:rowEditor />
+                    </p:column>
+                </p:dataTable>
+                <br/>
+                <div>
+                    <p:outputLabel class="labelFormulario" value="Total Factura:"/>
+                    <p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.totalFactura}">
+                        <f:convertNumber type="currency"/>
+                    </p:outputLabel>                    
+                </div>                
+                <div style="clear: left">
+                    <p:outputLabel class="labelFormulario" value="Total Items:"/><p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.listaDetalle.size()}"/>
+                </div>
+                <p:commandButton value="Imprimir" icon="ui-icon-print" actionListener="#{facturaMB.imprimir}"/>
             </h:form>
         </p:dialog>
     </ui:define>
