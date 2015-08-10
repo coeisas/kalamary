@@ -106,7 +106,7 @@ public class AplicacionMB implements Serializable {
             return "";
         }
         user.getSession().invalidate();
-        return "main?faces-redirect=true";
+        return "procesos/main?faces-redirect=true";
     }
 
     public void insertarHttpSession(HttpSession session) {
