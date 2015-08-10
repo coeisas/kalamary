@@ -11,10 +11,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -38,20 +36,18 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "FacDocumentosmaster.findAll", query = "SELECT f FROM FacDocumentosmaster f"),
-    @NamedQuery(name = "FacDocumentosmaster.findByNumDocumento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.numDocumento = :numDocumento"),
+    @NamedQuery(name = "FacDocumentosmaster.findByCfgdocumentoidDoc", query = "SELECT f FROM FacDocumentosmaster f WHERE f.facDocumentosmasterPK.cfgdocumentoidDoc = :cfgdocumentoidDoc"),
+    @NamedQuery(name = "FacDocumentosmaster.findByNumDocumento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.facDocumentosmasterPK.numDocumento = :numDocumento"),
     @NamedQuery(name = "FacDocumentosmaster.findByTotalFactura", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFactura = :totalFactura"),
     @NamedQuery(name = "FacDocumentosmaster.findByFecCrea", query = "SELECT f FROM FacDocumentosmaster f WHERE f.fecCrea = :fecCrea"),
     @NamedQuery(name = "FacDocumentosmaster.findByEstado", query = "SELECT f FROM FacDocumentosmaster f WHERE f.estado = :estado"),
-    @NamedQuery(name = "FacDocumentosmaster.findByIddocumentomaster", query = "SELECT f FROM FacDocumentosmaster f WHERE f.iddocumentomaster = :iddocumentomaster"),
     @NamedQuery(name = "FacDocumentosmaster.findByTotalFacturaUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFacturaUSD = :totalFacturaUSD"),
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
 public class FacDocumentosmaster implements Serializable {
     private static final long serialVersionUID = 1L;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "numDocumento", nullable = false)
-    private int numDocumento;
+    @EmbeddedId
+    protected FacDocumentosmasterPK facDocumentosmasterPK;
     @Basic(optional = false)
     @Column(name = "totalFactura", nullable = false)
     private float totalFactura;
@@ -66,11 +62,6 @@ public class FacDocumentosmaster implements Serializable {
     private Date fecCrea;
     @Column(name = "estado", length = 10)
     private String estado;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "iddocumentomaster", nullable = false)
-    private Long iddocumentomaster;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "totalFacturaUSD", precision = 12)
     private Float totalFacturaUSD;
@@ -78,12 +69,16 @@ public class FacDocumentosmaster implements Serializable {
     private Float subtotal;
     @Column(name = "descuento", precision = 12)
     private Float descuento;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
+    private List<FacDocuementopago> facDocuementopagoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
+    private List<FacDocumentoimpuesto> facDocumentoimpuestoList;
     @JoinColumn(name = "cfg_cliente_idCliente", referencedColumnName = "idCliente", nullable = false)
     @ManyToOne(optional = false)
     private CfgCliente cfgclienteidCliente;
-    @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false)
+    @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private CfgDocumento cfgdocumentoidDoc;
+    private CfgDocumento cfgDocumento;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
@@ -95,29 +90,32 @@ public class FacDocumentosmaster implements Serializable {
     private SegUsuario segusuarioidUsuario;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocumentodetalle> facDocumentodetalleList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmasterIddocumentomaster")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacMovcajadetalle> facMovcajadetalleList;
 
     public FacDocumentosmaster() {
     }
 
-    public FacDocumentosmaster(Long iddocumentomaster) {
-        this.iddocumentomaster = iddocumentomaster;
+    public FacDocumentosmaster(FacDocumentosmasterPK facDocumentosmasterPK) {
+        this.facDocumentosmasterPK = facDocumentosmasterPK;
     }
 
-    public FacDocumentosmaster(Long iddocumentomaster, int numDocumento, float totalFactura, Date fecCrea) {
-        this.iddocumentomaster = iddocumentomaster;
-        this.numDocumento = numDocumento;
+    public FacDocumentosmaster(FacDocumentosmasterPK facDocumentosmasterPK, float totalFactura, Date fecCrea) {
+        this.facDocumentosmasterPK = facDocumentosmasterPK;
         this.totalFactura = totalFactura;
         this.fecCrea = fecCrea;
     }
 
-    public int getNumDocumento() {
-        return numDocumento;
+    public FacDocumentosmaster(int cfgdocumentoidDoc, int numDocumento) {
+        this.facDocumentosmasterPK = new FacDocumentosmasterPK(cfgdocumentoidDoc, numDocumento);
     }
 
-    public void setNumDocumento(int numDocumento) {
-        this.numDocumento = numDocumento;
+    public FacDocumentosmasterPK getFacDocumentosmasterPK() {
+        return facDocumentosmasterPK;
+    }
+
+    public void setFacDocumentosmasterPK(FacDocumentosmasterPK facDocumentosmasterPK) {
+        this.facDocumentosmasterPK = facDocumentosmasterPK;
     }
 
     public float getTotalFactura() {
@@ -152,14 +150,6 @@ public class FacDocumentosmaster implements Serializable {
         this.estado = estado;
     }
 
-    public Long getIddocumentomaster() {
-        return iddocumentomaster;
-    }
-
-    public void setIddocumentomaster(Long iddocumentomaster) {
-        this.iddocumentomaster = iddocumentomaster;
-    }
-
     public Float getTotalFacturaUSD() {
         return totalFacturaUSD;
     }
@@ -184,6 +174,24 @@ public class FacDocumentosmaster implements Serializable {
         this.descuento = descuento;
     }
 
+    @XmlTransient
+    public List<FacDocuementopago> getFacDocuementopagoList() {
+        return facDocuementopagoList;
+    }
+
+    public void setFacDocuementopagoList(List<FacDocuementopago> facDocuementopagoList) {
+        this.facDocuementopagoList = facDocuementopagoList;
+    }
+
+    @XmlTransient
+    public List<FacDocumentoimpuesto> getFacDocumentoimpuestoList() {
+        return facDocumentoimpuestoList;
+    }
+
+    public void setFacDocumentoimpuestoList(List<FacDocumentoimpuesto> facDocumentoimpuestoList) {
+        this.facDocumentoimpuestoList = facDocumentoimpuestoList;
+    }
+
     public CfgCliente getCfgclienteidCliente() {
         return cfgclienteidCliente;
     }
@@ -192,12 +200,12 @@ public class FacDocumentosmaster implements Serializable {
         this.cfgclienteidCliente = cfgclienteidCliente;
     }
 
-    public CfgDocumento getCfgdocumentoidDoc() {
-        return cfgdocumentoidDoc;
+    public CfgDocumento getCfgdocumento() {
+        return cfgDocumento;
     }
 
-    public void setCfgdocumentoidDoc(CfgDocumento cfgdocumentoidDoc) {
-        this.cfgdocumentoidDoc = cfgdocumentoidDoc;
+    public void setCfgdocumento(CfgDocumento cfgdocumento) {
+        this.cfgDocumento = cfgdocumento;
     }
 
     public CfgEmpresasede getCfgempresasedeidSede() {
@@ -245,7 +253,7 @@ public class FacDocumentosmaster implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (iddocumentomaster != null ? iddocumentomaster.hashCode() : 0);
+        hash += (facDocumentosmasterPK != null ? facDocumentosmasterPK.hashCode() : 0);
         return hash;
     }
 
@@ -256,7 +264,7 @@ public class FacDocumentosmaster implements Serializable {
             return false;
         }
         FacDocumentosmaster other = (FacDocumentosmaster) object;
-        if ((this.iddocumentomaster == null && other.iddocumentomaster != null) || (this.iddocumentomaster != null && !this.iddocumentomaster.equals(other.iddocumentomaster))) {
+        if ((this.facDocumentosmasterPK == null && other.facDocumentosmasterPK != null) || (this.facDocumentosmasterPK != null && !this.facDocumentosmasterPK.equals(other.facDocumentosmasterPK))) {
             return false;
         }
         return true;
@@ -264,7 +272,7 @@ public class FacDocumentosmaster implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.FacDocumentosmaster[ iddocumentomaster=" + iddocumentomaster + " ]";
+        return "entities.FacDocumentosmaster[ facDocumentosmasterPK=" + facDocumentosmasterPK + " ]";
     }
-    
+
 }

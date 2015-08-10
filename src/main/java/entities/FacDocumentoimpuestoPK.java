@@ -17,26 +17,22 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class FacDocumentoimpuestoPK implements Serializable {
     @Basic(optional = false)
-    @Column(name = "fac_documentosmaster_iddocumentomaster", nullable = false)
-    private long facDocumentosmasterIddocumentomaster;
-    @Basic(optional = false)
     @Column(name = "cfg_impuesto_idImpuesto", nullable = false)
     private int cfgimpuestoidImpuesto;
+    @Basic(optional = false)
+    @Column(name = "fac_documentosmaster_cfg_documento_idDoc", nullable = false)
+    private int facdocumentosmastercfgdocumentoidDoc;
+    @Basic(optional = false)
+    @Column(name = "fac_documentosmaster_numDocumento", nullable = false)
+    private int facdocumentosmasternumDocumento;
 
     public FacDocumentoimpuestoPK() {
     }
 
-    public FacDocumentoimpuestoPK(long facDocumentosmasterIddocumentomaster, int cfgimpuestoidImpuesto) {
-        this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
+    public FacDocumentoimpuestoPK(int cfgimpuestoidImpuesto, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento) {
         this.cfgimpuestoidImpuesto = cfgimpuestoidImpuesto;
-    }
-
-    public long getFacDocumentosmasterIddocumentomaster() {
-        return facDocumentosmasterIddocumentomaster;
-    }
-
-    public void setFacDocumentosmasterIddocumentomaster(long facDocumentosmasterIddocumentomaster) {
-        this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
+        this.facdocumentosmastercfgdocumentoidDoc = facdocumentosmastercfgdocumentoidDoc;
+        this.facdocumentosmasternumDocumento = facdocumentosmasternumDocumento;
     }
 
     public int getCfgimpuestoidImpuesto() {
@@ -47,11 +43,28 @@ public class FacDocumentoimpuestoPK implements Serializable {
         this.cfgimpuestoidImpuesto = cfgimpuestoidImpuesto;
     }
 
+    public int getFacdocumentosmastercfgdocumentoidDoc() {
+        return facdocumentosmastercfgdocumentoidDoc;
+    }
+
+    public void setFacdocumentosmastercfgdocumentoidDoc(int facdocumentosmastercfgdocumentoidDoc) {
+        this.facdocumentosmastercfgdocumentoidDoc = facdocumentosmastercfgdocumentoidDoc;
+    }
+
+    public int getFacdocumentosmasternumDocumento() {
+        return facdocumentosmasternumDocumento;
+    }
+
+    public void setFacdocumentosmasternumDocumento(int facdocumentosmasternumDocumento) {
+        this.facdocumentosmasternumDocumento = facdocumentosmasternumDocumento;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) facDocumentosmasterIddocumentomaster;
         hash += (int) cfgimpuestoidImpuesto;
+        hash += (int) facdocumentosmastercfgdocumentoidDoc;
+        hash += (int) facdocumentosmasternumDocumento;
         return hash;
     }
 
@@ -62,10 +75,13 @@ public class FacDocumentoimpuestoPK implements Serializable {
             return false;
         }
         FacDocumentoimpuestoPK other = (FacDocumentoimpuestoPK) object;
-        if (this.facDocumentosmasterIddocumentomaster != other.facDocumentosmasterIddocumentomaster) {
+        if (this.cfgimpuestoidImpuesto != other.cfgimpuestoidImpuesto) {
             return false;
         }
-        if (this.cfgimpuestoidImpuesto != other.cfgimpuestoidImpuesto) {
+        if (this.facdocumentosmastercfgdocumentoidDoc != other.facdocumentosmastercfgdocumentoidDoc) {
+            return false;
+        }
+        if (this.facdocumentosmasternumDocumento != other.facdocumentosmasternumDocumento) {
             return false;
         }
         return true;
@@ -73,7 +89,7 @@ public class FacDocumentoimpuestoPK implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.FacDocumentoimpuestoPK[ facDocumentosmasterIddocumentomaster=" + facDocumentosmasterIddocumentomaster + ", cfgimpuestoidImpuesto=" + cfgimpuestoidImpuesto + " ]";
+        return "entities.FacDocumentoimpuestoPK[ cfgimpuestoidImpuesto=" + cfgimpuestoidImpuesto + ", facdocumentosmastercfgdocumentoidDoc=" + facdocumentosmastercfgdocumentoidDoc + ", facdocumentosmasternumDocumento=" + facdocumentosmasternumDocumento + " ]";
     }
     
 }

@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -26,9 +27,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "FacDocuementopago.findAll", query = "SELECT f FROM FacDocuementopago f"),
-    @NamedQuery(name = "FacDocuementopago.findByFacDocumentosmasterIddocumentomaster", query = "SELECT f FROM FacDocuementopago f WHERE f.facDocuementopagoPK.facDocumentosmasterIddocumentomaster = :facDocumentosmasterIddocumentomaster"),
     @NamedQuery(name = "FacDocuementopago.findByCfgformapagoidFormaPago", query = "SELECT f FROM FacDocuementopago f WHERE f.facDocuementopagoPK.cfgformapagoidFormaPago = :cfgformapagoidFormaPago"),
-    @NamedQuery(name = "FacDocuementopago.findByValorPago", query = "SELECT f FROM FacDocuementopago f WHERE f.valorPago = :valorPago")})
+    @NamedQuery(name = "FacDocuementopago.findByValorPago", query = "SELECT f FROM FacDocuementopago f WHERE f.valorPago = :valorPago"),
+    @NamedQuery(name = "FacDocuementopago.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacDocuementopago f WHERE f.facDocuementopagoPK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
+    @NamedQuery(name = "FacDocuementopago.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacDocuementopago f WHERE f.facDocuementopagoPK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento")})
 public class FacDocuementopago implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -39,7 +41,9 @@ public class FacDocuementopago implements Serializable {
     @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgFormapago cfgFormapago;
-    @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false, insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmaster;
 
@@ -55,8 +59,8 @@ public class FacDocuementopago implements Serializable {
         this.valorPago = valorPago;
     }
 
-    public FacDocuementopago(long facDocumentosmasterIddocumentomaster, int cfgformapagoidFormaPago) {
-        this.facDocuementopagoPK = new FacDocuementopagoPK(facDocumentosmasterIddocumentomaster, cfgformapagoidFormaPago);
+    public FacDocuementopago(int cfgformapagoidFormaPago, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento) {
+        this.facDocuementopagoPK = new FacDocuementopagoPK(cfgformapagoidFormaPago, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento);
     }
 
     public FacDocuementopagoPK getFacDocuementopagoPK() {

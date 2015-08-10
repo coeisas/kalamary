@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="130" pageHeight="453" columnWidth="126" leftMargin="2" rightMargin="2" topMargin="2" bottomMargin="2" uuid="73a63e40-5e87-425d-b77a-7b665ad046a6">
+	<property name="ireport.zoom" value="4.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="formaPago" class="java.lang.String"/>
+	<field name="valorPago" class="java.lang.Float"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="6" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="63" height="6" uuid="c5d65531-c37f-415a-9e7c-6c463448f874"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{formaPago}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="63" y="0" width="63" height="6" uuid="5702d169-2e74-439b-954d-e2b0fb09056d"/>
+				<textElement textAlignment="Right">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valorPago}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

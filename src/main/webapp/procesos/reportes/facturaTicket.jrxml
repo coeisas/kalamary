@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="161" pageHeight="453" columnWidth="133" leftMargin="14" rightMargin="14" topMargin="20" bottomMargin="20" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
+	<property name="ireport.zoom" value="6.0"/>
+	<property name="ireport.x" value="132"/>
+	<property name="ireport.y" value="271"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String">
+		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="empresa" class="java.lang.String"/>
+	<parameter name="nit" class="java.lang.String"/>
+	<parameter name="fecha" class="java.util.Date"/>
+	<parameter name="cliente" class="java.lang.String"/>
+	<parameter name="usuario" class="java.lang.String"/>
+	<field name="numFac" class="java.lang.String"/>
+	<field name="subtotal" class="java.lang.Float"/>
+	<field name="descuento" class="java.lang.Float"/>
+	<field name="totalFactura" class="java.lang.Float"/>
+	<field name="totalLetras" class="java.lang.String"/>
+	<field name="detalle" class="java.util.List"/>
+	<field name="impuesto" class="java.util.List"/>
+	<field name="pago" class="java.util.List"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="14" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="132" height="6" uuid="24ee594a-c271-468f-8e08-7df5c2a456d8"/>
+				<textElement textAlignment="Center">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{empresa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="6" width="133" height="6" uuid="b398a1e7-18f9-4647-9288-9958c170ae1b"/>
+				<textElement textAlignment="Center">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{nit}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="19" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="133" height="6" uuid="3b1fa499-1a90-4297-b1a6-c6bb1c1721c3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FACTURA No." + $F{numFac}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="15" y="6" width="115" height="6" uuid="9170ac7c-9757-471b-a2a7-2bffb3f16d83"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="6" width="15" height="6" uuid="0813f220-ddf2-4e56-8728-2b38d1d8a369"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[FECHA:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="12" width="19" height="6" uuid="f132f43e-ed7f-4331-8651-e6ac09a819fe"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[CLIENTE:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="19" y="12" width="111" height="6" uuid="f8504176-d0ba-427b-ba94-cc715e427b2c"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{cliente}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="133" height="1" uuid="52032c08-c492-4e7f-a7da-c0b7bb0c41c8"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="6" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="133" height="6" uuid="b7e66def-2229-4dc7-936a-5b22a6affca6"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{detalle})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/facturaTicket_detalle.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="12">
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="67" y="0" width="63" height="6" uuid="39f3da25-14eb-4495-b385-77173ac4c9f8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="0" width="62" height="6" uuid="0dab4603-8962-4a85-8e53-7fce92079ea2"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[SUBTOTAL]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="67" y="6" width="63" height="6" uuid="3fd4d975-83f6-42e5-8387-9ac54517e370"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{descuento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="6" width="62" height="6" uuid="813bae92-a75b-4574-b8df-b259d90bdd53"/>
+				<textElement verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[DESCUENTO]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="0" width="133" height="1" uuid="bfa9229d-2404-4d85-8fc9-c1b6bc7c1bcd"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+		<band height="6">
+			<subreport>
+				<reportElement x="0" y="0" width="133" height="6" uuid="10191733-3d0b-48a1-9982-6140bdcbbca8"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{impuesto})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/facturaTicket_impuesto.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="8">
+			<staticText>
+				<reportElement x="4" y="0" width="63" height="8" uuid="66fb6db3-7ba8-4c2b-a7c2-42eacf4ee3ad"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[TOTAL FACTURA]]></text>
+			</staticText>
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="66" y="0" width="64" height="8" uuid="3628adfc-38da-4036-b51a-2d4f4c54c627"/>
+				<textElement textAlignment="Right">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{totalFactura}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="7" width="133" height="1" uuid="3804a3b8-5008-45a0-aef8-05f52ebea509"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="0" y="6" width="133" height="1" uuid="2607e7f0-0da8-4551-a776-6406e79ca141"/>
+				<graphicElement>
+					<pen lineWidth="0.25" lineStyle="Dashed"/>
+				</graphicElement>
+			</line>
+		</band>
+		<band height="6">
+			<subreport>
+				<reportElement x="0" y="0" width="133" height="6" uuid="edc1e17c-d3c4-4ecb-9f8d-8b4810a285d8"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{pago})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/facturaTicket_pago.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="10">
+			<textField>
+				<reportElement x="0" y="0" width="133" height="10" uuid="994846ec-4d28-4f67-878d-eb9189052ec4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA["FACTURA GENERADA POR " + $P{usuario}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

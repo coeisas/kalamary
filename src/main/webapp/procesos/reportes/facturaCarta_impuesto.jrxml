@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" columnCount="3" printOrder="Horizontal" pageWidth="311" pageHeight="792" columnWidth="97" columnSpacing="5" leftMargin="5" rightMargin="5" topMargin="20" bottomMargin="20" uuid="04371bda-bdb5-4ffb-ba87-85f498c85939">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<field name="valorImpuesto" class="java.lang.Float"/>
+	<field name="impuesto" class="java.lang.String"/>
+	<field name="porcentaje" class="java.lang.Float"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="45" y="0" width="52" height="18" uuid="3f7618c3-65b8-4577-8021-4f5268ca1b59"/>
+			</rectangle>
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="45" y="0" width="50" height="18" uuid="1cd76f8c-308a-46a4-ac65-9fb173dde19f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valorImpuesto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="3" width="43" height="12" uuid="70a2c773-14b2-40c4-aa4b-b8ca5e483d73"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{impuesto}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

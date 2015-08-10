@@ -229,8 +229,14 @@ public class DocumentoMB implements Serializable {
         if (sedeSeleccionada != null && aplicacion != 0) {
             CfgDocumento cfgDocumento = documentoFacade.buscarAplicacionDocumentoPorSede(sedeSeleccionada, aplicacion);
             if (cfgDocumento != null) {
-                aplicacionValidada = false;
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Aplicacion ya implementada por el documento " + cfgDocumento.getNomDoc()));
+                if (documentoSeleccionado != null) {
+                    if (!documentoSeleccionado.equals(cfgDocumento)) {
+                        aplicacionValidada = false;
+                    }
+                } else {
+                    aplicacionValidada = false;
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Aplicacion ya implementada por el documento " + cfgDocumento.getNomDoc()));
+                }
             }
         }
     }
@@ -270,7 +276,7 @@ public class DocumentoMB implements Serializable {
             return false;
         }
         validarAplicacion();
-        if(!aplicacionValidada){
+        if (!aplicacionValidada) {
             return false;
         }
         if (rangoInicial < 0) {
@@ -313,6 +319,7 @@ public class DocumentoMB implements Serializable {
             documento.setObsDocumento(observacion);
             documento.setFecCrea(new Date());
             documento.setSegusuarioidUsuario(sesionMB.getUsuarioActual());
+            documento.setFinalizado(false);
             documentoFacade.create(documento);
             limpiarFormulario();
             RequestContext.getCurrentInstance().update("IdFormDocumento");
@@ -328,6 +335,10 @@ public class DocumentoMB implements Serializable {
         }
         if (documentoSeleccionado == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija un documento"));
+            return;
+        }
+        if (documentoSeleccionado.getFinalizado()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "El documento se encuentra finalizado"));
             return;
         }
         try {

@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -61,14 +62,16 @@ public class FacMovcajadetalle implements Serializable {
     private CfgDocumento cfgdocumentoidDoc;
     @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false)
     @ManyToOne(optional = false)
-    private CfgFormapago cfgformapagoidFormaPago;   
-    @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false)
+    private CfgFormapago cfgformapagoidFormaPago;
+    @JoinColumns({
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false)})
     @ManyToOne(optional = false)
-    private FacDocumentosmaster facDocumentosmasterIddocumentomaster;
+    private FacDocumentosmaster facDocumentosmaster;
     @JoinColumn(name = "fac_movcaja_idMovimiento", referencedColumnName = "idMovimiento", nullable = false)
     @ManyToOne(optional = false)
     private FacMovcaja facmovcajaidMovimiento;
-    
+
     public FacMovcajadetalle() {
     }
 
@@ -122,7 +125,7 @@ public class FacMovcajadetalle implements Serializable {
     public void setCfgdocumentoidDoc(CfgDocumento cfgdocumentoidDoc) {
         this.cfgdocumentoidDoc = cfgdocumentoidDoc;
     }
-    
+
     public CfgFormapago getCfgformapagoidFormaPago() {
         return cfgformapagoidFormaPago;
     }
@@ -131,12 +134,12 @@ public class FacMovcajadetalle implements Serializable {
         this.cfgformapagoidFormaPago = cfgformapagoidFormaPago;
     }
 
-    public FacDocumentosmaster getFacDocumentosmasterIddocumentomaster() {
-        return facDocumentosmasterIddocumentomaster;
+    public FacDocumentosmaster getFacDocumentosmaster() {
+        return facDocumentosmaster;
     }
 
-    public void setFacDocumentosmasterIddocumentomaster(FacDocumentosmaster facDocumentosmasterIddocumentomaster) {
-        this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
+    public void setFacDocumentosmaster(FacDocumentosmaster facDocumentosmaster) {
+        this.facDocumentosmaster = facDocumentosmaster;
     }
 
     public FacMovcaja getFacmovcajaidMovimiento() {
@@ -146,7 +149,7 @@ public class FacMovcajadetalle implements Serializable {
     public void setFacmovcajaidMovimiento(FacMovcaja facmovcajaidMovimiento) {
         this.facmovcajaidMovimiento = facmovcajaidMovimiento;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

@@ -55,7 +55,7 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
 
     public CfgDocumento buscarAplicacionDocumentoPorSede(CfgEmpresasede sede, int idaplicacion) {
         try {
-            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.idaplicacion = ?2");
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.idaplicacion = ?2 AND d.finalizado =  FALSE");
             query.setParameter(1, sede);
             query.setParameter(2, idaplicacion);
             return (CfgDocumento) query.getSingleResult();
@@ -66,7 +66,7 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
 
     public CfgDocumento buscarDocumentoDeFacturaBySede(CfgEmpresasede sede) {
         try {
-            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'");
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1' AND d.finalizado = FALSE AND d.activo = TRUE");
             query.setParameter(1, sede);
             return (CfgDocumento) query.getSingleResult();
         } catch (Exception e) {

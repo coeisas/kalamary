@@ -130,6 +130,7 @@
                 <p:dataTable value="#{documentoMB.listaDocumento}" var="documento" emptyMessage="No hay documentos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{documentoMB.documentoSeleccionado}" rowKey="#{documento.idDoc}" selectionMode="single">
                     <p:column headerText="Codigo">#{documento.codDocumento}</p:column>
                     <p:column headerText="Documento">#{documento.nomDoc}</p:column>
+                    <p:column headerText="Finalizado">#{documento.finalizado ? "SI": "NO"}</p:column>
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Aceptar" actionListener="#{documentoMB.cargarInformacionDocumento}" onclick="PF('dlgDocumento').hide()"/>

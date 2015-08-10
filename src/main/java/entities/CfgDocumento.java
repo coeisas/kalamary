@@ -48,7 +48,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgDocumento.findByActDocumento", query = "SELECT c FROM CfgDocumento c WHERE c.actDocumento = :actDocumento"),
     @NamedQuery(name = "CfgDocumento.findByResDian", query = "SELECT c FROM CfgDocumento c WHERE c.resDian = :resDian"),
     @NamedQuery(name = "CfgDocumento.findByFecCrea", query = "SELECT c FROM CfgDocumento c WHERE c.fecCrea = :fecCrea"),
-    @NamedQuery(name = "CfgDocumento.findByCodDocumento", query = "SELECT c FROM CfgDocumento c WHERE c.codDocumento = :codDocumento")})
+    @NamedQuery(name = "CfgDocumento.findByCodDocumento", query = "SELECT c FROM CfgDocumento c WHERE c.codDocumento = :codDocumento"),
+    @NamedQuery(name = "CfgDocumento.findByFinalizado", query = "SELECT c FROM CfgDocumento c WHERE c.finalizado = :finalizado")})
 public class CfgDocumento implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -58,7 +59,6 @@ public class CfgDocumento implements Serializable {
     private Integer idDoc;
     @Basic(optional = false)
     @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "nomDoc", nullable = false, length = 25)
     private String nomDoc;
     @Basic(optional = false)
@@ -97,21 +97,25 @@ public class CfgDocumento implements Serializable {
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
+    @Basic(optional = false)
     @Column(name = "codDocumento", nullable = false, length = 10)
     private String codDocumento;
+    @Basic(optional = false)
+    @Column(name = "finalizado", nullable = false)
+    private boolean finalizado;
     @JoinColumn(name = "cfg_aplicaciondocumento_idaplicacion", referencedColumnName = "idaplicacion")
     @ManyToOne
-    private CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion;    
+    private CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
     @JoinColumn(name = "cfg_tipoempresa_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
-    private CfgTipoempresa cfgTipoempresaId;    
+    private CfgTipoempresa cfgTipoempresaId;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgdocumentoidDoc")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgDocumento")
     private List<FacDocumentosmaster> facDocumentosmasterList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgdocumentoidDoc")
     private List<FacMovcajadetalle> facMovcajadetalleList;
@@ -123,7 +127,7 @@ public class CfgDocumento implements Serializable {
         this.idDoc = idDoc;
     }
 
-    public CfgDocumento(Integer idDoc, String nomDoc, String abreviatura, boolean activo, int iniDocumento, int finDocumento, int actDocumento, Date fecCrea) {
+    public CfgDocumento(Integer idDoc, String nomDoc, String abreviatura, boolean activo, int iniDocumento, int finDocumento, int actDocumento, Date fecCrea, String codDocumento) {
         this.idDoc = idDoc;
         this.nomDoc = nomDoc;
         this.abreviatura = abreviatura;
@@ -132,6 +136,7 @@ public class CfgDocumento implements Serializable {
         this.finDocumento = finDocumento;
         this.actDocumento = actDocumento;
         this.fecCrea = fecCrea;
+        this.codDocumento = codDocumento;
     }
 
     public Integer getIdDoc() {
@@ -230,6 +235,14 @@ public class CfgDocumento implements Serializable {
         this.codDocumento = codDocumento;
     }
 
+    public boolean getFinalizado() {
+        return finalizado;
+    }
+
+    public void setFinalizado(boolean finalizado) {
+        this.finalizado = finalizado;
+    }
+
     public CfgAplicaciondocumento getCfgAplicaciondocumentoIdaplicacion() {
         return cfgAplicaciondocumentoIdaplicacion;
     }
@@ -237,7 +250,7 @@ public class CfgDocumento implements Serializable {
     public void setCfgAplicaciondocumentoIdaplicacion(CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion) {
         this.cfgAplicaciondocumentoIdaplicacion = cfgAplicaciondocumentoIdaplicacion;
     }
-    
+
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
     }
@@ -253,7 +266,7 @@ public class CfgDocumento implements Serializable {
     public void setCfgTipoempresaId(CfgTipoempresa cfgTipoempresaId) {
         this.cfgTipoempresaId = cfgTipoempresaId;
     }
-    
+
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
     }
@@ -304,5 +317,5 @@ public class CfgDocumento implements Serializable {
     public String toString() {
         return "entities.CfgDocumento[ idDoc=" + idDoc + " ]";
     }
-   
+    
 }

@@ -11,12 +11,12 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -33,31 +33,30 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FacDocumentodetalle.findByValorTotal", query = "SELECT f FROM FacDocumentodetalle f WHERE f.valorTotal = :valorTotal"),
     @NamedQuery(name = "FacDocumentodetalle.findByDescuento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.descuento = :descuento"),
     @NamedQuery(name = "FacDocumentodetalle.findByCfgproductoidProducto", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.cfgproductoidProducto = :cfgproductoidProducto"),
-    @NamedQuery(name = "FacDocumentodetalle.findByFacDocumentosmasterIddocumentomaster", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facDocumentosmasterIddocumentomaster = :facDocumentosmasterIddocumentomaster")})
+    @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
+    @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento")})
 public class FacDocumentodetalle implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentodetallePK facDocumentodetallePK;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "cantidad", nullable = false)
     private int cantidad;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "valorUnitario", nullable = false)
     private float valorUnitario;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "valorTotal", nullable = false)
     private float valorTotal;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "descuento", nullable = false)
     private int descuento;
     @JoinColumn(name = "cfg_producto_idProducto", referencedColumnName = "idProducto", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgProducto cfgProducto;
-    @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false, insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmaster;
     @Transient
@@ -78,8 +77,8 @@ public class FacDocumentodetalle implements Serializable {
         this.descuento = descuento;
     }
 
-    public FacDocumentodetalle(int cfgproductoidProducto, long facDocumentosmasterIddocumentomaster) {
-        this.facDocumentodetallePK = new FacDocumentodetallePK(cfgproductoidProducto, facDocumentosmasterIddocumentomaster);
+    public FacDocumentodetalle(int cfgproductoidProducto, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento) {
+        this.facDocumentodetallePK = new FacDocumentodetallePK(cfgproductoidProducto, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento);
     }
 
     public FacDocumentodetallePK getFacDocumentodetallePK() {

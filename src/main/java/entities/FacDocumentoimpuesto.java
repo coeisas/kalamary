@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -26,9 +27,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "FacDocumentoimpuesto.findAll", query = "SELECT f FROM FacDocumentoimpuesto f"),
-    @NamedQuery(name = "FacDocumentoimpuesto.findByFacDocumentosmasterIddocumentomaster", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.facDocumentoimpuestoPK.facDocumentosmasterIddocumentomaster = :facDocumentosmasterIddocumentomaster"),
     @NamedQuery(name = "FacDocumentoimpuesto.findByCfgimpuestoidImpuesto", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.facDocumentoimpuestoPK.cfgimpuestoidImpuesto = :cfgimpuestoidImpuesto"),
-    @NamedQuery(name = "FacDocumentoimpuesto.findByValorImpuesto", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.valorImpuesto = :valorImpuesto")})
+    @NamedQuery(name = "FacDocumentoimpuesto.findByValorImpuesto", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.valorImpuesto = :valorImpuesto"),
+    @NamedQuery(name = "FacDocumentoimpuesto.findByPorcentajeImpuesto", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.porcentajeImpuesto = :porcentajeImpuesto"),
+    @NamedQuery(name = "FacDocumentoimpuesto.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.facDocumentoimpuestoPK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
+    @NamedQuery(name = "FacDocumentoimpuesto.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacDocumentoimpuesto f WHERE f.facDocumentoimpuestoPK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento")})
 public class FacDocumentoimpuesto implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -38,11 +41,13 @@ public class FacDocumentoimpuesto implements Serializable {
     private float valorImpuesto;
     @Basic(optional = false)
     @Column(name = "porcentajeImpuesto", nullable = false)
-    private float porcentajeImpuesto;    
+    private float porcentajeImpuesto;
     @JoinColumn(name = "cfg_impuesto_idImpuesto", referencedColumnName = "idImpuesto", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgImpuesto cfgImpuesto;
-    @JoinColumn(name = "fac_documentosmaster_iddocumentomaster", referencedColumnName = "iddocumentomaster", nullable = false, insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmaster;
 
@@ -53,13 +58,14 @@ public class FacDocumentoimpuesto implements Serializable {
         this.facDocumentoimpuestoPK = facDocumentoimpuestoPK;
     }
 
-    public FacDocumentoimpuesto(FacDocumentoimpuestoPK facDocumentoimpuestoPK, float valorImpuesto) {
+    public FacDocumentoimpuesto(FacDocumentoimpuestoPK facDocumentoimpuestoPK, float valorImpuesto, float porcentajeImpuesto) {
         this.facDocumentoimpuestoPK = facDocumentoimpuestoPK;
         this.valorImpuesto = valorImpuesto;
+        this.porcentajeImpuesto = porcentajeImpuesto;
     }
 
-    public FacDocumentoimpuesto(long facDocumentosmasterIddocumentomaster, int cfgimpuestoidImpuesto) {
-        this.facDocumentoimpuestoPK = new FacDocumentoimpuestoPK(facDocumentosmasterIddocumentomaster, cfgimpuestoidImpuesto);
+    public FacDocumentoimpuesto(int cfgimpuestoidImpuesto, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento) {
+        this.facDocumentoimpuestoPK = new FacDocumentoimpuestoPK(cfgimpuestoidImpuesto, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento);
     }
 
     public FacDocumentoimpuestoPK getFacDocumentoimpuestoPK() {
@@ -77,7 +83,7 @@ public class FacDocumentoimpuesto implements Serializable {
     public void setValorImpuesto(float valorImpuesto) {
         this.valorImpuesto = valorImpuesto;
     }
-    
+
     public float getPorcentajeImpuesto() {
         return porcentajeImpuesto;
     }
@@ -85,7 +91,7 @@ public class FacDocumentoimpuesto implements Serializable {
     public void setPorcentajeImpuesto(float porcentajeImpuesto) {
         this.porcentajeImpuesto = porcentajeImpuesto;
     }
-    
+
     public CfgImpuesto getCfgImpuesto() {
         return cfgImpuesto;
     }

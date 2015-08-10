@@ -98,8 +98,8 @@
                 </div>                
             </p:panel>
             <div style="text-align: center;clear: right">
-                <p:commandButton icon="ui-icon-disk" value="Guardar Factura" actionListener="#{facturaMB.guardarFactura}" title="Guardar Factura"/>&nbsp;
-                <p:commandButton icon="ui-icon-print" value="Facturar" actionListener="#{facturaMB.facturacion}" title="Guardar Factura"/>
+                <p:commandButton icon="ui-icon-disk" value="Facturar" actionListener="#{facturaMB.facturacion}" title="Facturar"/>&nbsp;
+                <p:commandButton icon="ui-icon-print" value="Generar PDF" actionListener="#{facturaMB.impresion}" title="Generar PDF"/>
             </div>
         </h:form>
 
@@ -126,9 +126,14 @@
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
                 <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
-                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains">#{producto.codProducto}</p:column>
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{producto.precio}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Insertar" actionListener="#{facturaMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
@@ -158,16 +163,52 @@
                     </p:column>
                 </p:dataTable>
                 <br/>
-                <div>
-                    <p:outputLabel class="labelFormulario" value="Total Factura:"/>
-                    <p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.totalFactura}">
-                        <f:convertNumber type="currency"/>
-                    </p:outputLabel>                    
+                <p:panelGrid class="panelGridSinBorder">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Total Factura:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.totalFactura}">
+                                <f:convertNumber type="currency"/>
+                            </p:outputLabel>                            
+                        </p:column>
+                        <!--p:column rowspan="2">
+                            <p:selectOneRadio value="# {facturaMB.tipoImpresion}">
+                                <p:ajax update="@none" event="change"/>
+                                <f:selectItem itemLabel="Ticket" itemValue="1" />
+                                <f:selectItem itemLabel="Carta" itemValue="2" />
+                            </p:selectOneRadio>                            
+                        </p:column-->
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Total Items:"/><p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.listaDetalle.size()}"/>                          
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+                <br/>
+                <div style="text-align: center">
+                    <p:commandButton id="IdBtnPrint" value="Guardar" disabled="#{!facturaMB.enableBtnPrint}"  icon="ui-icon-disk" actionListener="#{facturaMB.guardarFactura}"/>
                 </div>                
-                <div style="clear: left">
-                    <p:outputLabel class="labelFormulario" value="Total Items:"/><p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.listaDetalle.size()}"/>
-                </div>
-                <p:commandButton value="Imprimir" icon="ui-icon-print" actionListener="#{facturaMB.imprimir}"/>
+            </h:form>
+        </p:dialog>
+        <p:dialog widgetVar="dlgResult" modal="true" header="TIPO DE FACTURA" resizable="false" width="15%">
+            <h:form>
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <p:row>
+                        <p:column>
+                            <p:selectOneRadio value="#{facturaMB.tipoImpresion}">
+                                <p:ajax update="@none" event="change"/>
+                                <f:selectItem itemLabel="Ticket" itemValue="1" />
+                                <f:selectItem itemLabel="Carta" itemValue="2" />
+                            </p:selectOneRadio>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-circle-check" value="&nbsp;" actionListener="#{facturaMB.generarPDF}" ajax="false" onclick="this.form.target='_blank'"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
             </h:form>
         </p:dialog>
     </ui:define>

@@ -6,9 +6,13 @@
 package facades;
 
 import entities.FacDocumentoimpuesto;
+import entities.FacDocumentosmaster;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +30,16 @@ public class FacDocumentoimpuestoFacade extends AbstractFacade<FacDocumentoimpue
 
     public FacDocumentoimpuestoFacade() {
         super(FacDocumentoimpuesto.class);
+    }
+    
+        public List<FacDocumentoimpuesto> buscarByDocumentoMaster(FacDocumentosmaster documentosmaster){
+        try {
+            Query query = em.createQuery("SELECT i FROM FacDocumentoimpuesto i WHERE i.facDocumentosmaster = ?1");
+            query.setParameter(1, documentosmaster);
+            return query.getResultList();
+        } catch (Exception e) {
+            return new ArrayList();
+        }
     }
     
 }

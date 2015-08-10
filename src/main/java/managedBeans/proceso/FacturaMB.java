@@ -18,6 +18,7 @@ import entities.FacDocumentodetallePK;
 import entities.FacDocumentoimpuesto;
 import entities.FacDocumentoimpuestoPK;
 import entities.FacDocumentosmaster;
+import entities.FacDocumentosmasterPK;
 import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
@@ -28,6 +29,7 @@ import facades.FacDocuementopagoFacade;
 import facades.FacDocumentodetalleFacade;
 import facades.FacDocumentoimpuestoFacade;
 import facades.FacDocumentosmasterFacade;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import javax.faces.bean.ManagedBean;
@@ -47,6 +49,24 @@ import org.primefaces.model.LazyDataModel;
 import utilities.LazyProductosModel;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import utilities.FacturaReporte;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import utilities.FacturaDetalleReporte;
+import utilities.FacturaImpuestoReporte;
+import utilities.FacturaPagoReporte;
 
 /**
  *
@@ -66,12 +86,15 @@ public class FacturaMB implements Serializable {
     private List<CfgCliente> listaClientes;
     private List<CfgImpuesto> listaImpuestos;
     private List<CfgFormapago> listaFormapagos;
+
+    private int tipoImpresion;
 //    private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
     private CfgCliente clienteSeleccionado;
     private CfgProducto productoSeleccionado;
     private SegUsuario usuarioActual;
     private FacDocumentosmaster documentoActual;
+    private boolean enableBtnPrint;
 
     private SesionMB sesionMB;
     @EJB
@@ -100,19 +123,15 @@ public class FacturaMB implements Serializable {
     @PostConstruct
     private void init() {
         //si es super usuario o admin permitir escoger la empresa y la sede
+        tipoImpresion = 2;
+        setEnableBtnPrint(false);
         setListaDetalle((List<FacDocumentodetalle>) new ArrayList());
         setListaImpuestos((List<CfgImpuesto>) new ArrayList());
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
-//        empresaActual = sesionMB.getSedeActual().getCfgempresaidEmpresa();
         sedeActual = sesionMB.getSedeActual();
         if (sedeActual != null) {
-//            if (usuarioActual.getCfgempresasedeidSede() != null) {
-//                empresaActual = usuarioActual.getCfgempresasedeidSede().getCfgempresaidEmpresa();
-//            } else {
-//                empresaActual = null;
-//            }
             actualizarListadoClientes();
             listaProducto = new LazyProductosModel(sedeActual.getCfgempresaidEmpresa(), null, null, null, productoFacade);
             RequestContext.getCurrentInstance().update("FormModalProducto");
@@ -140,11 +159,12 @@ public class FacturaMB implements Serializable {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
             setIdentificacionCliente(clienteSeleccionado.getNumDoc());
             setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+            listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
         } else {
             setNombreCliente(null);
             listaDetalle.clear();
             listaImpuestos.clear();
-            getListaImpuestos().clear();
+            listaFormapagos.clear();
         }
         RequestContext.getCurrentInstance().execute("PF('dlgCliente').hide()");
         RequestContext.getCurrentInstance().update("IdFormFactura:IdNomCliente");
@@ -171,7 +191,7 @@ public class FacturaMB implements Serializable {
                 facdetalle = new FacDocumentodetalle();
                 facdetalle.setCfgProducto(productoSeleccionado);
                 //el valor del documento master no es el definitivo
-                facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1));
+                facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1, 1));
                 facdetalle.setCantidad(1);
                 facdetalle.setDescuento(0);
                 float aux = productoSeleccionado.getPrecio();
@@ -274,15 +294,11 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
             return false;
         }
-        if (documento == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplicado a factura"));
-            return false;
-        }
-        if (documento.getFinDocumento() == documento.getActDocumento()) {
+        if (documento.getFinDocumento() < documento.getActDocumento()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de factura. Revice la configuracion de documentos"));
             return false;
         }
-        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento, documento.getActDocumento()) != null) {
+        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento.getIdDoc(), documento.getActDocumento()) != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Consecutivo de factura duplicado. Revice la configuracion de documentos"));
             return false;
         }
@@ -291,15 +307,19 @@ public class FacturaMB implements Serializable {
 
     public void guardarFactura() {
         CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+        if (documento == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
+            return;
+        }
         documento.setActDocumento(documento.getActDocumento() + 1);
         if (!validarCampos(documento)) {
             return;
         }
         try {
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
+            documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
+            documentosmaster.setCfgdocumento(documento);
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
-            documentosmaster.setCfgdocumentoidDoc(documento);
-            documentosmaster.setNumDocumento(documento.getActDocumento());
             documentosmaster.setCfgempresasedeidSede(sedeActual);
             documentosmaster.setDescuento(totalDescuento);
             documentosmaster.setFecCrea(new Date());
@@ -308,15 +328,19 @@ public class FacturaMB implements Serializable {
             documentosmaster.setTotalFactura(totalFactura);
             documentosmaster.setEstado("PENDIENTE");
             documentosmasterFacade.create(documentosmaster);
+            if (documento.getActDocumento() == documento.getFinDocumento()) {
+                documento.setFinalizado(true);
+                documento.setActivo(false);
+            }
             documentoFacade.edit(documento);
             for (FacDocumentodetalle documentodetalle : listaDetalle) {
-                documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getIddocumentomaster()));
+                documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
                 documentodetalle.setFacDocumentosmaster(documentosmaster);
                 documentodetalleFacade.create(documentodetalle);
             }
             for (CfgImpuesto impuesto : listaImpuestos) {
                 FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
-                documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(documentosmaster.getIddocumentomaster(), impuesto.getIdImpuesto()));
+                documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(impuesto.getIdImpuesto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
                 documentoimpuesto.setCfgImpuesto(impuesto);
                 documentoimpuesto.setFacDocumentosmaster(documentosmaster);
                 documentoimpuesto.setValorImpuesto(impuesto.getTotalImpuesto());
@@ -326,7 +350,7 @@ public class FacturaMB implements Serializable {
             for (CfgFormapago formapago : listaFormapagos) {
                 if (formapago.getSubtotal() > 0) {
                     FacDocuementopago docuementopago = new FacDocuementopago();
-                    docuementopago.setFacDocuementopagoPK(new FacDocuementopagoPK(documentosmaster.getIddocumentomaster(), formapago.getIdFormaPago()));
+                    docuementopago.setFacDocuementopagoPK(new FacDocuementopagoPK(formapago.getIdFormaPago(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
                     docuementopago.setCfgFormapago(formapago);
                     docuementopago.setFacDocumentosmaster(documentosmaster);
                     docuementopago.setValorPago(formapago.getSubtotal());
@@ -334,6 +358,8 @@ public class FacturaMB implements Serializable {
                 }
             }
             documentoActual = documentosmaster;
+            limpiarFormulario();
+            RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
@@ -349,12 +375,21 @@ public class FacturaMB implements Serializable {
         }
     }
 
+    public void impresion() {
+        if (documentoActual != null) {
+            RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay una factura reciente"));
+        }
+    }
+
     public void onRowEdit(RowEditEvent event) {
         CfgFormapago formapago = (CfgFormapago) event.getObject();
         float aux = totalFormaPago();
         if (formapago.getSubtotal() < 0 || !validarFormaPago(aux)) {
             formapago.setSubtotal(0);
         }
+        setEnableBtnPrint(totalFactura == aux);
     }
 
     public void onRowCancel(RowEditEvent event) {
@@ -362,6 +397,8 @@ public class FacturaMB implements Serializable {
 //        FacesContext.getCurrentInstance().addMessage(null, msg);
         CfgFormapago formapago = (CfgFormapago) event.getObject();
         formapago.setSubtotal(0);
+        float aux = totalFormaPago();
+        setEnableBtnPrint(totalFactura == aux);
     }
 
     private float totalFormaPago() {
@@ -378,20 +415,131 @@ public class FacturaMB implements Serializable {
 
     public void actualizarTablaFormaPago() {
         RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
+        RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
     }
 
-    public void imprimir() {
-        float aux = totalFormaPago();
-        if (aux < totalFactura) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No coincide el valor total de la factura con los valores ingresados en las formas de pago"));
-            return;
+    public void generarPDF() {
+//        guardarFactura();
+        if (documentoActual != null) {
+            ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+            String ruta = null;
+            switch (tipoImpresion) {
+                case 1:
+                    ruta = servletContext.getRealPath("/procesos/reportes/facturaTicket.jasper");
+                    break;
+                case 2:
+                    ruta = servletContext.getRealPath("/procesos/reportes/facturaCarta.jasper");
+                    break;
+            }
+//            setTipoImpresion(2);
+            try {
+                generarFactura(ruta);
+            } catch (IOException ex) {
+                Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (JRException ex) {
+                Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//            documentoActual = null;
         }
-        guardarFactura();
+
+    }
+
+    private void generarFactura(String ruta) throws IOException, JRException {
+        FacDocumentosmaster documento
+                = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
+                        sedeActual,
+                        documentoActual.getFacDocumentosmasterPK().getCfgdocumentoidDoc(),
+                        documentoActual.getFacDocumentosmasterPK().getNumDocumento()
+                );
+        byte[] bites = sedeActual.getLogo();
+        if (bites == null) {
+            bites = sedeActual.getCfgempresaidEmpresa().getLogo();
+        }
+        List<FacturaReporte> facturas = new ArrayList();
+        FacturaReporte facturaReporte = new FacturaReporte();
+        facturaReporte.setNumFactura(documento.getFacDocumentosmasterPK().getNumDocumento());
+        facturaReporte.setDescuento(documento.getDescuento());
+        facturaReporte.setSubtotal(documento.getSubtotal());
+        facturaReporte.setTotalFactura(documento.getTotalFactura());
+        facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
+        facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
+        facturaReporte.setPago(crearListadoPago(docuementopagoFacade.buscarByDocumentoMaster(documento)));
+        facturas.add(facturaReporte);
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(facturas);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse httpServletResponse = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
+            httpServletResponse.setContentType("application/pdf");
+            ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+            String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
+            Map<String, Object> parametros = new HashMap<>();
+            InputStream logo = new ByteArrayInputStream(bites);
+            parametros.put("logo", logo);
+            parametros.put("empresa", sedeActual.getCfgempresaidEmpresa().getNomEmpresa());
+            parametros.put("nit", sedeActual.getNumDocumento());
+            parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
+            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
+            parametros.put("fecha", documento.getFecCrea());
+            parametros.put("usuario", usuarioActual.nombreCompleto());
+            parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
+            parametros.put("SUBREPORT_DIR", rutaReportes);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
+            JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
+            FacesContext.getCurrentInstance().responseComplete();
+        }
+    }
+
+    private List<FacturaDetalleReporte> crearListadoDetalle(List<FacDocumentodetalle> detalles) {
+        List<FacturaDetalleReporte> list = new ArrayList();
+        for (FacDocumentodetalle detalle : detalles) {
+            FacturaDetalleReporte facturaDetalleReporte = new FacturaDetalleReporte();
+            facturaDetalleReporte.setCantidad(detalle.getCantidad());
+            facturaDetalleReporte.setCodProducto(detalle.getCfgProducto().getCodProducto());
+            facturaDetalleReporte.setNomProducto(detalle.getCfgProducto().getNomProducto());
+            facturaDetalleReporte.setValorUnitario(detalle.getValorUnitario());
+            facturaDetalleReporte.setValorTotal(detalle.getValorTotal());
+            facturaDetalleReporte.setDescuento(detalle.getDescuento());
+            list.add(facturaDetalleReporte);
+        }
+        return list;
+    }
+
+    private List<FacturaPagoReporte> crearListadoPago(List<FacDocuementopago> pagos) {
+        List<FacturaPagoReporte> list = new ArrayList();
+        for (FacDocuementopago pago : pagos) {
+            FacturaPagoReporte facturaPagoReporte = new FacturaPagoReporte();
+            facturaPagoReporte.setFormaPago(pago.getCfgFormapago().getNomFormaPago());
+            facturaPagoReporte.setValorPago(pago.getValorPago());
+            list.add(facturaPagoReporte);
+        }
+        return list;
+    }
+
+    private List<FacturaImpuestoReporte> crearListadoImpuesto(List<FacDocumentoimpuesto> impuestos) {
+        List<FacturaImpuestoReporte> list = new ArrayList();
+        for (FacDocumentoimpuesto impuesto : impuestos) {
+            FacturaImpuestoReporte impuestoReporte = new FacturaImpuestoReporte();
+            impuestoReporte.setImpuesto(impuesto.getCfgImpuesto().getNomImpuesto());
+            impuestoReporte.setValorImpuesto(impuesto.getValorImpuesto());
+            impuestoReporte.setPorcentaje(impuesto.getPorcentajeImpuesto());
+            list.add(impuestoReporte);
+        }
+        return list;
     }
 
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
+        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+        listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
+        cargarInformacionCliente();
+        setSubtotal(0);
+        setTotalDescuento(0);
+        setTotalFactura(0);
+        setEnableBtnPrint(false);
+        RequestContext.getCurrentInstance().update("IdFormFactura");
+        RequestContext.getCurrentInstance().update("FormModalFactura");
+
     }
 
     public List<FacDocumentodetalle> getListaDetalle() {
@@ -490,4 +638,19 @@ public class FacturaMB implements Serializable {
         this.listaFormapagos = listaFormapagos;
     }
 
+    public int getTipoImpresion() {
+        return tipoImpresion;
+    }
+
+    public void setTipoImpresion(int tipoImpresion) {
+        this.tipoImpresion = tipoImpresion;
+    }
+
+    public boolean isEnableBtnPrint() {
+        return enableBtnPrint;
+    }
+
+    public void setEnableBtnPrint(boolean enableBtnPrint) {
+        this.enableBtnPrint = enableBtnPrint;
+    }
 }

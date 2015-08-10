@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a5af0e84-159c-4c24-aaf8-bf9ed9364e29">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="437"/>
+	<property name="ireport.y" value="0"/>
+	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<field name="valorPago" class="java.lang.Float"/>
+	<field name="formaPago" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="15">
+			<rectangle>
+				<reportElement style="fondo" x="0" y="0" width="200" height="15" uuid="898c8248-8725-472a-a0db-9ca39b44b3b8"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="200" height="15" uuid="784e12d5-8f2f-47c5-b06a-b67d243804b2"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[FORMA DE PAGO]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="11" splitType="Stretch">
+			<textField pattern="¤ #,##0.0">
+				<reportElement x="100" y="1" width="98" height="10" uuid="6ee15b0b-20f9-4b38-87c1-8eca2fbf2d32"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valorPago}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="200" y="0" width="1" height="11" uuid="81b0dcfd-41dc-4cb1-8d38-8e87620f0507"/>
+			</line>
+			<line>
+				<reportElement x="0" y="0" width="1" height="11" uuid="70a857f4-deea-4075-81f1-c0ee325adf25"/>
+			</line>
+			<textField>
+				<reportElement x="1" y="1" width="100" height="10" uuid="15d4b260-bf7e-4f20-be51-0f33e3c0c8af"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{formaPago}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="27">
+			<line>
+				<reportElement x="0" y="0" width="200" height="1" uuid="bf0ae59f-ff7d-4471-b4f3-76445514a409"/>
+			</line>
+		</band>
+	</columnFooter>
+</jasperReport>
