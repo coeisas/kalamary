@@ -42,7 +42,7 @@ import org.primefaces.model.StreamedContent;
 @ManagedBean
 @SessionScoped
 public class ClienteMB implements Serializable {
-    
+
     private String codEmpresa;
     private String nombreEmpresa;
     private String codigoCliente;
@@ -63,39 +63,39 @@ public class ClienteMB implements Serializable {
     private String tarjetaMembresia;
     private float cupoCredito;
     private StreamedContent image;
-    
+
     private String opcion;
     private CfgCliente clienteSeleccionado;
     private CfgEmpresa empresaSeleccionada;
     private List<CfgCliente> listaClientes;
     private List<CfgMunicipio> listaMunicipios;
-    
+
     @EJB
     CfgClienteFacade clienteFacade;
-    
+
     @EJB
     CfgEmpresaFacade empresaFacade;
-    
+
     @EJB
     CfgMunicipioFacade municipioFacade;
-    
+
     @EJB
     CfgTipoidentificacionFacade tipoidentificacionFacade;
-    
+
     @EJB
     CfgTipoempresaFacade tipoClienteFacade;
-    
+
     public ClienteMB() {
     }
-    
+
     @PostConstruct
     private void init() {
         opcion = "creacion";
         listaMunicipios = new ArrayList();
         listaClientes = new ArrayList();
-        
+
     }
-    
+
     public void cargarClientes() {
         if (empresaSeleccionada != null) {
             listaClientes = clienteFacade.buscarPorEmpresa(empresaSeleccionada);
@@ -105,7 +105,7 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
     }
-    
+
     public void cargarInformacionCliente() {
         if (getClienteSeleccionado() != null) {
             opcion = "modificacion";
@@ -146,11 +146,11 @@ public class ClienteMB implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('dlgCliente').hide()");
         RequestContext.getCurrentInstance().update("IdFormCliente");
     }
-    
+
     private void limpiarFormulario() {
         setIdIdentificacion(0);
-//        setNombreEmpresa(null);
-        setNumIdentificacion(null);
+//        setNumIdentificacion(null);
+//        setNombreEmpresa(null);       
         setPrimerNombre(null);
         setIdDepartamento(null);
         setIdTipoCliente(0);
@@ -162,14 +162,16 @@ public class ClienteMB implements Serializable {
         setTarjetaMembresia(null);
         setTelefono(null);
         setMail(null);
+        setIdMunicipio(null);
+        setIdIdentificacion(0);
         setFechaNacimiento(null);
         opcion = "creacion";
     }
-    
+
     public void buscarCliente() {
         if (empresaSeleccionada != null) {
-            if (codigoCliente != null && !codigoCliente.trim().isEmpty()) {
-                clienteSeleccionado = clienteFacade.buscarPorCodigoAndIdEmpresa(codigoCliente, empresaSeleccionada.getIdEmpresa());
+            if (numIdentificacion != null && !numIdentificacion.trim().isEmpty()) {
+                clienteSeleccionado = clienteFacade.buscarPorIdentificacionAndIdEmpresa(numIdentificacion, empresaSeleccionada);
                 cargarInformacionCliente();
             }
         } else {
@@ -178,7 +180,7 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
     }
-    
+
     public void buscarEmpresa() {
         empresaSeleccionada = null;
         if (!codEmpresa.trim().isEmpty()) {
@@ -198,9 +200,9 @@ public class ClienteMB implements Serializable {
             }
         }
         RequestContext.getCurrentInstance().update("IdFormCliente");
-        
+
     }
-    
+
     public void actualizarEmpresa() {
         if (getEmpresaSeleccionada() != null) {
             setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
@@ -216,14 +218,14 @@ public class ClienteMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormModalSede");
         RequestContext.getCurrentInstance().update("IdFormCliente");
     }
-    
+
     public void actualizarMunicipios() {
         listaMunicipios.clear();
         if (idDepartamento != null) {
             listaMunicipios = municipioFacade.buscarPorDepartamento(idDepartamento);
         }
     }
-    
+
     public void handleFileUpload(FileUploadEvent event) {
         file = event.getFile();
         if (file != null) {
@@ -231,7 +233,7 @@ public class ClienteMB implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('dlgFoto').hide()");
         }
     }
-    
+
     public void accion() {
         switch (opcion) {
             case "modificacion":
@@ -242,7 +244,7 @@ public class ClienteMB implements Serializable {
                 break;
         }
     }
-    
+
     private void crearCliente() {
         if (!validarCamposFormulario()) {
             return;
@@ -252,7 +254,7 @@ public class ClienteMB implements Serializable {
             CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             CfgCliente cliente = new CfgCliente();
-            cliente.setCodigoCliente(codigoCliente);
+//            cliente.setCodigoCliente(codigoCliente);
             cliente.setCfgMunicipio(municipio);
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
@@ -279,7 +281,8 @@ public class ClienteMB implements Serializable {
             listaMunicipios.clear();
             limpiarFormulario();
             setCodEmpresa(null);
-            setCodigoCliente(null);
+            setNombreEmpresa(null);
+            setNumIdentificacion(null);
             setEmpresaSeleccionada(null);
             RequestContext.getCurrentInstance().update("IdFormCliente");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Cliente creado"));
@@ -287,7 +290,7 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no creado"));
         }
     }
-    
+
     private void modificarCliente() {
         if (!validarCamposFormulario()) {
             return;
@@ -329,16 +332,16 @@ public class ClienteMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no modificado"));
         }
     }
-    
+
     private boolean validarCamposFormulario() {
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
             return false;
         }
-        if (codigoCliente.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un codigo al cliente"));
-            return false;
-        }
+//        if (codigoCliente.isEmpty()) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un codigo al cliente"));
+//            return false;
+//        }
         if (idIdentificacion == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de identificacion"));
             return false;
@@ -358,7 +361,7 @@ public class ClienteMB implements Serializable {
         if (direccion.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Direccion vacia"));
             return false;
-            
+
         }
         if (telefono.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero telefonico"));
@@ -366,7 +369,7 @@ public class ClienteMB implements Serializable {
         }
         return true;
     }
-    
+
     public void cancelar() {
         clienteSeleccionado = null;
         empresaSeleccionada = null;
@@ -376,143 +379,143 @@ public class ClienteMB implements Serializable {
         limpiarFormulario();
         RequestContext.getCurrentInstance().update("IdFormCliente");
     }
-    
+
     public String getCodEmpresa() {
         return codEmpresa;
     }
-    
+
     public void setCodEmpresa(String codEmpresa) {
         this.codEmpresa = codEmpresa;
     }
-    
+
     public int getIdIdentificacion() {
         return idIdentificacion;
     }
-    
+
     public void setIdIdentificacion(int idIdentificacion) {
         this.idIdentificacion = idIdentificacion;
     }
-    
+
     public String getNumIdentificacion() {
         return numIdentificacion;
     }
-    
+
     public void setNumIdentificacion(String numIdentificacion) {
         this.numIdentificacion = numIdentificacion;
     }
-    
+
     public String getPrimerNombre() {
         return primerNombre;
     }
-    
+
     public void setPrimerNombre(String primerNombre) {
         this.primerNombre = primerNombre;
     }
-    
+
     public String getSegundoNombre() {
         return segundoNombre;
     }
-    
+
     public void setSegundoNombre(String segundoNombre) {
         this.segundoNombre = segundoNombre;
     }
-    
+
     public String getPrimerApellido() {
         return primerApellido;
     }
-    
+
     public void setPrimerApellido(String primerApellido) {
         this.primerApellido = primerApellido;
     }
-    
+
     public String getSegundoApellido() {
         return segundoApellido;
     }
-    
+
     public void setSegundoApellido(String segundoApellido) {
         this.segundoApellido = segundoApellido;
     }
-    
+
     public UploadedFile getFile() {
         return file;
     }
-    
+
     public void setFile(UploadedFile file) {
         this.file = file;
     }
-    
+
     public String getDireccion() {
         return direccion;
     }
-    
+
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    
+
     public String getTelefono() {
         return telefono;
     }
-    
+
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    
+
     public String getMail() {
         return mail;
     }
-    
+
     public void setMail(String mail) {
         this.mail = mail;
     }
-    
+
     public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
-    
+
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
-    
+
     public String getTarjetaMembresia() {
         return tarjetaMembresia;
     }
-    
+
     public void setTarjetaMembresia(String tarjetaMembresia) {
         this.tarjetaMembresia = tarjetaMembresia;
     }
-    
+
     public float getCupoCredito() {
         return cupoCredito;
     }
-    
+
     public void setCupoCredito(float cupoCredito) {
         this.cupoCredito = cupoCredito;
     }
-    
+
     public List<CfgCliente> getListaClientes() {
         return listaClientes;
     }
-    
+
     public void setListaClientes(List<CfgCliente> listaClientes) {
         this.listaClientes = listaClientes;
     }
-    
+
     public CfgCliente getClienteSeleccionado() {
         return clienteSeleccionado;
     }
-    
+
     public void setClienteSeleccionado(CfgCliente clienteSeleccionado) {
         this.clienteSeleccionado = clienteSeleccionado;
     }
-    
+
     public CfgEmpresa getEmpresaSeleccionada() {
         return empresaSeleccionada;
     }
-    
+
     public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
         this.empresaSeleccionada = empresaSeleccionada;
     }
-    
+
     public StreamedContent getImage() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
@@ -529,57 +532,57 @@ public class ClienteMB implements Serializable {
             }
         }
     }
-    
+
     public void setImage(StreamedContent image) {
         this.image = image;
     }
-    
+
     public String getIdDepartamento() {
         return idDepartamento;
     }
-    
+
     public void setIdDepartamento(String idDepartamento) {
         this.idDepartamento = idDepartamento;
     }
-    
+
     public String getIdMunicipio() {
         return idMunicipio;
     }
-    
+
     public void setIdMunicipio(String idMunicipio) {
         this.idMunicipio = idMunicipio;
     }
-    
+
     public List<CfgMunicipio> getListaMunicipios() {
         return listaMunicipios;
     }
-    
+
     public void setListaMunicipios(List<CfgMunicipio> listaMunicipios) {
         this.listaMunicipios = listaMunicipios;
     }
-    
+
     public String getNombreEmpresa() {
         return nombreEmpresa;
     }
-    
+
     public void setNombreEmpresa(String nombreEmpresa) {
         this.nombreEmpresa = nombreEmpresa;
     }
-    
+
     public String getCodigoCliente() {
         return codigoCliente;
     }
-    
+
     public void setCodigoCliente(String codigoCliente) {
         this.codigoCliente = codigoCliente;
     }
-    
+
     public int getIdTipoCliente() {
         return idTipoCliente;
     }
-    
+
     public void setIdTipoCliente(int idTipoCliente) {
         this.idTipoCliente = idTipoCliente;
     }
-    
+
 }

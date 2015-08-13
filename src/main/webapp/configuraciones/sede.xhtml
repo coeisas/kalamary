@@ -12,7 +12,7 @@
         <p:growl showDetail="true" autoUpdate="true"/>
         <div>
             <h:form id="IdFormSede">
-                <div style="display: inline-block; width: 70%">
+                <div style="display: inline-block; width: 79%">
                     <p:panelGrid styleClass="panelGridSinBorder">
                         <f:facet name="header">
                             <p:row>
@@ -21,12 +21,12 @@
                         </f:facet>
                         <p:row>
                             <p:column>
-                                <p:outputLabel for="idCodigoEmpresa" value="Empresa:" class="labelFormulario"/>
+                                <p:outputLabel for="idCodigoEmpresa" value="Empresa:" class="labelFormularioObligatorio"/>
                                 <p:inputText id="idCodigoEmpresa" value="#{sedeMB.codEmpresa}" class="campoFormulario" >
                                     <p:ajax event="blur" listener="#{sedeMB.buscarEmpresa}" update="@none"/>
                                 </p:inputText>
                                 <p:commandButton icon="ui-icon-search" onclick="PF('dlgEmpresa').show()" class="campoFormulario"/>
-                                <p:outputLabel for="idCodigoSede" value="Sede:" class="labelFormulario"/>
+                                <p:outputLabel for="idCodigoSede" value="Sede:" class="labelFormularioObligatorio"/>
                                 <p:inputText id="idCodigoSede" value="#{sedeMB.codSede}" class="campoFormulario" >
                                     <p:ajax event="blur" listener="#{sedeMB.buscarSede}" update="@none"/>
                                 </p:inputText>                                
@@ -35,37 +35,41 @@
                         </p:row>
                         <p:row>
                             <p:column>
-                                <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
-                                <p:selectOneMenu id="IdSelectDepartamentos" value="#{sedeMB.idDepartamento}" style="width: 150px" class="campoFormulario">
+                                <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
+                                <p:selectOneMenu id="IdSelectDepartamentos" value="#{sedeMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
                                     <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
                                     <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
                                     <p:ajax event="change" update="IdSelectMunicipios" listener="#{sedeMB.actualizarMunicipios}"/>
                                 </p:selectOneMenu> 
-                                <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormulario"/>
-                                <p:selectOneMenu id="IdSelectMunicipios" value="#{sedeMB.idMuncipio}" style="width: 150px" class="campoFormulario">
+                                <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
+                                <p:selectOneMenu id="IdSelectMunicipios" value="#{sedeMB.idMuncipio}" style="width: 150px" class="campoFormulario"  filter="true" filterMatchMode="contains">
                                     <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
                                     <f:selectItems value="#{sedeMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
                                 </p:selectOneMenu>
-                                <p:outputLabel for="idNoDoc" value="No. Documento:" class="labelFormulario"/>
+                                <p:outputLabel for="idNoDoc" value="No. Documento:" class="labelFormularioObligatorio"/>
                                 <p:inputText id="idNoDoc" value="#{sedeMB.numDocumento}" class="campoFormulario"/>                                  
                             </p:column>
                         </p:row>
                         <p:row>
                             <p:column>
-                                <p:outputLabel for="nomEmpresa" value="Empresa:" class="labelFormulario"/>
-                                <p:inputText id="nomEmpresa"  size="50" value="#{sedeMB.nombreSede}" class="campoFormulario upperCase"/>
+                                <p:outputLabel for="nomSede" value="Sede:" class="labelFormularioObligatorio"/>
+                                <p:inputText id="nomSede"  size="50" value="#{sedeMB.nombreSede}" class="campoFormulario upperCase"/>
                                 <p:commandButton icon="ui-icon-image" value="Logo" onclick="PF('dlgLogo').show()" class="campoFormulario"/>
                                 <p:outputLabel id="nombreImagen" value="#{sedeMB.nombreArchivo}" class="labelFormularioInformativa"/>
                             </p:column>
                         </p:row>
                         <p:row>
                             <p:column>
-                                <p:outputLabel for="idDireccion" value="Direccion:" class="labelFormulario"/>
-                                <p:inputText id="idDireccion" value="#{sedeMB.direccion}" class="campoFormulario upperCase"/>
-                                <p:outputLabel for="idTelefono1" value="Telefono 1:" class="labelFormulario"/>
+                                <p:outputLabel for="idDireccion" value="Direccion:" class="labelFormularioObligatorio"/>
+                                <p:inputText id="idDireccion" value="#{sedeMB.direccion}" class="campoFormulario upperCase" size="130"/>                    
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column>
+                                <p:outputLabel for="idTelefono1" value="Telefono 1:" class="labelFormularioObligatorio"/>
                                 <p:inputText id="idTelefono1" value="#{sedeMB.telefono1}" class="campoFormulario"/>
                                 <p:outputLabel for="idTelefono2" value="Telefono 2:" class="labelFormulario"/>
-                                <p:inputText id="idTelefono2" value="#{sedeMB.telefono2}" class="campoFormulario"/>                        
+                                <p:inputText id="idTelefono2" value="#{sedeMB.telefono2}" class="campoFormulario"/>   
                             </p:column>
                         </p:row>
                         <p:row>
@@ -87,9 +91,9 @@
 
                 </div>
 
-                <div style="display: inline-block; width: 29%; vertical-align: top">
-                    <p:panel rendered="#{sedeMB.sedeSeleccionada != null}" style="text-align: center">
-                        <p:graphicImage  value="#{sedeMB.image}" style="width: 250px; height: 250px;text-align: center" rendered="#{sedeMB.sedeSeleccionada.logo != null}" >
+                <div style="display: inline-block; width: 20%; vertical-align: top">
+                    <p:panel rendered="#{sedeMB.sedeSeleccionada != null}" style="text-align: center;border: none" >
+                        <p:graphicImage  value="#{sedeMB.image}" style="width: 90%; height: 112.5%;text-align: center" rendered="#{sedeMB.sedeSeleccionada.logo != null}" >
                             <f:param name="id" value="#{sedeMB.sedeSeleccionada.idSede}"/>
                         </p:graphicImage>                
                     </p:panel>

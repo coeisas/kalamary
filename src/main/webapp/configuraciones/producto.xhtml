@@ -20,7 +20,7 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodEmpresa" class="labelFormulario" value="Empresa:"/>
+                            <p:outputLabel for="IdCodEmpresa" class="labelFormularioObligatorio" value="Empresa:"/>
                             <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{productoMB.codigoEmpresa}">
                                 <p:ajax event="blur" listener="#{productoMB.buscarEmpresa}" update="@none"/>
                             </p:inputText>
@@ -30,17 +30,17 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Categoria:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoCategoria}">
                                 <p:ajax event="blur" listener="#{productoMB.buscarCategoria}" update="@none"/>
                             </p:inputText>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCategoria').show()"/>
-                            <p:outputLabel class="labelFormulario" value="Referencia:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoReferencia}">
                                 <p:ajax event="blur" listener="#{productoMB.buscarReferencia}" update="@none"/>
                             </p:inputText>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgReferencia').show()"/>
-                            <p:outputLabel class="labelFormulario" value="Marca:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Marca:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoMarca}">
                                 <p:ajax event="blur" listener="#{productoMB.buscarMarca}" update="@none"/>
                             </p:inputText>
@@ -49,7 +49,7 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Codigo Producto:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo Producto:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoProducto}">
                                 <p:ajax event="blur" listener="#{productoMB.buscarProducto}" update="@none"/>
                             </p:inputText>
@@ -64,7 +64,7 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Producto:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Producto:"/>
                             <p:inputText class="campoFormulario upperCase" size="100" value="#{productoMB.nombreProducto}"/>
                             <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen"/>
                         </p:column>

@@ -185,8 +185,48 @@ public class SedeMB implements Serializable {
                 break;
         }
     }
+    
+    private boolean validar() {
+        boolean ban = true;
+        if(empresaSeleccionada == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un departamento"));
+            return false;
+        }
+        if(idDepartamento == null || idDepartamento.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un departamento"));
+            return false;
+        }
+        if(idMuncipio == null || idMuncipio.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija un municipio"));
+            return false;            
+        }
+        if(codSede == null || codSede.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de sede obligatorio"));
+            return false;
+        }
+        if(numDocumento == null ||numDocumento.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero de documento"));
+            return false;            
+        }
+        if(nombreSede == null || nombreSede.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el nombre de la sede"));
+            return false;
+        }
+        if(direccion == null || direccion.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Se requiere la direccion"));
+            return false;
+        }
+        if(telefono1 == null || telefono1.isEmpty()){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta telefono 1"));
+            return false;
+        }
+        return ban;
+    }
 
     private void crearSede() {
+        if(!validar()){
+            return;
+        }
         try {
             CfgEmpresasede sede = new CfgEmpresasede();
             sede.setCodSede(codSede);
@@ -219,6 +259,13 @@ public class SedeMB implements Serializable {
     }
 
     private void modificarSede() {
+        if(!validar()){
+            return;
+        }
+        if(sedeSeleccionada == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la sede a modificar"));
+            return;
+        }
         try {
             CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMuncipio, idDepartamento);
             CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);

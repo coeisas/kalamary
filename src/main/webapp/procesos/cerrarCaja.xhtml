@@ -6,7 +6,8 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui"
     template="../templates/layout.xhtml"
-    xmlns:f="http://xmlns.jcp.org/jsf/core">
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <ui:define name="title">Cerrar Caja</ui:define>
     <ui:define name="content">
         #{cerrarCajaMB.actualizarInformacionCaja()}
@@ -38,10 +39,15 @@
                                 #{formaPago.nomFormaPago}
                             </p:column>
                             <p:column headerText="Subtotal">
-                                #{formaPago.subtotal}
+                                <h:outputText value="#{formaPago.subtotal}">
+                                    <f:convertNumber type="currency"/>
+                                </h:outputText>
                             </p:column>
                             <f:facet name="footer">
-                                Total Ventas: #{cerrarCajaMB.valorCierre}
+                                <h:outputText value="Total Ventas: "/>
+                                <h:outputText value="#{cerrarCajaMB.valorCierre}">
+                                    <f:convertNumber type="currency"/>
+                                </h:outputText>
                             </f:facet>
                         </p:dataTable>
 
@@ -49,7 +55,7 @@
                 </p:row>
                 <p:row>
                     <p:column style="text-align: center">
-                        <p:commandButton icon="ui-icon-disk" value="Cerrar Caja" actionListener="#{cerrarCajaMB.cerrarCaja}"/>
+                        <p:commandButton icon="ui-icon-locked" value="Cerrar Caja" actionListener="#{cerrarCajaMB.cerrarCaja}"/>
                     </p:column>
                 </p:row>
             </p:panelGrid>            

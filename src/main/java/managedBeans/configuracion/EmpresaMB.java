@@ -92,7 +92,7 @@ public class EmpresaMB implements Serializable {
 
     @EJB
     CfgClienteFacade clienteFacade;
-    
+
     @EJB
     SegUsuarioFacade usuarioFacade;
 
@@ -176,6 +176,9 @@ public class EmpresaMB implements Serializable {
     }
 
     private void crearEmpresa() {
+        if(!validar()){
+            return;
+        }
         try {
             CfgEmpresa empresa = new CfgEmpresa();
             CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
@@ -215,6 +218,13 @@ public class EmpresaMB implements Serializable {
     }
 
     private void modificarEmpresa() {
+        if (!validar()) {
+            return;
+        }
+        if (empresaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la empresa a modificar"));
+            return;
+        }
         try {
             CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
             CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
@@ -244,6 +254,47 @@ public class EmpresaMB implements Serializable {
         }
     }
 
+    private boolean validar() {
+        boolean ban = true;
+        if (codigo == null || codigo.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de empresa obligatorio"));
+            return false;
+        }
+        if (idDepartamento == null || idDepartamento.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un departamento"));
+            return false;
+        }
+        if (idMunicipio == null || idMunicipio.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija un municipio"));
+            return false;
+        }
+        if (tipoEmpresa == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de empresa"));
+            return false;
+        }
+        if (tipoDocEmpresa == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta determinar el tipo de documento de la empresa"));
+            return false;
+        }
+        if (numDocumento == null || numDocumento.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero de documento"));
+            return false;
+        }
+        if (nombre == null || nombre.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Nombre de la empresa requerido"));
+            return false;
+        }
+        if (direccion == null || direccion.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Se requiere la direccion"));
+          return false;
+        }
+        if (telefono1 == null || telefono1.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta telefono 1"));
+            return false;
+        }
+        return ban;
+    }
+
     public void actualizarMunicipios() {
         listaMuncipios.clear();
         if (idDepartamento != null) {
@@ -261,7 +312,7 @@ public class EmpresaMB implements Serializable {
         }
     }
 
-    private void crearClienteDefault(CfgEmpresa  empresa) {
+    private void crearClienteDefault(CfgEmpresa empresa) {
         try {
             CfgCliente cliente = new CfgCliente();
             cliente.setNom1Cliente("CLIENTE");

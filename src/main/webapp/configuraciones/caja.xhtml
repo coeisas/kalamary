@@ -20,7 +20,7 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodEmpresa" class="labelFormulario" value="Codigo Empresa:" />
+                            <p:outputLabel for="IdCodEmpresa" class="labelFormularioObligatorio" value="Codigo Empresa:" />
                             <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{cajaMB.codigoEmpresa}">
                                 <p:ajax event="blur" listener="#{cajaMB.buscarEmpresaPorCodigo}" update="@none"/>
                             </p:inputText>
@@ -30,7 +30,7 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodSede" class="labelFormulario" value="Codigo Sede:" />
+                            <p:outputLabel for="IdCodSede" class="labelFormularioObligatorio" value="Codigo Sede:" />
                             <p:inputText id="IdCodSede" class="campoFormulario" value="#{cajaMB.codigoSede}">
                                 <p:ajax event="blur" listener="#{cajaMB.buscarSedePorCodigo}" update="@none"/>
                             </p:inputText>
@@ -40,11 +40,11 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodCaja" class="labelFormulario" value="Codigo Caja:" />                        
+                            <p:outputLabel for="IdCodCaja" class="labelFormularioObligatorio" value="Codigo Caja:" />                        
                             <p:inputText id="IdCodCaja" class="campoFormulario" value="#{cajaMB.codigoCaja}">
                                 <p:ajax event="blur" listener="#{cajaMB.buscarCajaPorCodigo}" update="@none"/>
                             </p:inputText>
-                            <p:outputLabel for="IdCaja" class="labelFormulario" value="Caja:" />
+                            <p:outputLabel for="IdCaja" class="labelFormularioObligatorio" value="Caja:" />
                             <p:inputText id="IdCaja" class="campoFormulario upperCase" value="#{cajaMB.nombreCaja}"/> 
                         </p:column>
                     </p:row>

@@ -11,7 +11,7 @@
     <ui:define name="content">        
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormUsuario">
-            <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
+            <p:outputLabel for="idCodigoEmpresa" class="labelFormularioObligatorio" value="Cod. Empresa:"/>
             <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{usuarioMB.codEmpresa}">
                 <p:ajax event="blur" listener="#{usuarioMB.buscarEmpresa}" update="@none"/>
             </p:inputText>
@@ -46,7 +46,7 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="idCodigoSede" class="labelFormulario" value="Cod. Sede:"/>
+                            <p:outputLabel for="idCodigoSede" class="labelFormularioObligatorio" value="Cod. Sede:"/>
                             <p:inputText id="idCodigoSede" class="campoFormulario" value="#{usuarioMB.codSede}">
                                 <p:ajax event="blur" listener="#{usuarioMB.buscarSede}" update="@none"/>
                             </p:inputText>
@@ -57,19 +57,19 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Identificacion:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
                             <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idIdentificacion}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
                             </p:selectOneMenu>
-                            <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
                             <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{usuarioMB.numIdentificacion}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
+                            <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
                             <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerNombre}"/>
                             <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
                             <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoNombre}"/>                        
@@ -78,7 +78,7 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
+                            <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
                             <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerApellido}" />
                             <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
                             <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoApellido}" />                                                
@@ -89,14 +89,14 @@
                         <p:column colspan="2">
                             <p:outputLabel for="IdComision" class="labelFormulario" value="Comision Venta %:"/>
                             <p:spinner id="IdComision" class="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>
-                            <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
+                            <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
                             <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{usuarioMB.direccion}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
+                            <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
                             <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>
                             <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
                             <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{usuarioMB.mail}"/>
@@ -107,11 +107,11 @@
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel class="labelFormulario" value="Usuario:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Usuario:"/>
                             <p:inputText class="campoFormulario lowerCase" value="#{usuarioMB.usuario}">
                                 <p:ajax event="blur" listener="#{usuarioMB.validarUsuario}" update="@none"/>
                             </p:inputText>
-                            <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormulario" value="Contraseña:" style="color: #{usuarioMB.background}"/>
+                            <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormularioObligatorio" value="Contraseña:" style="color: #{usuarioMB.background}"/>
                             <p:password id="IdPass1" class="campoFormulario" value="#{usuarioMB.contrasenia}" >
                                 <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass1 IdLabelPass2"/>
                             </p:password>
@@ -124,7 +124,7 @@
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel class="labelFormulario" value="Rol:"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Rol:"/>
                             <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idRole}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaRoles}" var="role" itemLabel="#{role.nomrol}" itemValue="#{role.idrol}"/>

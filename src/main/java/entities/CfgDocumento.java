@@ -117,8 +117,6 @@ public class CfgDocumento implements Serializable {
     private SegUsuario segusuarioidUsuario;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgDocumento")
     private List<FacDocumentosmaster> facDocumentosmasterList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgdocumentoidDoc")
-    private List<FacMovcajadetalle> facMovcajadetalleList;
 
     public CfgDocumento() {
     }
@@ -282,15 +280,6 @@ public class CfgDocumento implements Serializable {
 
     public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
         this.facDocumentosmasterList = facDocumentosmasterList;
-    }
-
-    @XmlTransient
-    public List<FacMovcajadetalle> getFacMovcajadetalleList() {
-        return facMovcajadetalleList;
-    }
-
-    public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
-        this.facMovcajadetalleList = facMovcajadetalleList;
     }
 
     @Override

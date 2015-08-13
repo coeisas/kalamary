@@ -9,6 +9,7 @@ import entities.FacCaja;
 import entities.FacMovcaja;
 import entities.SegUsuario;
 import facades.FacMovcajaFacade;
+import facades.SegUsuarioFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
@@ -41,6 +42,9 @@ public class AbrirCajaMB implements Serializable {
     @EJB
     FacMovcajaFacade movcajaFacade;
 
+    @EJB
+    SegUsuarioFacade usuarioFacade;
+
     public AbrirCajaMB() {
     }
 
@@ -51,12 +55,19 @@ public class AbrirCajaMB implements Serializable {
 //        actualizarInformacionCaja();
         if (sesionMB.getUsuarioActual() != null) {
             usuarioActual = sesionMB.getUsuarioActual();
+            setCajaActual(usuarioActual.getFaccajaidCaja());
         }
     }
 
     public void actualizarInformacionCaja() {
         if (usuarioActual != null) {
-            setCajaActual(usuarioActual.getFaccajaidCaja());
+            if (cajaActual == null) {
+                usuarioActual = usuarioFacade.find(usuarioActual.getIdUsuario());
+                cajaActual = usuarioActual.getFaccajaidCaja();
+                if (cajaActual != null) {
+                    sesionMB.getUsuarioActual().setFaccajaidCaja(cajaActual);
+                }
+            }
             if (getCajaActual() != null) {
                 movcajaActual = movcajaFacade.buscarMovimientoCaja(getCajaActual());
                 if (movcajaActual != null) {

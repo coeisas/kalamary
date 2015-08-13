@@ -7,10 +7,12 @@ package managedBeans.proceso;
 
 import entities.CfgCliente;
 import entities.CfgDocumento;
+import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgFormapago;
 import entities.CfgImpuesto;
 import entities.CfgProducto;
+import entities.FacCaja;
 import entities.FacDocuementopago;
 import entities.FacDocuementopagoPK;
 import entities.FacDocumentodetalle;
@@ -19,6 +21,8 @@ import entities.FacDocumentoimpuesto;
 import entities.FacDocumentoimpuestoPK;
 import entities.FacDocumentosmaster;
 import entities.FacDocumentosmasterPK;
+import entities.FacMovcaja;
+import entities.FacMovcajadetalle;
 import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
@@ -29,6 +33,9 @@ import facades.FacDocuementopagoFacade;
 import facades.FacDocumentodetalleFacade;
 import facades.FacDocumentoimpuestoFacade;
 import facades.FacDocumentosmasterFacade;
+import facades.FacMovcajaFacade;
+import facades.FacMovcajadetalleFacade;
+import facades.SegUsuarioFacade;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
@@ -86,6 +93,8 @@ public class FacturaMB implements Serializable {
     private List<CfgCliente> listaClientes;
     private List<CfgImpuesto> listaImpuestos;
     private List<CfgFormapago> listaFormapagos;
+    private FacCaja cajaUsuario;//caja asignada al usuario
+    private FacMovcaja movimientoCajaMaster;//contiene informacion del maestro del movimiento. Se crea uno cada vez que se habre caja. cuando se cierra se habilita
 
     private int tipoImpresion;
 //    private CfgEmpresa empresaActual;
@@ -97,6 +106,9 @@ public class FacturaMB implements Serializable {
     private boolean enableBtnPrint;
 
     private SesionMB sesionMB;
+
+    @EJB
+    SegUsuarioFacade usuarioFacade;
     @EJB
     CfgClienteFacade clienteFacade;
     @EJB
@@ -115,6 +127,10 @@ public class FacturaMB implements Serializable {
     FacDocumentoimpuestoFacade documentoimpuestoFacade;
     @EJB
     FacDocuementopagoFacade docuementopagoFacade;
+    @EJB
+    FacMovcajaFacade movcajamaestroFacade;
+    @EJB
+    FacMovcajadetalleFacade movcajadetalleFacade;
 
     public FacturaMB() {
 
@@ -139,6 +155,12 @@ public class FacturaMB implements Serializable {
             setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
             listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
             cargarInformacionCliente();
+        }
+        if (usuarioActual != null) {
+            cajaUsuario = usuarioActual.getFaccajaidCaja();
+            if (cajaUsuario != null) {
+                movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
+            }
         }
     }
 
@@ -205,6 +227,7 @@ public class FacturaMB implements Serializable {
                 facdetalle.setValorTotal(facdetalle.getCantidad() * facdetalle.getValorUnitario());
             }
             subtotal += facdetalle.getValorTotal();
+            calcularTotalDescuento();
             calcularImpuesto();
             calcularTotalFactura();
             RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
@@ -245,8 +268,8 @@ public class FacturaMB implements Serializable {
         descuento = Redondear(descuento, 0);
         listaDetalle.get(index).setValorDescuento(descuento);
         subtotal += listaDetalle.get(index).getValorTotal();
-        calcularImpuesto();
         calcularTotalDescuento();
+        calcularImpuesto();
         calcularTotalFactura();
         RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
     }
@@ -265,7 +288,7 @@ public class FacturaMB implements Serializable {
     private void calcularImpuesto() {
         float aux;
         for (CfgImpuesto impuesto : listaImpuestos) {
-            aux = impuesto.getPorcentaje() * subtotal / (float) 100;
+            aux = impuesto.getPorcentaje() * (subtotal - totalDescuento) / (float) 100;
             aux = Redondear(aux, 0);
             impuesto.setTotalImpuesto(aux);
         }
@@ -306,6 +329,11 @@ public class FacturaMB implements Serializable {
     }
 
     public void guardarFactura() {
+        movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
+        if (!movimientoCajaMaster.getAbierta()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
+            return;
+        }
         CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
@@ -358,6 +386,7 @@ public class FacturaMB implements Serializable {
                 }
             }
             documentoActual = documentosmaster;
+            generarMovimientoCaja(documentosmaster);
             limpiarFormulario();
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
@@ -366,7 +395,49 @@ public class FacturaMB implements Serializable {
         }
     }
 
+    private void generarMovimientoCaja(FacDocumentosmaster documentosmaster) {
+        List<FacDocuementopago> listaformapago = docuementopagoFacade.buscarByDocumentoMaster(documentosmaster);
+        try {
+            for (FacDocuementopago formapago : listaformapago) {
+                FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
+                movcajadetalle.setFacDocumentosmaster(documentosmaster);
+                movcajadetalle.setFecha(new Date());
+                movcajadetalle.setFacmovcajaidMovimiento(movimientoCajaMaster);
+                movcajadetalle.setCfgformapagoidFormaPago(formapago.getCfgFormapago());
+                movcajadetalle.setValor(formapago.getValorPago());
+                movcajadetalleFacade.create(movcajadetalle);
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro registrar el pago. Cancele la factura "+ documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
+        }
+    }
+
     public void facturacion() {
+        if (cajaUsuario == null) {
+            //se vuelve a buscar la caja del usario. Por si el usuario la creo en el transcurso de la sesion
+            usuarioActual = usuarioFacade.find(usuarioActual.getIdUsuario());
+            cajaUsuario = usuarioActual.getFaccajaidCaja();
+            if (cajaUsuario == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El usuario no tiene caja asignada"));
+                return;
+            } else {
+                sesionMB.getUsuarioActual().setFaccajaidCaja(cajaUsuario);
+            }
+        }
+        if(movimientoCajaMaster == null){
+            movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
+            if(movimientoCajaMaster == null){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Abra la caja por primera vez"));
+                return;
+            }
+        }
+        if (!movimientoCajaMaster.getAbierta()) {
+            movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
+            if (!movimientoCajaMaster.getAbierta()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
+                return;
+            }
+        }
         if (!listaDetalle.isEmpty()) {
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').show()");
             RequestContext.getCurrentInstance().update("FormModalFactura");
@@ -474,9 +545,16 @@ public class FacturaMB implements Serializable {
             String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
             Map<String, Object> parametros = new HashMap<>();
             InputStream logo = new ByteArrayInputStream(bites);
+            CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
             parametros.put("logo", logo);
-            parametros.put("empresa", sedeActual.getCfgempresaidEmpresa().getNomEmpresa());
-            parametros.put("nit", sedeActual.getNumDocumento());
+            parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
+            parametros.put("direccion", sedeActual.getDireccion() + " " + sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            String telefono = sedeActual.getTel1();
+            if (sedeActual.getTel2() != null || !sedeActual.getTel2().isEmpty()) {
+                telefono = telefono + "-".concat(sedeActual.getTel2());
+            }
+            parametros.put("telefono", telefono);
+            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
             parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
             parametros.put("fecha", documento.getFecCrea());

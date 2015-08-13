@@ -35,7 +35,6 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FacMovcajadetalle.findAll", query = "SELECT f FROM FacMovcajadetalle f"),
     @NamedQuery(name = "FacMovcajadetalle.findByValor", query = "SELECT f FROM FacMovcajadetalle f WHERE f.valor = :valor"),
     @NamedQuery(name = "FacMovcajadetalle.findByFecha", query = "SELECT f FROM FacMovcajadetalle f WHERE f.fecha = :fecha"),
-    @NamedQuery(name = "FacMovcajadetalle.findByNumRecibocaja", query = "SELECT f FROM FacMovcajadetalle f WHERE f.numRecibocaja = :numRecibocaja"),
     @NamedQuery(name = "FacMovcajadetalle.findByIdmovcajadetalle", query = "SELECT f FROM FacMovcajadetalle f WHERE f.idmovcajadetalle = :idmovcajadetalle")})
 public class FacMovcajadetalle implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -48,18 +47,11 @@ public class FacMovcajadetalle implements Serializable {
     @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "num_recibocaja", nullable = false)
-    private int numRecibocaja;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "idmovcajadetalle", nullable = false)
     private Long idmovcajadetalle;
-    @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false)
-    @ManyToOne(optional = false)
-    private CfgDocumento cfgdocumentoidDoc;
     @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false)
     @ManyToOne(optional = false)
     private CfgFormapago cfgformapagoidFormaPago;
@@ -83,7 +75,6 @@ public class FacMovcajadetalle implements Serializable {
         this.idmovcajadetalle = idmovcajadetalle;
         this.valor = valor;
         this.fecha = fecha;
-        this.numRecibocaja = numRecibocaja;
     }
 
     public float getValor() {
@@ -102,28 +93,12 @@ public class FacMovcajadetalle implements Serializable {
         this.fecha = fecha;
     }
 
-    public int getNumRecibocaja() {
-        return numRecibocaja;
-    }
-
-    public void setNumRecibocaja(int numRecibocaja) {
-        this.numRecibocaja = numRecibocaja;
-    }
-
     public Long getIdmovcajadetalle() {
         return idmovcajadetalle;
     }
 
     public void setIdmovcajadetalle(Long idmovcajadetalle) {
         this.idmovcajadetalle = idmovcajadetalle;
-    }
-
-    public CfgDocumento getCfgdocumentoidDoc() {
-        return cfgdocumentoidDoc;
-    }
-
-    public void setCfgdocumentoidDoc(CfgDocumento cfgdocumentoidDoc) {
-        this.cfgdocumentoidDoc = cfgdocumentoidDoc;
     }
 
     public CfgFormapago getCfgformapagoidFormaPago() {

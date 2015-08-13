@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="528" leftMargin="42" rightMargin="42" topMargin="42" bottomMargin="42" uuid="e2decc6e-399c-48df-9711-03c573432f26">
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="48"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -21,6 +21,8 @@
 	<parameter name="identificacionUsuario" class="java.lang.String"/>
 	<parameter name="usuario" class="java.lang.String"/>
 	<parameter name="nit" class="java.lang.String"/>
+	<parameter name="direccion" class="java.lang.String"/>
+	<parameter name="telefono" class="java.lang.String"/>
 	<field name="detalle" class="java.util.List"/>
 	<field name="pago" class="java.util.List"/>
 	<field name="impuesto" class="java.util.List"/>
@@ -33,15 +35,15 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="53" splitType="Stretch">
+		<band height="55" splitType="Stretch">
 			<image>
-				<reportElement x="0" y="16" width="91" height="37" uuid="322565c1-ace9-4714-8a94-7f7d2608bead"/>
+				<reportElement x="0" y="22" width="91" height="31" uuid="322565c1-ace9-4714-8a94-7f7d2608bead"/>
 				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="0" y="2" width="409" height="8" uuid="7acec3e5-37c8-4698-8fcd-d301a1259655"/>
+				<reportElement x="0" y="0" width="299" height="10" uuid="7acec3e5-37c8-4698-8fcd-d301a1259655"/>
 				<textElement>
-					<font size="6" isBold="true"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
@@ -56,17 +58,17 @@
 				<reportElement x="409" y="31" width="117" height="22" uuid="b62ad682-b0ba-4ae3-b81d-f651d2dcce73"/>
 			</rectangle>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="299" y="17" width="100" height="10" uuid="6694974e-1cfa-4c9a-bc26-9687ed6be5ae"/>
+				<reportElement x="299" y="23" width="100" height="10" uuid="6694974e-1cfa-4c9a-bc26-9687ed6be5ae"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="299" y="27" width="100" height="1" uuid="a466c970-af60-44bb-92cb-de7214e4b397"/>
+				<reportElement x="299" y="33" width="100" height="1" uuid="a466c970-af60-44bb-92cb-de7214e4b397"/>
 			</line>
 			<staticText>
-				<reportElement x="299" y="28" width="100" height="10" uuid="0d0f4b98-5e6d-4501-a4ff-6c13e24e8b2d"/>
+				<reportElement x="299" y="33" width="100" height="10" uuid="0d0f4b98-5e6d-4501-a4ff-6c13e24e8b2d"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
@@ -87,11 +89,11 @@
 				<textFieldExpression><![CDATA[$F{numFac}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="10" width="165" height="8" uuid="cefa3029-4c53-4712-806c-74d305c48e12"/>
+				<reportElement x="0" y="10" width="409" height="10" uuid="447f062b-ea0d-4f7a-b1ef-f1868c19a96c"/>
 				<textElement>
-					<font size="6"/>
+					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{nit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["DIRECCION: "+$P{direccion}+ " TELEFONO(S): "+$P{telefono}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -284,7 +286,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<text><![CDATA[REVICE BIEN SU MERCANCIA. UNA VEZ ACEPTADA LA ORDEN DE COMPRA NO SE HACEN DEVOLUCIONES DE DINERO. PARA ARTICULOS SEPARADOS SOLO CUENTA CON DOS MESES PARA RETIRARLOS A PARTIR DE LA FECHA DE SU FACTURA. NO HAY CAMBIOS DE REFERENCIA NI DEVOLUCIONES DE DINERO]]></text>
+				<text><![CDATA[REVISE BIEN SU MERCANCIA. UNA VEZ ACEPTADA LA ORDEN DE COMPRA NO SE HACEN DEVOLUCIONES DE DINERO. PARA ARTICULOS SEPARADOS SOLO CUENTA CON DOS MESES PARA RETIRARLOS A PARTIR DE LA FECHA DE SU FACTURA. NO HAY CAMBIOS DE REFERENCIA NI DEVOLUCIONES DE DINERO]]></text>
 			</staticText>
 		</band>
 	</pageFooter>

@@ -18,7 +18,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{impuesto}]]></textFieldExpression>
 			</textField>
-			<textField pattern="¤ #,##0.0">
+			<textField pattern="#,##0">
 				<reportElement x="63" y="0" width="63" height="6" uuid="d1dbfb17-ef1d-49d7-bc38-733d4aaa2dec"/>
 				<textElement textAlignment="Right">
 					<font size="4"/>

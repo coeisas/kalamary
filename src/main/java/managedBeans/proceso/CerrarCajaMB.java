@@ -13,6 +13,7 @@ import entities.SegUsuario;
 import facades.CfgFormapagoFacade;
 import facades.FacMovcajaFacade;
 import facades.FacMovcajadetalleFacade;
+import facades.SegUsuarioFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
@@ -33,59 +34,75 @@ import org.primefaces.context.RequestContext;
 @ManagedBean
 @SessionScoped
 public class CerrarCajaMB implements Serializable {
-
+    
     private Date fechaCierre;//equivale a la fecha de cierre de la caja
     private float valorCierre;
-
+    
     private FacCaja cajaActual;//corresponde la caja asociada que tiene el usuario logeado
     private FacMovcaja movcajaActual;
-
+    
     private SesionMB sesionMB;
     private SegUsuario usuarioActual;
-
+    
     private List<CfgFormapago> listaFormaPago;
-
+    
+    @EJB
+    SegUsuarioFacade usuarioFacade;
+    
     @EJB
     CfgFormapagoFacade formapagoFacade;
-
+    
     @EJB
     FacMovcajaFacade movcajaFacade;
-
+    
     @EJB
     FacMovcajadetalleFacade movcajadetalleFacade;
-
+    
     public CerrarCajaMB() {
     }
-
+    
     @PostConstruct
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
-        if (sesionMB.getUsuarioActual() != null && usuarioActual.getCfgempresasedeidSede() != null) {
-            setListaFormaPago(formapagoFacade.buscarPorEmpresa(usuarioActual.getCfgempresasedeidSede().getCfgempresaidEmpresa()));
+        //carga las formas de pago de la empresa elegida en el login
+        if (usuarioActual != null && sesionMB.getSedeActual() != null) {
+            setListaFormaPago(formapagoFacade.buscarPorEmpresa(sesionMB.getSedeActual().getCfgempresaidEmpresa()));
         } else {
             setListaFormaPago((List<CfgFormapago>) new ArrayList());
         }
-    }
-
-    public void actualizarInformacionCaja() {
         if (usuarioActual != null) {
             setCajaActual(usuarioActual.getFaccajaidCaja());
-            if (getCajaActual() != null) {
+            if (cajaActual != null) {
+                movcajaActual = movcajaActual = movcajaFacade.buscarMovimientoCaja(getCajaActual());
+            }
+        }else{
+            cajaActual = null;
+            movcajaActual = null;
+        }
+    }
+    
+    public void actualizarInformacionCaja() {
+        if (cajaActual == null && usuarioActual != null) {
+            usuarioActual = usuarioFacade.find(usuarioActual.getIdUsuario());
+            cajaActual = usuarioActual.getFaccajaidCaja();
+            if (cajaActual != null) {
+                sesionMB.getUsuarioActual().setFaccajaidCaja(cajaActual);
+            }
+        }
+        if (getCajaActual() != null) {            
                 movcajaActual = movcajaFacade.buscarMovimientoCaja(getCajaActual());
-                if (movcajaActual != null) {
-                    calcularInformacionCierre();
-                    if (!movcajaActual.getAbierta()) {
-                        setFechaCierre(movcajaActual.getFecCierre());
-                        setValorCierre(movcajaActual.getValorCierre());
-                    } else {
-                        setValorCierre(0);
-                        setFechaCierre(null);
-                        calcularValorCierre();
-                    }
-
-                }
+            if (movcajaActual != null) {
+                calcularInformacionCierre();
+                if (!movcajaActual.getAbierta()) {
+                    setFechaCierre(movcajaActual.getFecCierre());
+                    setValorCierre(movcajaActual.getValorCierre());
+                } else {
+                    setValorCierre(0);
+                    setFechaCierre(null);
+                    calcularValorCierre();
+                }                
             }
         } else {
             movcajaActual = null;
@@ -93,17 +110,18 @@ public class CerrarCajaMB implements Serializable {
         }
         RequestContext.getCurrentInstance().update("IdFormCerrarCaja");
     }
-
+    
     private void calcularInformacionCierre() {
         List<FacMovcajadetalle> listaMovDetalle = movcajadetalleFacade.buscarMovDetallePorMovCaja(movcajaActual);
         if (listaMovDetalle != null) {
+            clearSubtotales();
             for (FacMovcajadetalle movcajadetalle : listaMovDetalle) {
                 CfgFormapago formapago = obtenerItemFormaPago(movcajadetalle.getCfgformapagoidFormaPago());
                 formapago.setSubtotal(formapago.getSubtotal() + movcajadetalle.getValor());
             }
         }
     }
-
+    
     private CfgFormapago obtenerItemFormaPago(CfgFormapago formapago) {
         for (CfgFormapago cfgFormapago : getListaFormaPago()) {
             if (cfgFormapago.equals(formapago)) {
@@ -112,13 +130,19 @@ public class CerrarCajaMB implements Serializable {
         }
         return null;
     }
-
+    
+    private void clearSubtotales(){
+         for (CfgFormapago cfgFormapago : getListaFormaPago()) {
+             cfgFormapago.setSubtotal(0);
+        }       
+    }
+    
     private void calcularValorCierre() {
         for (CfgFormapago cfgFormapago : getListaFormaPago()) {
             valorCierre += cfgFormapago.getSubtotal();
         }
     }
-
+    
     public void cerrarCaja() {
         if (cajaActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El usuario no tiene caja asociada"));
@@ -148,35 +172,35 @@ public class CerrarCajaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro cerrar la caja"));
         }
     }
-
+    
     public Date getFechaCierre() {
         return fechaCierre;
     }
-
+    
     public void setFechaCierre(Date fechaCierre) {
         this.fechaCierre = fechaCierre;
     }
-
+    
     public FacCaja getCajaActual() {
         return cajaActual;
     }
-
+    
     public void setCajaActual(FacCaja cajaActual) {
         this.cajaActual = cajaActual;
     }
-
+    
     public float getValorCierre() {
         return valorCierre;
     }
-
+    
     public void setValorCierre(float valorCierre) {
         this.valorCierre = valorCierre;
     }
-
+    
     public List<CfgFormapago> getListaFormaPago() {
         return listaFormaPago;
     }
-
+    
     public void setListaFormaPago(List<CfgFormapago> listaFormaPago) {
         this.listaFormaPago = listaFormaPago;
     }

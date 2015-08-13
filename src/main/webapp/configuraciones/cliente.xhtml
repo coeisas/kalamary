@@ -28,19 +28,19 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="idCodigoCliente" class="labelFormulario" value="Cod. Cliente:"/>
-                            <p:inputText id="idCodigoCliente" class="campoFormulario" value="#{clienteMB.codigoCliente}">
-                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
+                            <!--p:outputLabel for="idCodigoCliente" class="labelFormulario" value="Cod. Cliente:"/>
+                            <p:inputText id="idCodigoCliente" class="campoFormulario" value="# {clienteMB.codigoCliente}">
+                                <p:ajax event="blur" listener="# {clienteMB.buscarCliente}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
-                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormulario" />
-                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario">
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="# {clienteMB.cargarClientes}"/-->
+                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
+                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
                                 <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
                                 <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
                             </p:selectOneMenu> 
-                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormulario"/>
-                            <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario">
+                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
+                            <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
                                 <f:selectItems value="#{clienteMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
                             </p:selectOneMenu>
@@ -60,20 +60,23 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}">
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
                             </p:selectOneMenu>
-                            <p:outputLabel for="IdDocumento" class="labelFormulario" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}"/>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdTipoCliente" class="labelFormulario" value="Tipo Cliente:"/>
-                            <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario">
+                            <p:outputLabel for="IdTipoCliente" class="labelFormularioObligatorio" value="Tipo Cliente:"/>
+                            <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoCliente" itemLabel="#{tipoCliente.descripcion}" itemValue="#{tipoCliente.id}"/>
                             </p:selectOneMenu>                        
@@ -81,7 +84,7 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerNombre" class="labelFormulario" value="Primer Nombre:"/>
+                            <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
                             <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerNombre}"/>
                             <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
                             <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoNombre}"/>                        
@@ -90,7 +93,7 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerApellido" class="labelFormulario" value="Primer Apellido:"/>
+                            <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
                             <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerApellido}" />
                             <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
                             <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoApellido}" />                                                
@@ -99,9 +102,9 @@
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel for="IdDireccion" class="labelFormulario" value="Direccion:"/>
+                            <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
                             <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{clienteMB.direccion}"/>
-                            <p:outputLabel for="IdTelefono" class="labelFormulario" value="Telefono:"/>
+                            <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
                             <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{clienteMB.telefono}"/>                        
                         </p:column>
                     </p:row>

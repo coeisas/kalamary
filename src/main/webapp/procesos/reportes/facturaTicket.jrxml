@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="161" pageHeight="453" columnWidth="133" leftMargin="14" rightMargin="14" topMargin="20" bottomMargin="20" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
-	<property name="ireport.zoom" value="6.0"/>
-	<property name="ireport.x" value="132"/>
-	<property name="ireport.y" value="271"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="161" pageHeight="283" columnWidth="133" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" isIgnorePagination="true" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
 		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
 	</parameter>
@@ -11,6 +11,8 @@
 	<parameter name="fecha" class="java.util.Date"/>
 	<parameter name="cliente" class="java.lang.String"/>
 	<parameter name="usuario" class="java.lang.String"/>
+	<parameter name="direccion" class="java.lang.String"/>
+	<parameter name="telefono" class="java.lang.String"/>
 	<field name="numFac" class="java.lang.String"/>
 	<field name="subtotal" class="java.lang.Float"/>
 	<field name="descuento" class="java.lang.Float"/>
@@ -23,9 +25,9 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="14" splitType="Stretch">
+		<band height="24" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="132" height="6" uuid="24ee594a-c271-468f-8e08-7df5c2a456d8"/>
+				<reportElement x="0" y="0" width="133" height="6" uuid="24ee594a-c271-468f-8e08-7df5c2a456d8"/>
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>
@@ -37,6 +39,20 @@
 					<font size="4"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{nit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-1" y="12" width="134" height="6" uuid="a1d7ee0f-34c9-4d20-8c1d-afdeae52a6a6"/>
+				<textElement textAlignment="Center">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{direccion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="18" width="132" height="6" uuid="d012b436-b6fa-4324-80d3-36ba41ffba68"/>
+				<textElement textAlignment="Center">
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{telefono}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -94,7 +110,7 @@
 			</subreport>
 		</band>
 		<band height="12">
-			<textField pattern="¤ #,##0.0">
+			<textField pattern="#,##0">
 				<reportElement x="67" y="0" width="63" height="6" uuid="39f3da25-14eb-4495-b385-77173ac4c9f8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="4"/>
@@ -108,7 +124,7 @@
 				</textElement>
 				<text><![CDATA[SUBTOTAL]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.0">
+			<textField pattern="#,##0">
 				<reportElement x="67" y="6" width="63" height="6" uuid="3fd4d975-83f6-42e5-8387-9ac54517e370"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="4"/>
@@ -144,7 +160,7 @@
 				</textElement>
 				<text><![CDATA[TOTAL FACTURA]]></text>
 			</staticText>
-			<textField pattern="¤ #,##0.0">
+			<textField pattern="#,##0">
 				<reportElement x="66" y="0" width="64" height="8" uuid="3628adfc-38da-4036-b51a-2d4f4c54c627"/>
 				<textElement textAlignment="Right">
 					<font size="4"/>
@@ -171,9 +187,22 @@
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/facturaTicket_pago.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
+		<band height="6">
+			<subreport>
+				<reportElement x="0" y="0" width="130" height="6" uuid="39d4ab37-ce07-4c6f-891c-bf781d53cb89"/>
+				<subreportParameter name="total">
+					<subreportParameterExpression><![CDATA[$F{totalFactura}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="subtotal">
+					<subreportParameterExpression><![CDATA[$F{subtotal}-$F{descuento}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{impuesto})]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "/facturaTicket_discriminacion.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
 		<band height="10">
 			<textField>
-				<reportElement x="0" y="0" width="133" height="10" uuid="994846ec-4d28-4f67-878d-eb9189052ec4"/>
+				<reportElement x="-1" y="0" width="133" height="10" uuid="994846ec-4d28-4f67-878d-eb9189052ec4"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="4"/>
 				</textElement>
@@ -181,13 +210,4 @@
 			</textField>
 		</band>
 	</detail>
-	<columnFooter>
-		<band height="45" splitType="Stretch"/>
-	</columnFooter>
-	<pageFooter>
-		<band height="54" splitType="Stretch"/>
-	</pageFooter>
-	<summary>
-		<band height="42" splitType="Stretch"/>
-	</summary>
 </jasperReport>

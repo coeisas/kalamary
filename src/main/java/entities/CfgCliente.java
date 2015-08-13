@@ -112,7 +112,7 @@ public class CfgCliente implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
     @Basic(optional = false)
-    @Column(name = "codigoCliente", nullable = false, length = 10)
+    @Column(name = "codigoCliente", length = 10)
     private String codigoCliente;    
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
