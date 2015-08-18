@@ -8,6 +8,7 @@ package managedBeans.configuracion;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.FacCaja;
+import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.FacCajaFacade;
@@ -31,22 +32,17 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class CajaMB implements Serializable {
 
-    private String codigoEmpresa;
-    private String nombreEmpresa;
-    private String codigoSede;
-    private String nombreSede;
     private String codigoCaja;
     private String nombreCaja;
-
-    private boolean codigoCajaValidado = false;
+    private float baseCaja;
 
     private List<CfgEmpresasede> listaSedes;
     private List<FacCaja> listaCajas;
 
     private FacCaja cajaSeleccionada;
-    private CfgEmpresa empresaSeleccionada;
-    private CfgEmpresasede sedeSeleccionada;
-    
+    private CfgEmpresa empresaActual;
+    private CfgEmpresasede sedeActual;
+    private SegUsuario usuarioActual;
     private SesionMB sesionMB;
 
     @EJB
@@ -60,118 +56,62 @@ public class CajaMB implements Serializable {
 
     public CajaMB() {
     }
-    
+
     @PostConstruct
-    private void init(){
+    private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-    }
-
-    public void buscarEmpresaPorCodigo() {
-        empresaSeleccionada = empresaFacade.buscarEmpresaPorCodigo(codigoEmpresa);
-        if (empresaSeleccionada == null && !codigoEmpresa.trim().isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro empresa"));
+        usuarioActual = sesionMB.getUsuarioActual();
+        if (sesionMB.getSedeActual() != null) {
+            sedeActual = sesionMB.getSedeActual();
+            empresaActual = getSedeActual().getCfgempresaidEmpresa();
+            listaCajas = cajaFacade.buscarCajasPorSede(getSedeActual());
         }
-        cargarInformacionEmpresa();
-    }
-
-    public void buscarSedePorCodigo() {
-        if (empresaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione una Empresa"));
-        } else {
-            sedeSeleccionada = sedeFacade.buscarSedePorEmpresa(empresaSeleccionada, codigoSede.trim());
-            if (sedeSeleccionada == null && !codigoSede.trim().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro sede"));
-            }
-            cargarInformacionSede();
-        }
-    }
-
-    public void cargarSedes() {
-        if (empresaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione una Empresa"));
-        } else {
-            RequestContext.getCurrentInstance().update("FormModalSede");
-            RequestContext.getCurrentInstance().execute("PF('dlgSede').show()");
-        }
-    }
-
-    public void cargarInformacionEmpresa() {
-        if (empresaSeleccionada != null) {
-            listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
-            setNombreEmpresa(empresaSeleccionada.getNomEmpresa());
-            setCodigoEmpresa(empresaSeleccionada.getCodEmpresa());
-            RequestContext.getCurrentInstance().execute("PF('dlgEmpresa').hide()");
-            if (codigoSede != null) {
-                if (!codigoSede.trim().isEmpty()) {
-                    buscarSedePorCodigo();
-                }
-            }
-        } else {
-            limpiarFormulario();
-            RequestContext.getCurrentInstance().update("IdDataCaja");
-        }
-        RequestContext.getCurrentInstance().update("IdFormCaja");
-
-    }
-
-    public void cargarInformacionSede() {
-        if (sedeSeleccionada != null) {
-            setNombreSede(sedeSeleccionada.getNomSede());
-            setCodigoSede(sedeSeleccionada.getCodSede());
-            RequestContext.getCurrentInstance().execute("PF('dlgSede').hide()");
-            listaCajas = cajaFacade.buscarCajasPorSede(sedeSeleccionada);
-            RequestContext.getCurrentInstance().update("IdDataCaja");
-        } else {
-            setCodigoSede("");
-            setNombreSede("");
-        }
-        RequestContext.getCurrentInstance().update("IdFormCaja");
-
     }
 
     public void limpiarFormulario() {
-        setCodigoEmpresa("");
-        setNombreEmpresa("");
-        setCodigoSede("");
-        setNombreSede("");
         setCodigoCaja("");
         setNombreCaja("");
-        setListaSedes(null);
-        setListaCajas(null);
     }
 
     public void buscarCajaPorCodigo() {
-        if (sedeSeleccionada == null) {
-            codigoCajaValidado = false;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione una sede"));
-        } else {
-            cajaSeleccionada = cajaFacade.buscarCajasPorSedeAndCodigo(sedeSeleccionada, codigoCaja);
-            if (cajaSeleccionada == null) {
-                codigoCajaValidado = true;
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Ya existe una caja con ese codigo"));
-            }
+        cajaSeleccionada = cajaFacade.buscarCajasPorSedeAndCodigo(getSedeActual(), codigoCaja);
+        cargarInformacionCaja();
+    }
 
+    private void cargarInformacionCaja() {
+        if (cajaSeleccionada != null) {
+            setCodigoCaja(cajaSeleccionada.getCodigoCaja());
+            setNombreCaja(cajaSeleccionada.getNomCaja());
+            setBaseCaja(cajaSeleccionada.getBase());
         }
-
+        RequestContext.getCurrentInstance().update("IdFormCaja");
     }
 
     public void cancelar() {
         limpiarFormulario();
-        setSedeSeleccionada(null);
-        setEmpresaSeleccionada(null);
-        RequestContext.getCurrentInstance().update("IdFormCaja");
+        listaCajas = cajaFacade.buscarCajasPorSede(getSedeActual());
         RequestContext.getCurrentInstance().update("IdDataCaja");
+        RequestContext.getCurrentInstance().update("IdFormCaja");
     }
 
-    public void crearCaja() {
-        if (empresaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la empresa"));
-            return;
+    public void accion() {
+        if (cajaSeleccionada == null) {
+            crearCaja();
+        } else {
+            modificarCaja();
         }
-        if (sedeSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la sede"));
+
+    }
+
+    private void crearCaja() {
+        //        solo los usuarios super y admin pueden modificar
+        if(usuarioActual == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
+            return;           
+        }
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
             return;
         }
         if (nombreCaja.trim().isEmpty()) {
@@ -186,14 +126,22 @@ public class CajaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de caja existente para la sede"));
             return;
         }
+        if (baseCaja < 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Valor de la base es invalido"));
+            return;
+        }
+        if (sedeActual == null) {
+            return;
+        }
         try {
             FacCaja caja = new FacCaja();
-            caja.setCfgempresasedeidSede(sedeSeleccionada);
+            caja.setCfgempresasedeidSede(getSedeActual());
             caja.setCodigoCaja(codigoCaja.toUpperCase());
             caja.setNomCaja(nombreCaja.toUpperCase());
             caja.setCerrada(true);
             caja.setFeccrea(new Date());
-            caja.setUsrcrea(sesionMB.getUsuarioActual().getIdUsuario());
+            caja.setUsrcrea(usuarioActual.getIdUsuario());
+            caja.setBase(baseCaja);
             cajaFacade.create(caja);
             cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Caja creada"));
@@ -202,36 +150,34 @@ public class CajaMB implements Serializable {
         }
     }
 
-    public String getCodigoEmpresa() {
-        return codigoEmpresa;
-    }
-
-    public void setCodigoEmpresa(String codigoEmpresa) {
-        this.codigoEmpresa = codigoEmpresa;
-    }
-
-    public String getNombreEmpresa() {
-        return nombreEmpresa;
-    }
-
-    public void setNombreEmpresa(String nombreEmpresa) {
-        this.nombreEmpresa = nombreEmpresa;
-    }
-
-    public String getCodigoSede() {
-        return codigoSede;
-    }
-
-    public void setCodigoSede(String codigoSede) {
-        this.codigoSede = codigoSede;
-    }
-
-    public String getNombreSede() {
-        return nombreSede;
-    }
-
-    public void setNombreSede(String nombreSede) {
-        this.nombreSede = nombreSede;
+    private void modificarCaja() {
+        //        solo los usuarios super y admin pueden modificar
+        if(usuarioActual == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
+            return;           
+        }
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
+            return;
+        }
+        if (cajaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene una caja seleccionada"));
+            return;
+        }
+        if (nombreCaja.trim().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese el nombre de la caja"));
+            return;
+        }
+        try {
+            cajaSeleccionada.setNomCaja(nombreCaja.toUpperCase());
+//            cajaSeleccionada.setUsrcrea(usuarioActual.getIdUsuario());
+            cajaSeleccionada.setBase(baseCaja);
+            cajaFacade.edit(cajaSeleccionada);
+            cancelar();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Caja modificada"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Caja no modificada"));
+        }
     }
 
     public String getCodigoCaja() {
@@ -274,20 +220,20 @@ public class CajaMB implements Serializable {
         this.cajaSeleccionada = cajaSeleccionada;
     }
 
-    public CfgEmpresa getEmpresaSeleccionada() {
-        return empresaSeleccionada;
+    public CfgEmpresa getEmpresaActual() {
+        return empresaActual;
     }
 
-    public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
-        this.empresaSeleccionada = empresaSeleccionada;
+    public CfgEmpresasede getSedeActual() {
+        return sedeActual;
     }
 
-    public CfgEmpresasede getSedeSeleccionada() {
-        return sedeSeleccionada;
+    public float getBaseCaja() {
+        return baseCaja;
     }
 
-    public void setSedeSeleccionada(CfgEmpresasede sedeSeleccionada) {
-        this.sedeSeleccionada = sedeSeleccionada;
+    public void setBaseCaja(float baseCaja) {
+        this.baseCaja = baseCaja;
     }
 
 }

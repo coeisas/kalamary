@@ -5,6 +5,7 @@
  */
 package entities;
 
+import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -45,6 +46,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
 public class FacDocumentosmaster implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
@@ -85,6 +87,9 @@ public class FacDocumentosmaster implements Serializable {
     @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit")
     @ManyToOne
     private CfgKitproductomaestro cfgkitproductomaestroidKit;
+    @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja")
+    @ManyToOne
+    private FacCaja faccajaidCaja;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
@@ -224,6 +229,14 @@ public class FacDocumentosmaster implements Serializable {
         this.cfgkitproductomaestroidKit = cfgkitproductomaestroidKit;
     }
 
+    public FacCaja getFaccajaidCaja() {
+        return faccajaidCaja;
+    }
+
+    public void setFaccajaidCaja(FacCaja faccajaidCaja) {
+        this.faccajaidCaja = faccajaidCaja;
+    }
+
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
     }
@@ -248,6 +261,22 @@ public class FacDocumentosmaster implements Serializable {
 
     public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
         this.facMovcajadetalleList = facMovcajadetalleList;
+    }
+
+    public String formasPagoString() {
+        String pago = "";
+        for (FacDocuementopago fd : facDocuementopagoList) {
+            pago += fd.getCfgFormapago().getAbreviatura() + " ";
+        }
+        return pago;
+    }
+    
+    public String determinarNumFactura(){
+        String numfac = "";
+        int fin = cfgDocumento.getFinDocumento();
+        String aux = String.valueOf(fin);
+        String numDocumento = String.valueOf(getFacDocumentosmasterPK().getNumDocumento());
+        return cfgDocumento.getPrefijoDoc().concat(Strings.padStart(numDocumento, aux.length(), '0'));       
     }
 
     @Override

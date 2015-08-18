@@ -31,7 +31,7 @@ body {
 }
 
 .campoFormulario{
-    float: left; margin-right: .1em
+    float: left;margin-right: .1em
 }
 
 .labelFormulario{
@@ -54,9 +54,18 @@ body {
     clear: right;margin-bottom: .125em
 }
 .divContent{
-    background: #3c667c;color: #e0e0e0;padding: .25em;border-radius:.45em;width: 20%;float: right;
+    /*background: #3c667c;color: #e0e0e0;padding: .25em;border-radius:.45em;width: 20%;*/float: right;
+}
+
+.label{
+    font-weight: bold;
+    text-align: left;
 }
 
 .ui-selectonemenu-filter-container {//ajusta la caja de filtrado de las listas desplegables
     width: 98% !important;
+}
+
+.cajaH{
+    border-radius: .45em; width: 180px;padding: 0 .25em;font-style: italic;height: 19px
 }

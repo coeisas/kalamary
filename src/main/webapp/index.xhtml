@@ -13,15 +13,15 @@
         <p:growl id="message" autoUpdate="false" showDetail="true"/>
         <h:form>
 
-            <div style="padding: 5em 10em">
+            <div style="padding: 5em 10em;">
 
-                <p:galleria value="#{aplicacionMB.imagenes}" var="imagen" panelWidth="512" panelHeight="384" style="display: inline-block">
+                <p:galleria value="#{aplicacionMB.imagenes}" var="imagen" panelWidth="640" panelHeight="480" style="display: inline-block">
                     <p:graphicImage  library="img" name="#{imagen}" styleClass="presentacionIndex"/>
                     <!--div class="caption"># {imagen}</div-->
                 </p:galleria>
 
-                <div style="display: inline-block; vertical-align: top;padding-left: 10em">
-                    <p:panelGrid styleClass="panelGridSinBorder">
+                <div style="display: inline-block; vertical-align: top;padding-left: 10em;">
+                    <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
                         <p:row>
                             <p:column><h1>KALAMARY POS</h1></p:column>
                         </p:row>
@@ -41,7 +41,7 @@
                         <p:column><p:outputLabel for="IdEmpresa" value="Empresa:"/></p:column>
                         <p:column>
                             <p:selectOneMenu id="IdEmpresa" style="width: 150px" value="#{loginMB.idEmpresa}">
-                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
+                                <f:selectItem itemValue="0" itemLabel="..." noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaEmpresas}" var="empresa" itemValue="#{empresa.idEmpresa}" itemLabel="#{empresa.nomEmpresa}" />
                                 <p:ajax event="change" listener="#{loginMB.cargarSedes}" update="IdSede"/>
                             </p:selectOneMenu>
@@ -51,7 +51,7 @@
                         <p:column><p:outputLabel for="IdSede" value="Sede:"/></p:column>
                         <p:column>
                             <p:selectOneMenu id="IdSede" style="width: 150px" value="#{loginMB.idSede}">
-                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true"/>
+                                <f:selectItem itemValue="0" itemLabel="..." noSelectionOption="true"/>
                                 <f:selectItems value="#{loginMB.listaSedes}" var="sede" itemValue="#{sede.idSede}" itemLabel="#{sede.nomSede}"/>
                             </p:selectOneMenu>
                         </p:column>

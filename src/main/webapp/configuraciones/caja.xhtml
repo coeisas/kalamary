@@ -12,7 +12,7 @@
         <p:growl autoUpdate="true" showDetail="true"/>
         <div style="text-align: center">
             <h:form id="IdFormCaja">
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;width: 70%">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;width: 80%">
                     <f:facet name="header">
                         <p:row>
                             <p:column>Caja</p:column>
@@ -20,37 +20,21 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodEmpresa" class="labelFormularioObligatorio" value="Codigo Empresa:" />
-                            <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{cajaMB.codigoEmpresa}">
-                                <p:ajax event="blur" listener="#{cajaMB.buscarEmpresaPorCodigo}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgEmpresa').show()"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{cajaMB.nombreEmpresa}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                            <p:outputLabel for="IdCodSede" class="labelFormularioObligatorio" value="Codigo Sede:" />
-                            <p:inputText id="IdCodSede" class="campoFormulario" value="#{cajaMB.codigoSede}">
-                                <p:ajax event="blur" listener="#{cajaMB.buscarSedePorCodigo}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{cajaMB.cargarSedes}"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{cajaMB.nombreSede}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
                             <p:outputLabel for="IdCodCaja" class="labelFormularioObligatorio" value="Codigo Caja:" />                        
                             <p:inputText id="IdCodCaja" class="campoFormulario" value="#{cajaMB.codigoCaja}">
                                 <p:ajax event="blur" listener="#{cajaMB.buscarCajaPorCodigo}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel for="IdCaja" class="labelFormularioObligatorio" value="Caja:" />
                             <p:inputText id="IdCaja" class="campoFormulario upperCase" value="#{cajaMB.nombreCaja}"/> 
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <p:outputLabel for="IdBaseCaja" class="labelFormularioObligatorio" value="Base:" />
+                            <p:inputText id="IdBaseCaja" class="campoFormulario upperCase" value="#{cajaMB.baseCaja}"/> 
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:commandButton value="Guardar" icon="ui-icon-disk"  actionListener="#{cajaMB.crearCaja}"/>
+                            <p:commandButton value="Guardar" icon="ui-icon-disk"  actionListener="#{cajaMB.accion}"/>
                             &nbsp;
                             <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{cajaMB.cancelar}"/>
                         </p:column>
@@ -68,31 +52,14 @@
                 </p:column>
                 <p:column headerText="Caja">
                     #{caja.nomCaja}
-                </p:column>                    
+                </p:column>
+                <p:column headerText="Base">
+                    <h:outputText value="#{caja.base}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>
             </p:dataTable>
         </div>
-
-        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalEmpresa">
-                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cajaMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
-                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
-                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{cajaMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
-            </h:form>
-        </p:dialog>
-
-        <p:dialog id="IdModalSede" widgetVar="dlgSede" header="BUSCAR SEDE" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalSede">
-                <p:dataTable value="#{cajaMB.listaSedes}" var="sede" emptyMessage="No hay sedes registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cajaMB.sedeSeleccionada}" rowKey="#{sede.idSede}" selectionMode="single">
-                    <p:column headerText="Codigo">#{sede.codSede}</p:column>
-                    <p:column headerText="Empresa">#{sede.nomSede}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{cajaMB.cargarInformacionSede}" onclick="PF('dlgSede').hide()"/>
-            </h:form>
-        </p:dialog>   
     </ui:define>
 </ui:composition>
 

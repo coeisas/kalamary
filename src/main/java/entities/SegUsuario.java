@@ -132,6 +132,9 @@ public class SegUsuario implements Serializable {
     private List<CfgCliente> cfgClienteList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<CfgProveedor> cfgProveedorList;
+    @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa")
+    @ManyToOne
+    private CfgEmpresa cfgempresaidEmpresa;    
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede")
     @ManyToOne
     private CfgEmpresasede cfgempresasedeidSede;
@@ -353,7 +356,15 @@ public class SegUsuario implements Serializable {
     public void setCfgProveedorList(List<CfgProveedor> cfgProveedorList) {
         this.cfgProveedorList = cfgProveedorList;
     }
+    
+    public CfgEmpresa getCfgempresaidEmpresa() {
+        return cfgempresaidEmpresa;
+    }
 
+    public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
+        this.cfgempresaidEmpresa = cfgempresaidEmpresa;
+    }
+    
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
     }

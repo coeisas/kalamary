@@ -10,6 +10,7 @@ import entities.CfgEmpresa;
 import entities.CfgMarcaproducto;
 import entities.CfgProducto;
 import entities.CfgReferenciaproducto;
+import entities.SegUsuario;
 import facades.CfgCategoriaproductoFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgMarcaproductoFacade;
@@ -22,10 +23,10 @@ import org.primefaces.context.RequestContext;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
-import java.text.DecimalFormat;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import managedBeans.seguridad.SesionMB;
 import org.primefaces.model.LazyDataModel;
 import utilities.LazyProductosModel;
 
@@ -37,10 +38,7 @@ import utilities.LazyProductosModel;
 @SessionScoped
 public class ProductoMB implements Serializable {
 
-    private String codigoEmpresa;
-    private String codigoCategoria;
-    private String codigoReferencia;
-    private String codigoMarca;
+
     private String codigoProducto;
     private String codigoBarra;
     private String color;
@@ -57,6 +55,8 @@ public class ProductoMB implements Serializable {
     private boolean activo;
 
     private String nombreEmpresa;
+    private SesionMB sesionMB;
+    private SegUsuario usuarioActual;
 
     private List<CfgCategoriaproducto> listaCategoria;
     private List<CfgReferenciaproducto> listaReferencia;
@@ -90,9 +90,17 @@ public class ProductoMB implements Serializable {
 
     @PostConstruct
     private void init() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
+        usuarioActual = sesionMB.getUsuarioActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
+        if (empresaSeleccionada != null) {
+            listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
+        } else {
+            listaCategoria = new ArrayList();
+        }
         setPrecio(0);
         setCostoFinal(0);
-        listaCategoria = new ArrayList();
         listaReferencia = new ArrayList();
         listaMarca = new ArrayList();
         listFormsModal = new ArrayList();
@@ -103,38 +111,7 @@ public class ProductoMB implements Serializable {
         activo = true;
     }
 
-    public void buscarEmpresa() {
-        empresaSeleccionada = empresaFacade.buscarEmpresaPorCodigo(codigoEmpresa.trim());
-        if (!codigoEmpresa.trim().isEmpty() && empresaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se econtro empresa"));
-        }
-        cargarInformacionEmpresa();
-    }
-
-    public void cargarInformacionEmpresa() {
-        listaCategoria.clear();
-//        getListaProducto().clear();
-        limpiarFormulario();
-        if (empresaSeleccionada != null) {
-            setCodigoEmpresa(empresaSeleccionada.getCodEmpresa());
-            setNombreEmpresa(empresaSeleccionada.getNomEmpresa());
-            listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
-//            listaProducto = productoFacade.buscarPorEmpresa(empresaSeleccionada);
-        } else {
-            setCodigoEmpresa(null);
-            setNombreEmpresa(null);
-        }
-        listaReferencia.clear();
-        listaMarca.clear();
-        RequestContext.getCurrentInstance().update("IdFormProducto");
-        RequestContext.getCurrentInstance().update(listFormsModal);
-    }
-
     private void limpiarFormulario() {
-        codigoEmpresa = null;
-        codigoCategoria = null;
-        codigoReferencia = null;
-        codigoMarca = null;
         codigoProducto = null;
         codigoBarra = null;
         color = null;
@@ -151,36 +128,9 @@ public class ProductoMB implements Serializable {
         activo = false;
     }
 
-    public void buscarCategoria() {
-        if (empresaSeleccionada != null) {
-            categoriaSeleccionada = categoriaFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, codigoCategoria);
-            cargarInformacionCategoria();
-            if (categoriaSeleccionada == null && !codigoCategoria.trim().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se econtro la categoria"));
-            }
-        } else {
-            setCategoriaSeleccionada(null);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la empresa"));
-        }
-
-    }
-
-    public void buscarReferencia() {
-        if (categoriaSeleccionada != null) {
-            referenciaSeleccionada = referenciaFacade.buscarPorCategoriaAndCodigo(categoriaSeleccionada, codigoReferencia);
-            cargarInformacionReferencia();
-            if (referenciaSeleccionada == null && !codigoReferencia.trim().isEmpty()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se econtro la referencia"));
-            }
-        } else {
-            setReferenciaSeleccionada(null);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la categoria"));
-        }
-    }
-
     public void cargarInformacionCategoria() {
         if (categoriaSeleccionada != null) {
-            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
+//            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
             listaReferencia = referenciaFacade.buscarPorCategoria(categoriaSeleccionada);
         } else {
             listaReferencia.clear();
@@ -191,7 +141,7 @@ public class ProductoMB implements Serializable {
 
     public void cargarInformacionReferencia() {
         if (referenciaSeleccionada != null) {
-            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
+//            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
             listaMarca = marcaFacade.buscarPorReferencia(referenciaSeleccionada);
         } else {
             listaMarca.clear();
@@ -200,23 +150,7 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
 
-    public void buscarMarca() {
-        if (referenciaSeleccionada != null) {
-            marcaSeleccionada = marcaFacade.buscarPorReferenciaAndCodigo(referenciaSeleccionada, codigoMarca);
-            cargarInformacionMarca();
-            if (!codigoMarca.trim().isEmpty() && marcaSeleccionada == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro la marca"));
-            }
-        } else {
-            setMarcaSeleccionada(null);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la referencia"));
-        }
-    }
-
     public void cargarInformacionMarca() {
-        if (marcaSeleccionada != null) {
-            setCodigoMarca(marcaSeleccionada.getCodigoMarca());
-        }
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
 
@@ -258,9 +192,6 @@ public class ProductoMB implements Serializable {
             setMarcaSeleccionada(productoSeleccionado.getCfgmarcaproductoidMarca());
             setReferenciaSeleccionada(marcaSeleccionada.getCfgreferenciaproductoidReferencia());
             setCategoriaSeleccionada(referenciaSeleccionada.getCfgcategoriaproductoidCategoria());
-            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
-            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
-            setCodigoMarca(marcaSeleccionada.getCodigoMarca());
             setCodigoProducto(productoSeleccionado.getCodProducto());
             setCodigoBarra(productoSeleccionado.getCodBarProducto());
             setColor(productoSeleccionado.getColor());
@@ -270,7 +201,7 @@ public class ProductoMB implements Serializable {
             setCostoAdq(determinarValor(productoSeleccionado.getCostoAdquisicion()));
             setIva(determinarValor(productoSeleccionado.getIva()));
             setFlete(determinarValor(productoSeleccionado.getFlete()));
-            setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));            
+            setCostoInd(determinarValor(productoSeleccionado.getCostoIndirecto()));
             setCostoFinal((float) productoSeleccionado.getCosto());
             setUtilidad(determinarValor(productoSeleccionado.getUtilidad()));
             setPrecio((float) productoSeleccionado.getPrecio());
@@ -417,36 +348,17 @@ public class ProductoMB implements Serializable {
         return valor == null ? 0 : valor;
     }
 
-    public String getCodigoEmpresa() {
-        return codigoEmpresa;
-    }
+    public void cancelar() {
+        limpiarFormulario();
+        marcaSeleccionada = null;
+        referenciaSeleccionada = null;
+        categoriaSeleccionada = null;
+        productoSeleccionado = null;
+        listaMarca.clear();
+        listaReferencia.clear();
+        RequestContext.getCurrentInstance().update("IdFormProducto");
+        RequestContext.getCurrentInstance().update(listFormsModal);
 
-    public void setCodigoEmpresa(String codigoEmpresa) {
-        this.codigoEmpresa = codigoEmpresa;
-    }
-
-    public String getCodigoCategoria() {
-        return codigoCategoria;
-    }
-
-    public void setCodigoCategoria(String codigoCategoria) {
-        this.codigoCategoria = codigoCategoria;
-    }
-
-    public String getCodigoReferencia() {
-        return codigoReferencia;
-    }
-
-    public void setCodigoReferencia(String codigoReferencia) {
-        this.codigoReferencia = codigoReferencia;
-    }
-
-    public String getCodigoMarca() {
-        return codigoMarca;
-    }
-
-    public void setCodigoMarca(String codigoMarca) {
-        this.codigoMarca = codigoMarca;
     }
 
     public String getCodigoProducto() {

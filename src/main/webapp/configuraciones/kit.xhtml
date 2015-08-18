@@ -12,15 +12,8 @@
         <p:growl autoUpdate="true" showDetail="true"/>
         <div style="text-align: center">
             <h:form id="IdFormKit">
-                <p:outputLabel for="IdCodEmpresa" class="labelFormulario" value="Empresa:"/>
-                <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{kitMB.codigoEmpresa}">
-                    <p:ajax event="blur" listener="#{kitMB.buscarEmpresa}" update="@none"/>
-                </p:inputText>
-                <p:commandButton  icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
-                <p:outputLabel class="labelFormularioInformativa" value="#{kitMB.nombreEmpresa}"/> 
-                <br style="clear: left;"/>
-                <p:separator style="margin-bottom: 1em"/>
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:remoteCommand name="update" actionListener="#{kitMB.updateTabla}"/>
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;">
                     <f:facet name="header">
                         <p:row>
                             <p:column>Kit</p:column>
@@ -28,21 +21,33 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Codigo:"/>
-                            <p:inputText class="campoFormulario" value="#{kitMB.codigoKit}">
+                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{kitMB.codigoKit}">
                                 <p:ajax event="blur" listener="#{kitMB.buscarKit}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgKit').show()"/>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{kitMB.cargarKits}"/>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Kit:"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{kitMB.nombreKit}" size="55"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Costo:"/>
-                            <p:inputText class="campoFormulario" value="#{kitMB.costo}"/>
-                            <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{kitMB.utilidad}"/>
+                            <h:inputText class="cajaH" style="float: left;width: 100px" value="#{kitMB.costo}" readonly="true">
+                                <f:convertNumber type="currency"/>
+                            </h:inputText>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <!--p:outputLabel class="labelFormulario" value="Utilidad %:"/>
+                            <p:inputText class="campoFormulario" size="3" value="# {kitMB.utilidad}">
+                                <p:ajax event="change" listener="# {kitMB.calcularPrecioKit}" update="IdPrecioKit"/>
+                            </p:inputText>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/-->
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
-                            <p:inputText class="campoFormulario" value="#{kitMB.precio}"/>
+                            <h:inputText id="IdPrecioKit" class="cajaH" style="float: left;width: 100px" value="#{kitMB.precio}" readonly="true">
+                                <f:convertNumber type="currency"/>
+                            </h:inputText>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{kitMB.activo}" />
                         </p:column>
@@ -55,47 +60,54 @@
                     id="IdTableKit"
                     value="#{kitMB.listaKitDetalle}"
                     var="itemKit"
-                    style="width: 80%;margin: 0 auto"
+                    style="width: 80%;margin: 0 auto;text-align: left"
                     emptyMessage="Items del kit vacia"
+                    editable="true"
+                    editMode="cell"
                     >
+                    <p:ajax event="cellEdit" listener="#{kitMB.onCellEdit}" oncomplete="update()" update="@none"/>
                     <f:facet name="header">Items Kit</f:facet>
                     <p:column headerText="Producto">
                         #{itemKit.cfgProducto.nomProducto}                   
                     </p:column>
                     <p:column headerText="Cantidad">
-                        #{itemKit.cant}
+                        <p:cellEditor>
+                            <f:facet name="input"><p:spinner value="#{itemKit.cant}" min="1"/></f:facet>
+                            <f:facet name="output">
+                                #{itemKit.cant}
+                            </f:facet>
+                        </p:cellEditor>
                     </p:column>
-                    <p:column headerText="Costo Unit">
-                        #{itemKit.costo}
+                    <p:column headerText="Vlr Unit">
+                        <h:outputText value="#{itemKit.precioUnitario}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
                     </p:column>
-                    <p:column headerText="Costo Total">
-                        #{itemKit.costo} * #{itemKit.cant}
+                    <p:column headerText="Vlr Total">
+                        <h:outputText value="#{itemKit.precioTotal}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column width="6%">
+                        <p:commandButton icon="ui-icon-minus" title="Quitar elemento" actionListener="#{kitMB.quitarItem}">
+                            <f:attribute name="itemKit" value="#{itemKit}"/>
+                        </p:commandButton>
                     </p:column>
                 </p:dataTable>
                 <br/>
                 <div >
                     <p:column style="text-align: center">
-                        <p:commandButton icon="ui-icon-disk" value="Guardar"/>
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{kitMB.accion}"/>
                         &nbsp;
-                        <p:commandButton icon="ui-icon-cancel" value="Cancelar"/>
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{kitMB.cancelar}"/>
                     </p:column>
                 </div>
             </h:form>
         </div>
-        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalEmpresa">
-                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{kitMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
-                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
-                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{kitMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
-            </h:form>
-        </p:dialog>
         <p:dialog id="IdModalKit" widgetVar="dlgKit" header="BUSCAR KIT" resizable="false" width="700px" modal="true">
             <h:form id="FormModalKit">
-                <p:dataTable value="#{kitMB.listaKitMaestro}" var="kit" emptyMessage="No hay kits registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{kitMB.kitMaestroSeleccionado}" rowKey="#{kit.idKit}" selectionMode="single" lazy="true">
-                    <p:column headerText="Codigo">#{kit.idKit}</p:column>
+                <p:dataTable value="#{kitMB.listaKitMaestro}" var="kit" emptyMessage="No hay kits registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{kitMB.kitMaestroSeleccionado}" rowKey="#{kit.idKit}" selectionMode="single">
+                    <p:column headerText="Codigo">#{kit.codKit}</p:column>
                     <p:column headerText="Producto">#{kit.nomKit}</p:column>                   
                 </p:dataTable>
                 <p:separator/>
@@ -104,13 +116,18 @@
         </p:dialog>        
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
-                <p:dataTable value="#{kitMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="5" paginator="true" paginatorPosition="bottom" selection="#{kitMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
-                    <p:column headerText="Codigo">#{producto.codProducto}</p:column>
-                    <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
+                <p:dataTable value="#{kitMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{kitMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{producto.precio}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{kitMB.cargarItemKit}" onclick="PF('dlgProducto').hide()"/>
+                <p:commandButton value="Aceptar" actionListener="#{kitMB.insertarItemKit}"/>
             </h:form>
         </p:dialog>
     </ui:define>

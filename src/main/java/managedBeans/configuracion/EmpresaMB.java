@@ -67,9 +67,10 @@ public class EmpresaMB implements Serializable {
     private CfgEmpresa empresaSeleccionada;
     private List<CfgMunicipio> listaMuncipios;
     private StreamedContent image;
-    private String opcion;//opcion que contiene la accion del boton guardar: creacion, modificacion
+//    private String opcion;//opcion que contiene la accion del boton guardar: creacion, modificacion
 
     private SesionMB sesionMB;
+    private AplicacionMB aplicacionMB;
     private SegUsuario usuarioActual;
 
     @EJB
@@ -100,9 +101,13 @@ public class EmpresaMB implements Serializable {
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-        opcion = "creacion";
+        aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
         listaMuncipios = new ArrayList();
         usuarioActual = sesionMB.getUsuarioActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
+        if (empresaSeleccionada != null) {
+            cargarInformacionEmpresa();
+        }
     }
 
     /**
@@ -112,13 +117,10 @@ public class EmpresaMB implements Serializable {
     }
 
     public void accion() {
-        switch (opcion) {
-            case "creacion":
-                crearEmpresa();
-                break;
-            case "modificacion":
-                modificarEmpresa();
-                break;
+        if (empresaSeleccionada != null) {
+            modificarEmpresa();
+        } else {
+            crearEmpresa();
         }
     }
 
@@ -126,17 +128,14 @@ public class EmpresaMB implements Serializable {
         empresaSeleccionada = empresaFacade.buscarEmpresaPorCodigo(codigo);
         if (empresaSeleccionada != null) {
             cargarInformacionEmpresa();
-            opcion = "modificacion";
         } else {
             limpiarFormulario();
-            opcion = "creacion";
             RequestContext.getCurrentInstance().update("IdFormEmpresa");
         }
 
     }
 
     public void cargarInformacionEmpresa() {
-        opcion = "modificacion";
         setNombreArchivo(null);
         setCodigo(empresaSeleccionada.getCodEmpresa());
         setIdDepartamento(empresaSeleccionada.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
@@ -173,10 +172,19 @@ public class EmpresaMB implements Serializable {
         setWebsite(null);
         setMail(null);
         setImage(null);
+        FacesContext context = FacesContext.getCurrentInstance();
+        aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
+        aplicacionMB.actualizarListaEmpresas();
+        RequestContext.getCurrentInstance().update("FormModalEmpresa");
     }
 
     private void crearEmpresa() {
-        if(!validar()){
+        if (!validar()) {
+            return;
+        }
+//        el superusuario es el unico que puede crear empresas
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No posee los permisos para crear empresas"));
             return;
         }
         try {
@@ -206,10 +214,8 @@ public class EmpresaMB implements Serializable {
             setEmpresaSeleccionada(null);
             setCodigo(null);
             limpiarFormulario();
-            FacesContext context = FacesContext.getCurrentInstance();
-            AplicacionMB aplicacionMB = context.getApplication().evaluateExpressionGet(context, "#{aplicacionMB}", AplicacionMB.class);
-            aplicacionMB.actualizarListaEmpresas();
             RequestContext.getCurrentInstance().update("IdFormEmpresa");
+
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Empresa creada"));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Empresa no creada"));
@@ -224,6 +230,18 @@ public class EmpresaMB implements Serializable {
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la empresa a modificar"));
             return;
+        }
+//        solo los usuarios super y admin pueden modificar
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
+            return;
+        }
+//        el admin esta limitado a modificar unicamente su empresa.
+        if (usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            if (!usuarioActual.getCfgempresaidEmpresa().equals(empresaSeleccionada)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No puede modificar esta empresa"));
+                return;
+            }
         }
         try {
             CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
@@ -256,6 +274,10 @@ public class EmpresaMB implements Serializable {
 
     private boolean validar() {
         boolean ban = true;
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No es un usuario"));
+            return false;
+        }
         if (codigo == null || codigo.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de empresa obligatorio"));
             return false;
@@ -286,7 +308,7 @@ public class EmpresaMB implements Serializable {
         }
         if (direccion == null || direccion.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Se requiere la direccion"));
-          return false;
+            return false;
         }
         if (telefono1 == null || telefono1.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta telefono 1"));

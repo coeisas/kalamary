@@ -43,7 +43,21 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
             return null;
         }
     }
-    
+
+    public SegUsuario buscarUsuarioAdminByEmpresa(String usuario, String pasword, CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgRolIdrol.codrol = '00002' AND u.usuario = ?1 AND u.password = ?2  AND u.cfgempresaidEmpresa = ?3 AND u.activo = TRUE");
+            query.setParameter(1, usuario);
+            query.setParameter(2, pasword);
+            query.setParameter(3, empresa);
+            return (SegUsuario) query.getSingleResult();
+        } catch (Exception e) {
+        return null;
+        }
+        
+        
+    }
+
 //    usado para comprabar existencia de un usuario super. Valor unico
     public SegUsuario buscarUsuarioSuper(String usuario) {
         try {
@@ -66,25 +80,37 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
             return null;
         }
     }
-    
-    public SegUsuario buscarPorEmpresaAndNomUsuario(Integer idEmpresa, String nomUsuario){
-        try{
+
+    public SegUsuario buscarPorEmpresaAndNomUsuario(Integer idEmpresa, String nomUsuario) {
+        try {
             Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresasedeidSede.cfgempresaidEmpresa.idEmpresa = ?1 AND u.usuario LIKE ?2");
             query.setParameter(1, idEmpresa);
             query.setParameter(2, nomUsuario);
             return (SegUsuario) query.getSingleResult();
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
-    
-    public List<SegUsuario> buscarPorEmpresa(CfgEmpresa empresa){
-        try{
-            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresasedeidSede.cfgempresaidEmpresa = ?1");
+
+    public List<SegUsuario> buscarPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1");
             query.setParameter(1, empresa);
             return query.getResultList();
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
-        }        
+        }
+    }
+
+    public SegUsuario buscarPorEmpresaAndDocumento(CfgEmpresa empresa, String documento) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.numDoc = ?2");
+            query.setParameter(1, empresa);
+            query.setParameter(2, documento);
+            query.setMaxResults(1);
+            return (SegUsuario) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

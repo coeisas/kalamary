@@ -9,6 +9,7 @@ import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
 import entities.CfgTipoempresa;
+import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.CfgImpuestoFacade;
@@ -34,15 +35,10 @@ import managedBeans.seguridad.SesionMB;
 @SessionScoped
 public class ImpuestoMB implements Serializable {
 
-    private String codigoEmpresa;
-    private String codigoSede;
     private String codigoImpuesto;
     private String nombreImpuesto;
     private float porcentajeImpuesto;
     private int tipoEmpresa;
-
-    private String nombreEmpresa;
-    private String nombreSede;
 
     private CfgEmpresa empresaSeleccionada;
     private CfgEmpresasede sedeSeleccionada;
@@ -52,6 +48,7 @@ public class ImpuestoMB implements Serializable {
     private List<CfgImpuesto> listaImpuestos;
 
     private SesionMB sesionMB;
+    private SegUsuario usuarioActual;
 
     @EJB
     CfgEmpresaFacade empresaFacade;
@@ -69,27 +66,14 @@ public class ImpuestoMB implements Serializable {
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-        listaImpuestos = new ArrayList();
-    }
-
-    public void buscarEmpresa() {
-        if (!codigoEmpresa.trim().isEmpty()) {
-            empresaSeleccionada = empresaFacade.buscarEmpresaPorCodigo(codigoEmpresa);
-            if (empresaSeleccionada == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro empresa"));
-            }
-            cargarInformacionEmpresa();
-        }
-    }
-
-    public void cargarInformacionEmpresa() {
-        if (empresaSeleccionada != null) {
-            setCodigoEmpresa(empresaSeleccionada.getCodEmpresa());
-            setNombreEmpresa(empresaSeleccionada.getNomEmpresa());
+        usuarioActual = sesionMB.getUsuarioActual();
+        if (sesionMB.getSedeActual() != null) {
+            sedeSeleccionada = sesionMB.getSedeActual();
+            empresaSeleccionada = sedeSeleccionada.getCfgempresaidEmpresa();
+            listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
         } else {
-            limpiarFormulario();
+            listaImpuestos = new ArrayList();
         }
-        RequestContext.getCurrentInstance().update("IdFormImpuesto");
     }
 
     public void cargarListaSedes() {
@@ -100,30 +84,6 @@ public class ImpuestoMB implements Serializable {
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
-    }
-
-    public void buscarSede() {
-        if (!codigoSede.trim().isEmpty() && empresaSeleccionada != null) {
-            sedeSeleccionada = sedeFacade.buscarSedePorEmpresa(empresaSeleccionada, codigoSede);
-            cargarInformacionSede();
-            if (sedeSeleccionada == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro sede"));
-            }
-        }
-    }
-
-    public void cargarInformacionSede() {
-        if (sedeSeleccionada != null) {
-            setCodigoSede(sedeSeleccionada.getCodSede());
-            setNombreSede(sedeSeleccionada.getNomSede());
-            listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
-            RequestContext.getCurrentInstance().update("IdTableImpuestos");
-        } else {
-            setCodigoSede(null);
-            setNombreSede(null);
-            setSedeSeleccionada(null);
-        }
-        RequestContext.getCurrentInstance().update("IdFormImpuesto");
     }
 
     public void buscarImpuesto() {
@@ -150,18 +110,12 @@ public class ImpuestoMB implements Serializable {
     }
 
     private void limpiarFormulario() {
-        setEmpresaSeleccionada(null);
-        setSedeSeleccionada(null);
         setImpuestoSeleccionado(null);
-        setCodigoEmpresa(null);
-        setNombreEmpresa(null);
-        setCodigoSede(null);
-        setNombreSede(null);
         setCodigoImpuesto(null);
         setNombreImpuesto(null);
         setPorcentajeImpuesto(0);
         setTipoEmpresa(0);
-        listaImpuestos.clear();
+        listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
     }
 
     public void accion() {
@@ -182,6 +136,15 @@ public class ImpuestoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Sede no seleccionada"));
             return;
         }
+        //        solo los usuarios super y admin pueden creary  modificar
+        if(usuarioActual == null){
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
+            return;           
+        }
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
+            return;
+        }        
         if (codigoImpuesto.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo impuesto requerido"));
             return;
@@ -236,7 +199,7 @@ public class ImpuestoMB implements Serializable {
             limpiarFormulario();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Impuesto actualizado"));
             RequestContext.getCurrentInstance().update("IdFormImpuesto");
-            RequestContext.getCurrentInstance().update("IdTableImpuestos");            
+            RequestContext.getCurrentInstance().update("IdTableImpuestos");
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Impuesto no actualizado"));
         }
@@ -252,22 +215,6 @@ public class ImpuestoMB implements Serializable {
     }
 
     public ImpuestoMB() {
-    }
-
-    public String getCodigoEmpresa() {
-        return codigoEmpresa;
-    }
-
-    public void setCodigoEmpresa(String codigoEmpresa) {
-        this.codigoEmpresa = codigoEmpresa;
-    }
-
-    public String getCodigoSede() {
-        return codigoSede;
-    }
-
-    public void setCodigoSede(String codigoSede) {
-        this.codigoSede = codigoSede;
     }
 
     public String getCodigoImpuesto() {
@@ -300,22 +247,6 @@ public class ImpuestoMB implements Serializable {
 
     public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
         this.empresaSeleccionada = empresaSeleccionada;
-    }
-
-    public String getNombreEmpresa() {
-        return nombreEmpresa;
-    }
-
-    public void setNombreEmpresa(String nombreEmpresa) {
-        this.nombreEmpresa = nombreEmpresa;
-    }
-
-    public String getNombreSede() {
-        return nombreSede;
-    }
-
-    public void setNombreSede(String nombreSede) {
-        this.nombreSede = nombreSede;
     }
 
     public CfgEmpresasede getSedeSeleccionada() {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="130" pageHeight="453" columnWidth="128" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1" uuid="0e137ddd-0611-4c67-8a85-d5896001689f">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="226" pageHeight="453" columnWidth="224" leftMargin="1" rightMargin="1" topMargin="1" bottomMargin="1" uuid="0e137ddd-0611-4c67-8a85-d5896001689f">
 	<property name="ireport.zoom" value="4.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -13,36 +13,36 @@
 		<groupHeader>
 			<band height="12">
 				<textField>
-					<reportElement x="0" y="0" width="128" height="6" uuid="02ef6565-e5f9-4db9-8492-5da1083dfff2"/>
+					<reportElement x="0" y="0" width="224" height="6" uuid="02ef6565-e5f9-4db9-8492-5da1083dfff2"/>
 					<textElement textAlignment="Center">
 						<font size="4"/>
 					</textElement>
 					<textFieldExpression><![CDATA["DISCRIMINACION TARIFAS " + $F{impuesto}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement x="0" y="6" width="23" height="6" uuid="d318def4-f941-44fd-a041-7a5ba5299a83"/>
+					<reportElement x="35" y="6" width="23" height="6" uuid="d318def4-f941-44fd-a041-7a5ba5299a83"/>
 					<textElement>
 						<font size="4"/>
 					</textElement>
 					<text><![CDATA[TARIFA]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="23" y="6" width="35" height="6" uuid="c2ffb75f-8857-4e20-911e-383965c5d9c2"/>
-					<textElement>
+					<reportElement x="58" y="6" width="35" height="6" uuid="c2ffb75f-8857-4e20-911e-383965c5d9c2"/>
+					<textElement textAlignment="Center">
 						<font size="4"/>
 					</textElement>
 					<text><![CDATA[COMPRA]]></text>
 				</staticText>
 				<textField>
-					<reportElement x="58" y="6" width="35" height="6" uuid="403090ab-07e6-4ca8-8936-a1af768b28f5"/>
-					<textElement>
+					<reportElement x="93" y="6" width="35" height="6" uuid="403090ab-07e6-4ca8-8936-a1af768b28f5"/>
+					<textElement textAlignment="Center">
 						<font size="4"/>
 					</textElement>
 					<textFieldExpression><![CDATA["BASE "+$F{impuesto}]]></textFieldExpression>
 				</textField>
 				<textField>
-					<reportElement x="93" y="6" width="35" height="6" uuid="0b9fc8ff-e472-4924-9957-c5e6b0244491"/>
-					<textElement>
+					<reportElement x="128" y="6" width="35" height="6" uuid="0b9fc8ff-e472-4924-9957-c5e6b0244491"/>
+					<textElement textAlignment="Center">
 						<font size="4"/>
 					</textElement>
 					<textFieldExpression><![CDATA["VR."+$F{impuesto}]]></textFieldExpression>
@@ -56,28 +56,28 @@
 	<detail>
 		<band height="6" splitType="Stretch">
 			<textField pattern="#,##0">
-				<reportElement x="23" y="0" width="35" height="6" uuid="0459f441-a12e-4206-9a55-a2c8b034affc"/>
+				<reportElement x="58" y="0" width="35" height="6" uuid="0459f441-a12e-4206-9a55-a2c8b034affc"/>
 				<textElement textAlignment="Right">
 					<font size="4"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{total}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="58" y="0" width="35" height="6" uuid="c64856b1-1705-499f-859f-82d252e07325"/>
+				<reportElement x="93" y="0" width="35" height="6" uuid="c64856b1-1705-499f-859f-82d252e07325"/>
 				<textElement textAlignment="Right">
 					<font size="4"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{subtotal}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="93" y="0" width="35" height="6" uuid="7bc80400-249d-428e-9752-2ca0cec90ca5"/>
+				<reportElement x="128" y="0" width="35" height="6" uuid="7bc80400-249d-428e-9752-2ca0cec90ca5"/>
 				<textElement textAlignment="Right">
 					<font size="4"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorImpuesto}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="0" width="23" height="6" uuid="f4c8e1f5-b423-43c4-8225-6bad31d1929d"/>
+				<reportElement x="35" y="0" width="23" height="6" uuid="f4c8e1f5-b423-43c4-8225-6bad31d1929d"/>
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>

@@ -73,7 +73,7 @@ public class AplicacionMB implements Serializable {
         setListaTipodocempresa(tipodocempresaFacade.findAll());
         setListaTipoEmpresa(tipoempresaFacade.findAll());
         setListaEmpresas(empresaFacade.findAll());
-        setListaRoles(rolFacade.findAll());
+        setListaRoles(rolFacade.buscarRolVisibles());
         setListaUsuariosActivos((List<SegUsuario>) new ArrayList());
         for (int i = 1; i <= 6; i++) {
             String img = "idx" + i + ".jpg";

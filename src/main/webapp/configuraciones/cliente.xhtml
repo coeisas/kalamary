@@ -11,38 +11,26 @@
     <ui:define name="content">
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormCliente">
-            <p:outputLabel for="idCodigoEmpresa" class="labelFormulario" value="Cod. Empresa:"/>
-            <p:inputText id="idCodigoEmpresa" class="campoFormulario" value="#{clienteMB.codEmpresa}">
-                <p:ajax event="blur" listener="#{clienteMB.buscarEmpresa}" update="@none"/>
-            </p:inputText>            
-            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
-            <p:outputLabel class="labelFormularioInformativa" value="#{clienteMB.nombreEmpresa}"/>
-            <br style="clear: left"/>
-            <p:separator />
             <div style="text-align: center">
-                <p:panelGrid class="panelGridSinBorder" style="width: 85%; margin: 0 auto">
+                <p:panelGrid class="panelGridSinBorder" style="width: 78%; margin: 0 auto">
 
                     <f:facet name="header">
-                        <p:row><p:column colspan="2">Cliente</p:column></p:row>
+                        <p:row><p:column colspan="3">Cliente</p:column></p:row>
                     </f:facet>
 
                     <p:row>
                         <p:column>
-                            <!--p:outputLabel for="idCodigoCliente" class="labelFormulario" value="Cod. Cliente:"/>
-                            <p:inputText id="idCodigoCliente" class="campoFormulario" value="# {clienteMB.codigoCliente}">
-                                <p:ajax event="blur" listener="# {clienteMB.buscarCliente}" update="@none"/>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="# {clienteMB.cargarClientes}"/-->
-                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
-                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
-                                <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
-                                <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
-                            </p:selectOneMenu> 
-                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
-                            <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
-                                <f:selectItems value="#{clienteMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
+                        </p:column>
+                        <p:column>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
                             </p:selectOneMenu>
                         </p:column>
                         <p:column rowspan="5">
@@ -52,29 +40,33 @@
                                         <f:param name="id" value="#{clienteMB.clienteSeleccionado.idCliente}"/>
                                     </p:graphicImage>                                  
                                 </p:panel>
-                                <p:separator/>
+                                <p:separator style="width: 75px"/>
                                 <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
                             </div>
-                        </p:column>
+                        </p:column>                        
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
+                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
+                                <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
+                                <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
                             </p:selectOneMenu>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}">
-                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
                         </p:column>
+                        <p:column>                            
+                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
+                            <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
+                                <f:selectItems value="#{clienteMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
+                            </p:selectOneMenu>
+                        </p:column>
+
                     </p:row>
 
                     <p:row>
-                        <p:column>
+                        <p:column colspan="2">
                             <p:outputLabel for="IdTipoCliente" class="labelFormularioObligatorio" value="Tipo Cliente:"/>
                             <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
@@ -86,6 +78,8 @@
                         <p:column>
                             <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
                             <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerNombre}"/>
+                        </p:column>
+                        <p:column>
                             <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
                             <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoNombre}"/>                        
                         </p:column>
@@ -95,41 +89,46 @@
                         <p:column>
                             <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
                             <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerApellido}" />
+                        </p:column>
+                        <p:column>
                             <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
                             <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoApellido}" />                                                
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="2">
+                        <p:column colspan="3">
                             <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
                             <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{clienteMB.direccion}"/>
+                            <div style="float: left;margin-left: 25px;height: 1.5em"/>
                             <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
                             <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{clienteMB.telefono}"/>                        
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="2">
-
+                        <p:column colspan="3">
                             <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{clienteMB.mail}"/>
+                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{clienteMB.mail}"/>                      
+                            <div style="float: left;margin-left: 25px;height: 1.5em"/>
                             <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
                             <p:calendar id="IdFechaNacimiento"  class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{clienteMB.fechaNacimiento}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="2">
+                        <p:column>
                             <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
                             <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{clienteMB.cupoCredito}" />
+                        </p:column>
+                        <p:column colspan="2">                            
                             <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
                             <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{clienteMB.tarjetaMembresia}" />
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="2" style="text-align: center">
+                        <p:column colspan="3" style="text-align: center">
                             <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{clienteMB.accion}"/>&nbsp;
                             <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{clienteMB.cancelar}"/>
                         </p:column>
@@ -139,17 +138,6 @@
             </div>
         </h:form>
 
-        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalEmpresa">
-                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{clienteMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
-                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
-                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{clienteMB.actualizarEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
-            </h:form>
-        </p:dialog>
-
         <p:dialog id="IdModalFoto" widgetVar="dlgFoto" header="Cargar Foto" modal="true" width="600px" resizable="false">
             <h:form>
                 <p:fileUpload value="#{clienteMB.file}" fileUploadListener="#{clienteMB.handleFileUpload}" label="Buscar Imagen" cancelLabel="Cancelar" uploadLabel="Cargar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" update="@none" sizeLimit="16777215"/>
@@ -158,10 +146,7 @@
 
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
             <h:form id="FormBuscarCliente">
-                <p:dataTable value="#{clienteMB.listaClientes}" var="cliente" selectionMode="single" selection="#{clienteMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
-                    <p:column headerText="Empresa">
-                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
-                    </p:column>
+                <p:dataTable value="#{clienteMB.listaClientes}" var="cliente" emptyMessage="No se encontraron clientes" selectionMode="single" selection="#{clienteMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" lazy="true" paginator="true" paginatorPosition="bottom">
                     <p:column headerText="Identificacion">
                         <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
                     </p:column>

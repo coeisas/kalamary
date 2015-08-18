@@ -9,6 +9,7 @@ import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgMunicipio;
 import entities.CfgMunicipioPK;
+import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.CfgMunicipioFacade;
@@ -27,6 +28,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.model.DefaultStreamedContent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
+import managedBeans.seguridad.SesionMB;
 import org.primefaces.event.FileUploadEvent;
 
 /**
@@ -37,7 +39,6 @@ import org.primefaces.event.FileUploadEvent;
 @SessionScoped
 public class SedeMB implements Serializable {
 
-    private String codEmpresa;
     private String codSede;
     private String idDepartamento;
     private String idMuncipio;
@@ -49,7 +50,7 @@ public class SedeMB implements Serializable {
     private String telefono2;
     private String website;
     private String mail;
-
+    
     private String opcion;
     private CfgEmpresa empresaSeleccionada;
     private CfgEmpresasede sedeSeleccionada;
@@ -57,50 +58,38 @@ public class SedeMB implements Serializable {
     private String nombreArchivo;
     private List<CfgMunicipio> listaMunicipios;
     private List<CfgEmpresasede> listaSedes;
-
+    
+    private SegUsuario usuarioActual;
+    private SesionMB sesionMB;
+    
     @EJB
     CfgEmpresaFacade empresaFacade;
-
+    
     @EJB
     CfgEmpresasedeFacade sedeFacade;
-
+    
     @EJB
     CfgMunicipioFacade municipioFacade;
-
+    
     public SedeMB() {
     }
-
+    
     @PostConstruct
     private void init() {
-        listaSedes = new ArrayList();
+        FacesContext context = FacesContext.getCurrentInstance();
+        sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
+        usuarioActual = sesionMB.getUsuarioActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
+        if (empresaSeleccionada != null) {
+            listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
+//        } else {
+//            listaSedes = new ArrayList();
+        }else{
+            listaSedes = new ArrayList();
+        }
         setListaMunicipios((List<CfgMunicipio>) new ArrayList());
     }
-
-    public void buscarEmpresa() {
-        setEmpresaSeleccionada(empresaFacade.buscarEmpresaPorCodigo(codEmpresa));
-        if (getEmpresaSeleccionada() != null) {
-            limpiarFormulario();
-            actualizarEmpresa();
-        } else {
-            listaSedes.clear();
-            limpiarFormulario();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro empresa con el codigo " + codEmpresa));
-            RequestContext.getCurrentInstance().update("IdFormSede");
-        }
-    }
-
-    public void actualizarEmpresa() {
-        if (empresaSeleccionada != null) {
-            setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
-
-            listaSedes = sedeFacade.buscarSedesPorEmpresa(getEmpresaSeleccionada().getIdEmpresa());
-            RequestContext.getCurrentInstance().update("FormModalSede");
-        } else {
-            limpiarFormulario();
-        }
-        RequestContext.getCurrentInstance().update("IdFormSede");
-    }
-
+    
     public void buscarSede() {
         if (!codSede.trim().isEmpty() && empresaSeleccionada != null) {
             setSedeSeleccionada(sedeFacade.buscarSedePorEmpresa(empresaSeleccionada, codSede));
@@ -108,7 +97,7 @@ public class SedeMB implements Serializable {
                 cargarInformacionSede();
             } else {
                 limpiarFormulario();
-                setNumDocumento(getEmpresaSeleccionada().getNumDoc());
+                setNumDocumento(empresaSeleccionada.getNumDoc());
                 opcion = "creacion";
             }
         } else {
@@ -117,8 +106,9 @@ public class SedeMB implements Serializable {
         }
         RequestContext.getCurrentInstance().update("IdFormSede");
     }
-
+    
     public void limpiarFormulario() {
+        listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
         setNombreArchivo(null);
         setIdDepartamento(null);
         setIdMuncipio(null);
@@ -131,19 +121,19 @@ public class SedeMB implements Serializable {
         setMail(null);
         setImage(null);
     }
-
+    
     public void actualizarMunicipios() {
         getListaMunicipios().clear();
         if (getIdDepartamento() != null) {
             setListaMunicipios(municipioFacade.buscarPorDepartamento(getIdDepartamento()));
         }
     }
-
+    
     public void cargarInformacionSede() {
         if (sedeSeleccionada != null) {
             opcion = "modificacion";
             setNombreArchivo(null);
-            setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
+//            setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
             setCodSede(sedeSeleccionada.getCodSede());
             setNumDocumento(empresaSeleccionada.getNumDoc());
             setIdDepartamento(sedeSeleccionada.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
@@ -164,7 +154,7 @@ public class SedeMB implements Serializable {
             RequestContext.getCurrentInstance().update("IdFormSede");
         }
     }
-
+    
     public void handleFileUpload(FileUploadEvent event) {
         file = event.getFile();
         if (file != null) {
@@ -174,7 +164,7 @@ public class SedeMB implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('dlgLogo').hide()");
         }
     }
-
+    
     public void accion() {
         switch (opcion) {
             case "creacion":
@@ -188,43 +178,48 @@ public class SedeMB implements Serializable {
     
     private boolean validar() {
         boolean ban = true;
-        if(empresaSeleccionada == null){
+        if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un departamento"));
             return false;
         }
-        if(idDepartamento == null || idDepartamento.isEmpty()){
+//        solo los usuarios super y admin pueden crear y modificar sedes
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
+            return false;
+        }        
+        if (idDepartamento == null || idDepartamento.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un departamento"));
             return false;
         }
-        if(idMuncipio == null || idMuncipio.isEmpty()){
+        if (idMuncipio == null || idMuncipio.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija un municipio"));
-            return false;            
+            return false;
         }
-        if(codSede == null || codSede.isEmpty()){
+        if (codSede == null || codSede.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo de sede obligatorio"));
             return false;
         }
-        if(numDocumento == null ||numDocumento.isEmpty()){
+        if (numDocumento == null || numDocumento.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero de documento"));
-            return false;            
+            return false;
         }
-        if(nombreSede == null || nombreSede.isEmpty()){
+        if (nombreSede == null || nombreSede.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el nombre de la sede"));
             return false;
         }
-        if(direccion == null || direccion.isEmpty()){
+        if (direccion == null || direccion.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Se requiere la direccion"));
             return false;
         }
-        if(telefono1 == null || telefono1.isEmpty()){
+        if (telefono1 == null || telefono1.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta telefono 1"));
             return false;
         }
         return ban;
     }
-
+    
     private void crearSede() {
-        if(!validar()){
+        if (!validar()) {
             return;
         }
         try {
@@ -244,11 +239,13 @@ public class SedeMB implements Serializable {
             sede.setActivo(true);
             if (file != null) {
                 sede.setLogo(getFile().getContents());
+            } else {
+                sede.setLogo(empresaSeleccionada.getLogo());
             }
             sedeFacade.create(sede);
-            setEmpresaSeleccionada(null);
+//            setEmpresaSeleccionada(null);
             setSedeSeleccionada(null);
-            setCodEmpresa(null);
+//            setCodEmpresa(null);
             setCodSede(null);
             limpiarFormulario();
             RequestContext.getCurrentInstance().update("IdFormSede");
@@ -257,12 +254,12 @@ public class SedeMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Sede no creada"));
         }
     }
-
+    
     private void modificarSede() {
-        if(!validar()){
+        if (!validar()) {
             return;
         }
-        if(sedeSeleccionada == null){
+        if (sedeSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione la sede a modificar"));
             return;
         }
@@ -281,9 +278,9 @@ public class SedeMB implements Serializable {
                 sedeSeleccionada.setLogo(getFile().getContents());
             }
             sedeFacade.edit(sedeSeleccionada);
-            setEmpresaSeleccionada(null);
+//            setEmpresaSeleccionada(null);
             setSedeSeleccionada(null);
-            setCodEmpresa(null);
+//            setCodEmpresa(null);
             setCodSede(null);
             limpiarFormulario();
             RequestContext.getCurrentInstance().update("IdFormSede");
@@ -293,118 +290,110 @@ public class SedeMB implements Serializable {
         }
     }
 
-    public String getCodEmpresa() {
-        return codEmpresa;
-    }
-
-    public void setCodEmpresa(String codEmpresa) {
-        this.codEmpresa = codEmpresa;
-    }
-
     public String getCodSede() {
         return codSede;
     }
-
+    
     public void setCodSede(String codSede) {
         this.codSede = codSede;
     }
-
+    
     public String getIdMuncipio() {
         return idMuncipio;
     }
-
+    
     public void setIdMuncipio(String idMuncipio) {
         this.idMuncipio = idMuncipio;
     }
-
+    
     public String getNumDocumento() {
         return numDocumento;
     }
-
+    
     public void setNumDocumento(String numDocumento) {
         this.numDocumento = numDocumento;
     }
-
+    
     public String getNombreSede() {
         return nombreSede;
     }
-
+    
     public void setNombreSede(String nombreSede) {
         this.nombreSede = nombreSede;
     }
-
+    
     public UploadedFile getFile() {
         return file;
     }
-
+    
     public void setFile(UploadedFile file) {
         this.file = file;
     }
-
+    
     public String getDireccion() {
         return direccion;
     }
-
+    
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-
+    
     public String getTelefono1() {
         return telefono1;
     }
-
+    
     public void setTelefono1(String telefono1) {
         this.telefono1 = telefono1;
     }
-
+    
     public String getTelefono2() {
         return telefono2;
     }
-
+    
     public void setTelefono2(String telefono2) {
         this.telefono2 = telefono2;
     }
-
+    
     public String getWebsite() {
         return website;
     }
-
+    
     public void setWebsite(String website) {
         this.website = website;
     }
-
+    
     public String getMail() {
         return mail;
     }
-
+    
     public void setMail(String mail) {
         this.mail = mail;
     }
-
+    
     public String getIdDepartamento() {
         return idDepartamento;
     }
-
+    
     public void setIdDepartamento(String idDepartamento) {
         this.idDepartamento = idDepartamento;
     }
-
+    
     public List<CfgMunicipio> getListaMunicipios() {
         return listaMunicipios;
     }
-
+    
     public void setListaMunicipios(List<CfgMunicipio> listaMunicipios) {
         this.listaMunicipios = listaMunicipios;
     }
-
+    
     public String getNombreArchivo() {
         return nombreArchivo;
     }
-
+    
     public void setNombreArchivo(String nombreArchivo) {
         this.nombreArchivo = nombreArchivo;
     }
-
+    
     public StreamedContent getImage() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
@@ -421,33 +410,25 @@ public class SedeMB implements Serializable {
             }
         }
     }
-
+    
     public void setImage(StreamedContent image) {
         this.image = image;
     }
-
+    
     public List<CfgEmpresasede> getListaSedes() {
         return listaSedes;
     }
-
+    
     public void setListaSedes(List<CfgEmpresasede> listaSedes) {
         this.listaSedes = listaSedes;
     }
-
+    
     public CfgEmpresasede getSedeSeleccionada() {
         return sedeSeleccionada;
     }
-
+    
     public void setSedeSeleccionada(CfgEmpresasede sedeSeleccionada) {
         this.sedeSeleccionada = sedeSeleccionada;
-    }
-
-    public CfgEmpresa getEmpresaSeleccionada() {
-        return empresaSeleccionada;
-    }
-
-    public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
-        this.empresaSeleccionada = empresaSeleccionada;
     }
 
 }

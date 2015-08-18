@@ -36,6 +36,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
     @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento")})
 public class FacDocumentodetalle implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentodetallePK facDocumentodetallePK;
@@ -61,6 +62,8 @@ public class FacDocumentodetalle implements Serializable {
     private FacDocumentosmaster facDocumentosmaster;
     @Transient
     private float valorDescuento;
+    @Transient
+    private float precioOriginal;
 
     public FacDocumentodetalle() {
     }
@@ -144,7 +147,15 @@ public class FacDocumentodetalle implements Serializable {
     public void setValorDescuento(float valorDescuento) {
         this.valorDescuento = valorDescuento;
     }
-    
+
+    public float getPrecioOriginal() {
+        return precioOriginal;
+    }
+
+    public void setPrecioOriginal(float precioOriginal) {
+        this.precioOriginal = precioOriginal;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -169,5 +180,5 @@ public class FacDocumentodetalle implements Serializable {
     public String toString() {
         return "entities.FacDocumentodetalle[ facDocumentodetallePK=" + facDocumentodetallePK + " ]";
     }
-   
+
 }

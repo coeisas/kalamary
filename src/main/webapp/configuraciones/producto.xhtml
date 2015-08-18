@@ -12,7 +12,7 @@
         <p:growl autoUpdate="true" showDetail="true"/>
         <div style="text-align: center">
             <h:form id="IdFormProducto">
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto;width: 100%" >
                     <f:facet name="header">
                         <p:row>
                             <p:column>Producto</p:column>
@@ -20,30 +20,16 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdCodEmpresa" class="labelFormularioObligatorio" value="Empresa:"/>
-                            <p:inputText id="IdCodEmpresa" class="campoFormulario" value="#{productoMB.codigoEmpresa}">
-                                <p:ajax event="blur" listener="#{productoMB.buscarEmpresa}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{productoMB.nombreEmpresa}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
                             <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.codigoCategoria}">
-                                <p:ajax event="blur" listener="#{productoMB.buscarCategoria}" update="@none"/>
-                            </p:inputText>
+                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.categoriaSeleccionada.nombreCategoria}" readonly="true"/>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCategoria').show()"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.codigoReferencia}">
-                                <p:ajax event="blur" listener="#{productoMB.buscarReferencia}" update="@none"/>
-                            </p:inputText>
+                           <h:inputText class="campoFormulario cajaH" value="#{productoMB.referenciaSeleccionada.nombreReferencia}" readonly="true"/>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgReferencia').show()"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Marca:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.codigoMarca}">
-                                <p:ajax event="blur" listener="#{productoMB.buscarMarca}" update="@none"/>
-                            </p:inputText>
+                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.marcaSeleccionada.nombreMarca}" readonly="true"/>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgMarca').show()"/>
                         </p:column>
                     </p:row>
@@ -54,12 +40,15 @@
                                 <p:ajax event="blur" listener="#{productoMB.buscarProducto}" update="@none"/>
                             </p:inputText>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{productoMB.cargarProductos}"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Codigo Barras:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.codigoBarra}"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Color:"/>
                             <p:inputText class="campoFormulario upperCase" value="#{productoMB.color}"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Talla:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.talla}"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.talla}" size="18"/>
                         </p:column>
                     </p:row>
                     <p:row>
@@ -73,18 +62,22 @@
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Stock Min:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.stockMin}"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Costo Adq:"/>
                             <p:inputText class="campoFormulario" value="#{productoMB.costoAdq}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="IVA %:"/>
                             <p:inputText class="campoFormulario" size="3" value="#{productoMB.iva}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="FLETE %:"/>
                             <p:inputText class="campoFormulario" size="3"  value="#{productoMB.flete}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Costos IND %:"/>
                             <p:inputText class="campoFormulario" size="3" value="#{productoMB.costoInd}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
@@ -97,14 +90,17 @@
                             <p:outputLabel id="IdCostoFinal" class="labelFormularioInformativa" value="#{productoMB.costoFinal}">
                                 <f:convertNumber  type="currency"/>
                             </p:outputLabel>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
                             <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
                             <p:outputLabel id="IdPrecio" class="labelFormularioInformativa" value="#{productoMB.precio}">
                                 <f:convertNumber type="currency"/>
                             </p:outputLabel>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
                         </p:column>
@@ -113,22 +109,13 @@
                         <p:column style="text-align: center">
                             <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{productoMB.determinarAccion}"/>
                             &nbsp;
-                            <p:commandButton icon="ui-icon-cancel" value="Cancelar"/>
+                            <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{productoMB.cancelar()}"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
             </h:form>
         </div>
-        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalEmpresa">
-                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
-                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
-                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
-            </h:form>
-        </p:dialog> 
+
         <p:dialog id="IdModalCategoria" widgetVar="dlgCategoria" header="BUSCAR CATEGORIA" resizable="false" width="500px" modal="true">
             <h:form id="FormModalCategoria">
                 <p:dataTable value="#{productoMB.listaCategoria}" var="categoria" emptyMessage="No hay categorias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.categoriaSeleccionada}" rowKey="#{categoria.idCategoria}" selectionMode="single">
@@ -161,7 +148,7 @@
         </p:dialog>
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
-                <p:dataTable value="#{productoMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                <p:dataTable value="#{productoMB.listaProducto}" var="producto" lazy="true" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single">
                     <p:column headerText="Codigo">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>

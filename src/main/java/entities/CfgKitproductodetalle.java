@@ -6,7 +6,6 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
@@ -16,10 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -32,48 +28,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "CfgKitproductodetalle.findAll", query = "SELECT c FROM CfgKitproductodetalle c"),
     @NamedQuery(name = "CfgKitproductodetalle.findByCfgkitproductomaestroidKit", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.cfgKitproductodetallePK.cfgkitproductomaestroidKit = :cfgkitproductomaestroidKit"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByCant", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.cant = :cant"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByCosto", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.costo = :costo"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByEstado", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.estado = :estado"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByFecCrea", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.fecCrea = :fecCrea"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByUsrCrea", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.usrCrea = :usrCrea"),
     @NamedQuery(name = "CfgKitproductodetalle.findByCfgproductoidProducto", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.cfgKitproductodetallePK.cfgproductoidProducto = :cfgproductoidProducto"),
-    @NamedQuery(name = "CfgKitproductodetalle.findByFacDocumentosmasterIddocumentomaster", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.facDocumentosmasterIddocumentomaster = :facDocumentosmasterIddocumentomaster")})
+    @NamedQuery(name = "CfgKitproductodetalle.findByPrecioUnitario", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.precioUnitario = :precioUnitario"),
+    @NamedQuery(name = "CfgKitproductodetalle.findByCant", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.cant = :cant"),
+    @NamedQuery(name = "CfgKitproductodetalle.findByPrecioTotal", query = "SELECT c FROM CfgKitproductodetalle c WHERE c.precioTotal = :precioTotal")})
 public class CfgKitproductodetalle implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected CfgKitproductodetallePK cfgKitproductodetallePK;
     @Basic(optional = false)
-    @NotNull
+    @Column(name = "precioUnitario", nullable = false)
+    private float precioUnitario;
+    @Basic(optional = false)
     @Column(name = "cant", nullable = false)
     private float cant;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "costo", nullable = false)
-    private float costo;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "estado", nullable = false)
-    private boolean estado;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "fecCrea", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date fecCrea;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "usrCrea", nullable = false)
-    private int usrCrea;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "fac_documentosmaster_iddocumentomaster", nullable = false)
-    private long facDocumentosmasterIddocumentomaster;
+    @Column(name = "precioTotal", nullable = false)
+    private float precioTotal;
     @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgKitproductomaestro cfgKitproductomaestro;
     @JoinColumn(name = "cfg_producto_idProducto", referencedColumnName = "idProducto", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgProducto cfgProducto;
+    @Transient
+    private boolean nuevo;
 
     public CfgKitproductodetalle() {
     }
@@ -82,14 +61,11 @@ public class CfgKitproductodetalle implements Serializable {
         this.cfgKitproductodetallePK = cfgKitproductodetallePK;
     }
 
-    public CfgKitproductodetalle(CfgKitproductodetallePK cfgKitproductodetallePK, float cant, float costo, boolean estado, Date fecCrea, int usrCrea, long facDocumentosmasterIddocumentomaster) {
+    public CfgKitproductodetalle(CfgKitproductodetallePK cfgKitproductodetallePK, float precioUnitario, float cant, float precioTotal) {
         this.cfgKitproductodetallePK = cfgKitproductodetallePK;
+        this.precioUnitario = precioUnitario;
         this.cant = cant;
-        this.costo = costo;
-        this.estado = estado;
-        this.fecCrea = fecCrea;
-        this.usrCrea = usrCrea;
-        this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
+        this.precioTotal = precioTotal;
     }
 
     public CfgKitproductodetalle(int cfgkitproductomaestroidKit, int cfgproductoidProducto) {
@@ -104,6 +80,14 @@ public class CfgKitproductodetalle implements Serializable {
         this.cfgKitproductodetallePK = cfgKitproductodetallePK;
     }
 
+    public float getPrecioUnitario() {
+        return precioUnitario;
+    }
+
+    public void setPrecioUnitario(float precioUnitario) {
+        this.precioUnitario = precioUnitario;
+    }
+
     public float getCant() {
         return cant;
     }
@@ -112,44 +96,12 @@ public class CfgKitproductodetalle implements Serializable {
         this.cant = cant;
     }
 
-    public float getCosto() {
-        return costo;
+    public float getPrecioTotal() {
+        return precioTotal;
     }
 
-    public void setCosto(float costo) {
-        this.costo = costo;
-    }
-
-    public boolean getEstado() {
-        return estado;
-    }
-
-    public void setEstado(boolean estado) {
-        this.estado = estado;
-    }
-
-    public Date getFecCrea() {
-        return fecCrea;
-    }
-
-    public void setFecCrea(Date fecCrea) {
-        this.fecCrea = fecCrea;
-    }
-
-    public int getUsrCrea() {
-        return usrCrea;
-    }
-
-    public void setUsrCrea(int usrCrea) {
-        this.usrCrea = usrCrea;
-    }
-
-    public long getFacDocumentosmasterIddocumentomaster() {
-        return facDocumentosmasterIddocumentomaster;
-    }
-
-    public void setFacDocumentosmasterIddocumentomaster(long facDocumentosmasterIddocumentomaster) {
-        this.facDocumentosmasterIddocumentomaster = facDocumentosmasterIddocumentomaster;
+    public void setPrecioTotal(float precioTotal) {
+        this.precioTotal = precioTotal;
     }
 
     public CfgKitproductomaestro getCfgKitproductomaestro() {
@@ -168,6 +120,14 @@ public class CfgKitproductodetalle implements Serializable {
         this.cfgProducto = cfgProducto;
     }
 
+    public boolean isNuevo() {
+        return nuevo;
+    }
+
+    public void setNuevo(boolean nuevo) {
+        this.nuevo = nuevo;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -192,5 +152,5 @@ public class CfgKitproductodetalle implements Serializable {
     public String toString() {
         return "entities.CfgKitproductodetalle[ cfgKitproductodetallePK=" + cfgKitproductodetallePK + " ]";
     }
-   
+  
 }

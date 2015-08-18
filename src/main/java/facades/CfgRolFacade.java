@@ -9,6 +9,8 @@ import entities.CfgRol;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +28,15 @@ public class CfgRolFacade extends AbstractFacade<CfgRol> {
 
     public CfgRolFacade() {
         super(CfgRol.class);
+    }
+    
+    public List<CfgRol> buscarRolVisibles(){
+        try {
+            Query query = em.createQuery("SELECT r FROM CfgRol r WHERE r.codrol NOT LIKE '00001'");
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
     

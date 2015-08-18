@@ -10,6 +10,7 @@ import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgTipoempresa;
+import entities.SegUsuario;
 import facades.CfgAplicaciondocumentoFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgEmpresaFacade;
@@ -35,8 +36,6 @@ import javax.annotation.PostConstruct;
 @SessionScoped
 public class DocumentoMB implements Serializable {
 
-    private String codigoEmpresa;
-    private String codigoSede;
     private String codigoDocumento;
     private int tipoEmpresa;
     private String nombreDocumento;
@@ -50,9 +49,6 @@ public class DocumentoMB implements Serializable {
     private String resDian;
     private String observacion;
 
-    private String nombreEmpresa;
-    private String nombreSede;
-
     private SesionMB sesionMB;
     private boolean aplicacionValidada;
 
@@ -63,6 +59,7 @@ public class DocumentoMB implements Serializable {
     private CfgEmpresa empresaSeleccionada;
     private CfgEmpresasede sedeSeleccionada;
     private CfgDocumento documentoSeleccionado;
+    private SegUsuario usuarioActual;
 
     @EJB
     CfgEmpresaFacade empresaFacade;
@@ -87,42 +84,10 @@ public class DocumentoMB implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         listaAplicacionDocumento = aplicaciondocumentoFacade.findAll();
-    }
-
-    public void buscarEmpresa() {
-        if (!codigoEmpresa.trim().isEmpty()) {
-            empresaSeleccionada = empresaFacade.buscarEmpresaPorCodigo(codigoEmpresa);
-            cargarInformacionEmpresa();
-            if (empresaSeleccionada == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro Empresa"));
-            }
-        } else {
-            limpiarFormulario();
-            empresaSeleccionada = null;
-        }
-    }
-
-    public void cargarInformacionEmpresa() {
-        if (empresaSeleccionada != null) {
-            setCodigoEmpresa(empresaSeleccionada.getCodEmpresa());
-            setNombreEmpresa(empresaSeleccionada.getNomEmpresa());
-        } else {
-            limpiarFormulario();
-        }
-        RequestContext.getCurrentInstance().update("IdFormDocumento");
-    }
-
-    public void buscarSede() {
-        if (empresaSeleccionada != null) {
-            if (!codigoSede.trim().isEmpty()) {
-                sedeSeleccionada = sedeFacade.buscarSedePorEmpresa(empresaSeleccionada, codigoSede);
-                cargarInformacionSede();
-                if (sedeSeleccionada == null) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro sede"));
-                }
-            }
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se ha seleccionado una Empresa"));
+        usuarioActual = sesionMB.getUsuarioActual();
+        if (sesionMB.getSedeActual() != null) {
+            sedeSeleccionada = sesionMB.getSedeActual();
+            empresaSeleccionada = sedeSeleccionada.getCfgempresaidEmpresa();
         }
     }
 
@@ -134,18 +99,6 @@ public class DocumentoMB implements Serializable {
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
-    }
-
-    public void cargarInformacionSede() {
-        if (sedeSeleccionada != null) {
-            setCodigoSede(sedeSeleccionada.getCodSede());
-            setNombreSede(sedeSeleccionada.getNomSede());
-            buscarDocumento();
-        } else {
-            setCodigoSede(null);
-            setNombreSede(null);
-        }
-        RequestContext.getCurrentInstance().update("IdFormDocumento");
     }
 
     public void buscarDocumento() {
@@ -207,19 +160,11 @@ public class DocumentoMB implements Serializable {
     }
 
     private void limpiarFormulario() {
-        empresaSeleccionada = null;
-        sedeSeleccionada = null;
         documentoSeleccionado = null;
-        setNombreEmpresa(null);
-        setCodigoEmpresa(null);
-        setCodigoSede(null);
-        setNombreSede(null);
         limpiarInformacionDocumento();
     }
 
     public void cancelar() {
-        setSedeSeleccionada(null);
-        setEmpresaSeleccionada(null);
         limpiarFormulario();
         RequestContext.getCurrentInstance().update("IdFormDocumento");
     }
@@ -253,6 +198,11 @@ public class DocumentoMB implements Serializable {
         boolean ban = true;
         if (sedeSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Especifique la sede"));
+            return false;
+        }
+//        solo los usuarios super y admin pueden modificar y crear documentos
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para crear documentos"));
             return false;
         }
         if (codigoDocumento.trim().isEmpty()) {
@@ -318,7 +268,7 @@ public class DocumentoMB implements Serializable {
             documento.setResDian(resDian);
             documento.setObsDocumento(observacion);
             documento.setFecCrea(new Date());
-            documento.setSegusuarioidUsuario(sesionMB.getUsuarioActual());
+            documento.setSegusuarioidUsuario(usuarioActual);
             documento.setFinalizado(false);
             documentoFacade.create(documento);
             limpiarFormulario();
@@ -362,22 +312,6 @@ public class DocumentoMB implements Serializable {
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Documento No actualizado"));
         }
-    }
-
-    public String getCodigoEmpresa() {
-        return codigoEmpresa;
-    }
-
-    public void setCodigoEmpresa(String codigoEmpresa) {
-        this.codigoEmpresa = codigoEmpresa;
-    }
-
-    public String getCodigoSede() {
-        return codigoSede;
-    }
-
-    public void setCodigoSede(String codigoSede) {
-        this.codigoSede = codigoSede;
     }
 
     public int getTipoEmpresa() {
@@ -460,36 +394,12 @@ public class DocumentoMB implements Serializable {
         this.observacion = observacion;
     }
 
-    public CfgEmpresa getEmpresaSeleccionada() {
-        return empresaSeleccionada;
-    }
-
-    public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
-        this.empresaSeleccionada = empresaSeleccionada;
-    }
-
-    public String getNombreEmpresa() {
-        return nombreEmpresa;
-    }
-
-    public void setNombreEmpresa(String nombreEmpresa) {
-        this.nombreEmpresa = nombreEmpresa;
-    }
-
     public CfgEmpresasede getSedeSeleccionada() {
         return sedeSeleccionada;
     }
 
     public void setSedeSeleccionada(CfgEmpresasede sedeSeleccionada) {
         this.sedeSeleccionada = sedeSeleccionada;
-    }
-
-    public String getNombreSede() {
-        return nombreSede;
-    }
-
-    public void setNombreSede(String nombreSede) {
-        this.nombreSede = nombreSede;
     }
 
     public String getCodigoDocumento() {

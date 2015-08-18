@@ -44,10 +44,6 @@ import org.primefaces.model.DefaultStreamedContent;
 @SessionScoped
 public class UsuarioMB implements Serializable {
 
-    private String codEmpresa;
-    private String nomEmpresa;
-    private String codSede;
-    private String nomSede;
     private int idIdentificacion;
     private String numIdentificacion;
     private String primerNombre;
@@ -81,6 +77,9 @@ public class UsuarioMB implements Serializable {
     private SegUsuario usuarioSeleccionado;
     private String displayActivoControl = "none";
 
+    private SesionMB sesionMB;
+    private SegUsuario usuarioActual;
+
     @EJB
     CfgEmpresaFacade empresaFacade;
 
@@ -101,75 +100,39 @@ public class UsuarioMB implements Serializable {
 
     @PostConstruct
     private void init() {
-        listaSedes = new ArrayList();
+        FacesContext context = FacesContext.getCurrentInstance();
+        sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
+        usuarioActual = sesionMB.getUsuarioActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
+        if (empresaSeleccionada != null) {
+            listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
+        } else {
+            listaSedes = new ArrayList();
+        }
         listaCajas = new ArrayList();
+
         opcion = "creacion";
         background = "#e0e0e0";
 
     }
 
     public UsuarioMB() {
-    }
-
-    public void buscarEmpresa() {
-        empresaSeleccionada = null;
-        setSedeSeleccionada(null);
-        if (!codEmpresa.trim().isEmpty()) {
-            setEmpresaSeleccionada(empresaFacade.buscarEmpresaPorCodigo(codEmpresa));
-            if (getEmpresaSeleccionada() != null) {
-                setNomSede(null);
-                setCodSede(null);
-                if (usuarioSeleccionado == null) {
-                    limpiarFormulario();
-                }
-                actualizarEmpresa();
-
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro empresa con el codigo " + codEmpresa));
-            }
-        }
-        if (getEmpresaSeleccionada() == null) {
-            getListaSedes().clear();
-            setNomSede(null);
-            setCodSede(null);
-            setNomSede(null);
-            setNomEmpresa(null);
-            if (usuarioSeleccionado == null) {
-                limpiarFormulario();
-            }
-        }
-        RequestContext.getCurrentInstance().update("IdFormUsuario");
 
     }
 
-    public void buscarSede() {
-        if (codSede != null && getEmpresaSeleccionada() != null) {
-            setSedeSeleccionada(sedeFacade.buscarSedePorEmpresa(getEmpresaSeleccionada(), codSede.trim()));
-            if (getSedeSeleccionada() != null) {
-                cargarInformacionSede();
-            } else {
-                setNomSede(null);
-                if (usuarioSeleccionado == null) {
-                    limpiarFormulario();
-                }
-                if (!codSede.trim().isEmpty()) {
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro sede con el codigo " + codSede));
-                }
-            }
+    public void buscarUsuario() {
+        if (numIdentificacion != null && !numIdentificacion.trim().isEmpty()) {
+            usuarioSeleccionado = usuarioFacade.buscarPorEmpresaAndDocumento(empresaSeleccionada, numIdentificacion);
         } else {
+            setIdIdentificacion(0);
             setSedeSeleccionada(null);
-            setNomSede(null);
-            if (usuarioSeleccionado == null) {
-                limpiarFormulario();
-            }
+            usuarioSeleccionado = null;
         }
-        RequestContext.getCurrentInstance().update("IdFormUsuario");
+        cargarInformacionUsuario();
     }
 
     public void limpiarFormulario() {
-        setNumIdentificacion(null);
         setFile(null);
-        setIdIdentificacion(0);
         setUsuario(null);
         setPrimerNombre(null);
         setSegundoNombre(null);
@@ -188,29 +151,9 @@ public class UsuarioMB implements Serializable {
         setBackground("#e0e0e0");
     }
 
-    public void actualizarEmpresa() {
-        if (getEmpresaSeleccionada() != null) {
-            setCodEmpresa(getEmpresaSeleccionada().getCodEmpresa());
-            setNomEmpresa(getEmpresaSeleccionada().getNomEmpresa());
-            listaSedes = sedeFacade.buscarSedesPorEmpresa(getEmpresaSeleccionada().getIdEmpresa());
-            buscarSede();
-        } else {
-            listaSedes.clear();
-            if (usuarioSeleccionado == null) {
-                limpiarFormulario();
-            }
-        }
-        RequestContext.getCurrentInstance().update("FormModalSede");
-        RequestContext.getCurrentInstance().update("IdFormUsuario");
-    }
-
     public void cargarInformacionSede() {
         if (getSedeSeleccionada() != null) {
-            setCodSede(sedeSeleccionada.getCodSede());
-            setNomSede(getSedeSeleccionada().getNomSede());
             listaCajas = cajaFacade.buscarCajasPorSede(sedeSeleccionada);
-        } else {
-            setNomSede(null);
         }
         RequestContext.getCurrentInstance().update("IdFormUsuario");
     }
@@ -265,18 +208,20 @@ public class UsuarioMB implements Serializable {
     }
 
     public void validarContrasenia() {
-        if (!contraseniaR.trim().isEmpty() && !contrasenia.trim().isEmpty()) {
-            if (contraseniaR.equals(contrasenia)) {
-                contraseniaValidada = true;
-                background = "#bbeebb";
-            } else {
-                contraseniaValidada = false;
-                background = "#FFAAAA";
+        contraseniaValidada = false;
+        background = "#e0e0e0";
+        if (contraseniaR != null && contrasenia != null) {
+            if (!contraseniaR.trim().isEmpty() && !contrasenia.trim().isEmpty()) {
+                if (contraseniaR.equals(contrasenia)) {
+                    contraseniaValidada = true;
+                    background = "#bbeebb";
+                } else {
+                    contraseniaValidada = false;
+                    background = "#FFAAAA";
+                }
             }
-        } else {
-            contraseniaValidada = false;
-            background = "#e0e0e0";
         }
+
     }
 
     public void cargarUsuarios() {
@@ -294,21 +239,10 @@ public class UsuarioMB implements Serializable {
             opcion = "modificacion";
             displayActivoControl = "block";
             if (usuarioSeleccionado.getCfgempresasedeidSede() != null) {
-                setEmpresaSeleccionada(usuarioSeleccionado.getCfgempresasedeidSede().getCfgempresaidEmpresa());
                 setSedeSeleccionada(usuarioSeleccionado.getCfgempresasedeidSede());
-                setCodEmpresa(usuarioSeleccionado.getCfgempresasedeidSede().getCfgempresaidEmpresa().getCodEmpresa());
-                setNomEmpresa(usuarioSeleccionado.getCfgempresasedeidSede().getCfgempresaidEmpresa().getNomEmpresa());
-                setCodSede(usuarioSeleccionado.getCfgempresasedeidSede().getCodSede());
-                setNomSede(usuarioSeleccionado.getCfgempresasedeidSede().getNomSede());
-                listaCajas = cajaFacade.buscarCajasPorSede(sedeSeleccionada);
             } else {
-                setEmpresaSeleccionada(null);
                 setSedeSeleccionada(null);
-                setCodEmpresa(null);
                 listaCajas.clear();
-                setNomEmpresa(null);
-                setCodSede(null);
-                setNomSede(null);
             }
             setIdIdentificacion(usuarioSeleccionado.getCfgTipoidentificacionId().getId());
             setNumIdentificacion(usuarioSeleccionado.getNumDoc());
@@ -353,12 +287,7 @@ public class UsuarioMB implements Serializable {
 
     public void cancelar() {
         limpiarFormulario();
-        setNomEmpresa(null);
-        setCodEmpresa(null);
-        setNomSede(null);
-        setCodSede(null);
         setUsuarioSeleccionado(null);
-        setEmpresaSeleccionada(null);
         setSedeSeleccionada(null);
         displayActivoControl = "none";
         background = "#e0e0e0";
@@ -378,6 +307,16 @@ public class UsuarioMB implements Serializable {
 
     private void crearUsuario() {
         if (!validarCamposFormulario()) {
+            return;
+        }
+        //        solo los usuarios super y admin pueden crear y modificar
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
+            return;
+        }
+        //solo el super y el admin pueden crear usuarios
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
             return;
         }
         try {
@@ -407,16 +346,12 @@ public class UsuarioMB implements Serializable {
             user.setTel1(telefono.trim());
             user.setUsuario(usuario.trim().toLowerCase());
             user.setFecNacimiento(fechaNacimiento);
-            FacesContext context = FacesContext.getCurrentInstance();
-            SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-            user.setUsrCrea(sesionMB.getUsuarioActual().getIdUsuario());
+            user.setCfgempresaidEmpresa(empresaSeleccionada);
+            user.setUsrCrea(usuarioActual.getIdUsuario());
             usuarioFacade.create(user);
             limpiarFormulario();
-            setNomEmpresa(null);
-            setCodEmpresa(null);
-            setNomSede(null);
-            setCodSede(null);
-            setEmpresaSeleccionada(null);
+            setIdIdentificacion(0);
+            setNumIdentificacion(null);
             setSedeSeleccionada(null);
             displayActivoControl = "none";
             RequestContext.getCurrentInstance().update("IdFormUsuario");
@@ -429,6 +364,18 @@ public class UsuarioMB implements Serializable {
     private void modificarUsuario() {
         if (!validarCamposFormulario()) {
             return;
+        }
+        //        solo los usuarios super y admin pueden crear y modificar
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
+            return;
+        }
+        //solo el super y el admin pueden modificar usuarios sin restriccion
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+            if (!usuarioActual.equals(usuarioSeleccionado)) {//los otros usuarios unicamente puede modificar su perfil
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No pude modificar este usuario"));
+                return;
+            }
         }
         try {
             usuarioSeleccionado.setActivo(usuarioActivo);
@@ -459,12 +406,9 @@ public class UsuarioMB implements Serializable {
             usuarioSeleccionado.setUsuario(usuario.trim().toLowerCase());
             usuarioFacade.edit(usuarioSeleccionado);
             limpiarFormulario();
-            setNomEmpresa(null);
-            setCodEmpresa(null);
-            setNomSede(null);
-            setCodSede(null);
             setUsuarioSeleccionado(null);
-            setEmpresaSeleccionada(null);
+            setIdIdentificacion(0);
+            setNumIdentificacion(null);
             setSedeSeleccionada(null);
             opcion = "creacion";
             RequestContext.getCurrentInstance().update("FormBuscarUsuario");
@@ -485,13 +429,19 @@ public class UsuarioMB implements Serializable {
         if (rol == null) {//un usuario debe obligatoriamente tener asignado un rol
             return false;
         }
-        if (!rol.getCodrol().equals("00001")) {//el rol con codigo 00001 es el SUPER. Que es el unico rol que puede estar o no asignado a empresa - sede
+        if (rol.getCodrol().equals("00003") || rol.getCodrol().equals("00004")) {//cajero y vendedor necesitan tener especificado la empresa - sede
             if (empresaSeleccionada == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No ha Determinado la empresa a la que pertenecera el usuario"));
                 return false;
             }
             if (sedeSeleccionada == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Especifique la sede"));
+                return false;
+            }
+        }
+        if (rol.getCodrol().equals("00002")) {//administradores necesitan estar asociados a una empresa
+            if (empresaSeleccionada == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No ha Determinado la empresa a la que pertenecera el usuario"));
                 return false;
             }
         }
@@ -540,38 +490,6 @@ public class UsuarioMB implements Serializable {
             return false;
         }
         return true;
-    }
-
-    public String getCodEmpresa() {
-        return codEmpresa;
-    }
-
-    public void setCodEmpresa(String codEmpresa) {
-        this.codEmpresa = codEmpresa;
-    }
-
-    public String getNomEmpresa() {
-        return nomEmpresa;
-    }
-
-    public void setNomEmpresa(String nomEmpresa) {
-        this.nomEmpresa = nomEmpresa;
-    }
-
-    public String getCodSede() {
-        return codSede;
-    }
-
-    public void setCodSede(String codSede) {
-        this.codSede = codSede;
-    }
-
-    public String getNomSede() {
-        return nomSede;
-    }
-
-    public void setNomSede(String nomSede) {
-        this.nomSede = nomSede;
     }
 
     public int getIdIdentificacion() {
@@ -737,14 +655,6 @@ public class UsuarioMB implements Serializable {
 
     public void setListaSedes(List<CfgEmpresasede> listaSedes) {
         this.listaSedes = listaSedes;
-    }
-
-    public CfgEmpresa getEmpresaSeleccionada() {
-        return empresaSeleccionada;
-    }
-
-    public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
-        this.empresaSeleccionada = empresaSeleccionada;
     }
 
     public CfgEmpresasede getSedeSeleccionada() {

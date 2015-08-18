@@ -5,8 +5,10 @@
  */
 package managedBeans.seguridad;
 
+import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.SegUsuario;
+import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.SegUsuarioFacade;
 import java.io.Serializable;
@@ -40,6 +42,9 @@ public class LoginMB implements Serializable {
 
     @EJB
     CfgEmpresasedeFacade empresasedeFacade;
+
+    @EJB
+    CfgEmpresaFacade empresaFacade;
 
     @PostConstruct
     private void init() {
@@ -76,19 +81,32 @@ public class LoginMB implements Serializable {
             RequestContext.getCurrentInstance().update("message");
             return "";
         }
-        if (!aplicacionMB.getListaEmpresas().isEmpty()) {
-            if (idSede == null) {
+        CfgEmpresa empresa = empresaFacade.find(idEmpresa);
+        //comprueba primero si es un superusuario. Un super solo necesita de user y pass
+        SegUsuario usuarioActual = usuarioFacade.buscarUsuarioSuper(usuario, password);
+        if (empresa == null && usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la empresa"));
+            RequestContext.getCurrentInstance().update("message");
+            return "";
+
+        }
+        //busca si el usuario tiene el rol admin. Este necesita especificar la empresa. Si no encontro superusuario
+        if (usuarioActual == null) {
+            usuarioActual = usuarioFacade.buscarUsuarioAdminByEmpresa(usuario, password, empresa);
+        }
+        if (usuarioActual == null) {
+//            if (!aplicacionMB.getListaEmpresas().isEmpty()) {
+            if (idSede == 0) {
 //                FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la sede"));
                 RequestContext.getCurrentInstance().update("message");
                 return "";
             }
             sede = empresasedeFacade.find(idSede);
-        }
-        //comprueba primero si es un superusuario
-        SegUsuario usuarioActual = usuarioFacade.buscarUsuarioSuper(usuario, password);
-        if (usuarioActual == null) {
+//            }
             usuarioActual = usuarioFacade.buscarUsuario(usuario, password, idSede);
+        } else {
+            sede = empresasedeFacade.find(idSede);
         }
         if (usuarioActual == null) {
 //                    FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
@@ -96,7 +114,7 @@ public class LoginMB implements Serializable {
             RequestContext.getCurrentInstance().update("message");
             return "";
         } else {
-            
+
             if (!aplicacionMB.getListaUsuariosActivos().contains(usuarioActual)) {
 //                        usuarioActual.setRememberToken(econtext.getSessionId(false));
                 aplicacionMB.insertarUsuario(usuarioActual);
@@ -104,6 +122,7 @@ public class LoginMB implements Serializable {
                 sesionMB.setUsuarioActual(usuarioActual);
                 sesionMB.tokenSession();
                 sesionMB.setAutenticado(true);
+                sesionMB.setEmpresaActual(empresa);
                 sesionMB.setSedeActual(sede);
 //                        sesionMB.insertarItemSession(usuarioActual);
                 return "procesos/main?faces-redirect=true";
@@ -119,6 +138,7 @@ public class LoginMB implements Serializable {
                         sesionMB.setAutenticado(true);
 //                                sesionMB.insertarItemSession(usuarioActual);
                         aplicacionMB.insertarUsuario(usuarioActual);
+                        sesionMB.setEmpresaActual(empresa);
                         sesionMB.setSedeActual(sede);
                     }
                     return path;

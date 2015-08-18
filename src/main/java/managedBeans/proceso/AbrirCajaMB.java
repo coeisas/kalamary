@@ -33,6 +33,8 @@ public class AbrirCajaMB implements Serializable {
     private float base;
     private float trm;
 
+    private boolean abilitadaCajaBase;
+
     private FacCaja cajaActual;//corresponde la caja asociada que tiene el usuario logeado
     private FacMovcaja movcajaActual;
 
@@ -52,10 +54,17 @@ public class AbrirCajaMB implements Serializable {
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
-//        actualizarInformacionCaja();
-        if (sesionMB.getUsuarioActual() != null) {
-            usuarioActual = sesionMB.getUsuarioActual();
+        setAbilitadaCajaBase(false);
+        usuarioActual = sesionMB.getUsuarioActual();
+        if (usuarioActual != null) {
             setCajaActual(usuarioActual.getFaccajaidCaja());
+            if (cajaActual != null) {
+                setBase(cajaActual.getBase());
+            }
+            String codRol = usuarioActual.getCfgRolIdrol().getCodrol();
+            if (codRol.equals("00001") || codRol.equals("00002")) {
+                setAbilitadaCajaBase(true);
+            }
         }
     }
 
@@ -88,7 +97,11 @@ public class AbrirCajaMB implements Serializable {
 
     public void limpiarForm() {
         setFechaApertura(null);
-        setBase(0);
+        if (cajaActual != null) {
+            setBase(cajaActual.getBase());
+        } else {
+            setBase(0);
+        }
         setTrm(0);
 
     }
@@ -154,6 +167,14 @@ public class AbrirCajaMB implements Serializable {
 
     public void setCajaActual(FacCaja cajaActual) {
         this.cajaActual = cajaActual;
+    }
+
+    public boolean isAbilitadaCajaBase() {
+        return abilitadaCajaBase;
+    }
+
+    public void setAbilitadaCajaBase(boolean abilitadaCajaBase) {
+        this.abilitadaCajaBase = abilitadaCajaBase;
     }
 
 }

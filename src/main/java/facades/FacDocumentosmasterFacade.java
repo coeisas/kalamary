@@ -5,8 +5,11 @@
  */
 package facades;
 
-import entities.CfgDocumento;
+import entities.CfgCliente;
 import entities.CfgEmpresasede;
+import java.util.Calendar;
+import java.util.List;
+import java.util.ArrayList;
 import entities.FacDocumentosmaster;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -19,6 +22,7 @@ import javax.persistence.Query;
  */
 @Stateless
 public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaster> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -30,8 +34,8 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
     public FacDocumentosmasterFacade() {
         super(FacDocumentosmaster.class);
     }
-    
-    public FacDocumentosmaster buscarBySedeAndDocumentoAndNum(CfgEmpresasede sede, long documento, long num){
+
+    public FacDocumentosmaster buscarBySedeAndDocumentoAndNum(CfgEmpresasede sede, long documento, long num) {
         try {
             Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.facDocumentosmasterPK.cfgdocumentoidDoc = ?2 AND d.facDocumentosmasterPK.numDocumento = ?3");
             query.setParameter(1, sede);
@@ -42,5 +46,91 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             return null;
         }
     }
-           
+
+    public List<FacDocumentosmaster> buscarBySede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1");
+            query.setParameter(1, sede);
+            return query.getResultList();
+        } catch (Exception e) {
+            return new ArrayList();
+        }
+    }
+
+    public List<FacDocumentosmaster> buscarBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin, int offset, int limit) {
+        try {
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1";
+            if (cliente != null) {
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
+            }
+            if (numFactura > 0) {
+                consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?3");
+            }
+            if (fechaIni != null) {
+                consulta = consulta.concat(" AND d.fecCrea >= ?4");
+            }
+            if (fechafin != null) {
+                consulta = consulta.concat(" AND d.fecCrea <= ?5");
+            }
+//            System.out.println(fechaIni +"-"+fechafin );
+//            System.out.println(consulta);
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, sede);
+            if (cliente != null) {
+                query.setParameter(2, cliente);
+            }
+            if (numFactura > 0) {
+                query.setParameter(3, numFactura);
+            }
+            if (fechaIni != null) {
+                query.setParameter(4, fechaIni.getTime());
+            }
+            if (fechafin != null) {
+                query.setParameter(5, fechafin.getTime());
+            }
+            query.setMaxResults(limit);
+            query.setFirstResult(offset);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public int totalBySede(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin) {
+        try {
+
+            String consulta = "SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1";
+            if (cliente != null) {
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
+            }
+            if(numFactura > 0){
+
+                consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?3");
+            } 
+            if (fechaIni != null) {
+                consulta = consulta.concat(" AND d.fecCrea >= ?4");
+            }
+            if (fechafin != null) {
+                consulta = consulta.concat(" AND d.fecCrea <= ?5");
+            }
+//            System.out.println(consulta);
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, sede);
+            if (cliente != null) {
+                query.setParameter(2, cliente);
+            }
+            if (numFactura > 0) {
+                query.setParameter(3, numFactura);
+            }
+            if (fechaIni != null) {
+                query.setParameter(4, fechaIni.getTime());
+            }
+            if (fechafin != null) {
+                query.setParameter(5, fechafin.getTime());
+            }
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 }

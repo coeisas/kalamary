@@ -20,32 +20,14 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo Empresa:"/>
-                            <p:inputText value="#{impuestoMB.codigoEmpresa}" class="campoFormulario">
-                                <p:ajax event="blur" listener="#{impuestoMB.buscarEmpresa}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgEmpresa').show()"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{impuestoMB.nombreEmpresa}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo Sede:"/>
-                            <p:inputText value="#{impuestoMB.codigoSede}" class="campoFormulario">
-                                <p:ajax event="blur" listener="#{impuestoMB.buscarSede}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{impuestoMB.cargarListaSedes}"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{impuestoMB.nombreSede}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
                             <p:outputLabel class="labelFormularioObligatorio" value="Codigo Impuesto:"/>
                             <p:inputText class="campoFormulario" value="#{impuestoMB.codigoImpuesto}">
                                 <p:ajax event="blur" listener="#{impuestoMB.buscarImpuesto}" update="@none"/>
                             </p:inputText>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Impuesto:"/>
                             <p:inputText class="campoFormulario upperCase" value="#{impuestoMB.nombreImpuesto}"/>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="% Impuesto:"/>
                             <p:inputText class="campoFormulario" value="#{impuestoMB.porcentajeImpuesto}"/>
                         </p:column>
@@ -78,27 +60,6 @@
                 <p:column headerText="Porcentaje" width="20%">#{impuesto.porcentaje}</p:column>
             </p:dataTable>
         </div>
-        <p:dialog id="IdModalEmpresa" widgetVar="dlgEmpresa" header="BUSCAR EMPRESAS" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalEmpresa">
-                <p:dataTable value="#{aplicacionMB.listaEmpresas}" var="empresa" emptyMessage="No hay empresas registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{impuestoMB.empresaSeleccionada}" rowKey="#{empresa.idEmpresa}" selectionMode="single">
-                    <p:column headerText="Codigo">#{empresa.codEmpresa}</p:column>
-                    <p:column headerText="Empresa">#{empresa.nomEmpresa}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{impuestoMB.cargarInformacionEmpresa}" onclick="PF('dlgEmpresa').hide()"/>
-            </h:form>
-        </p:dialog>
-
-        <p:dialog id="IdModalSede" widgetVar="dlgSede" header="BUSCAR SEDE" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalSede">
-                <p:dataTable value="#{impuestoMB.listaSede}" var="sede" emptyMessage="No hay sedes registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{impuestoMB.sedeSeleccionada}" rowKey="#{sede.idSede}" selectionMode="single">
-                    <p:column headerText="Codigo">#{sede.codSede}</p:column>
-                    <p:column headerText="Empresa">#{sede.nomSede}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{impuestoMB.cargarInformacionSede}" onclick="PF('dlgSede').hide()"/>
-            </h:form>
-        </p:dialog>
     </ui:define>
 </ui:composition>
 

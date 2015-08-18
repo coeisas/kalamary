@@ -42,7 +42,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacCaja.findByFeccrea", query = "SELECT f FROM FacCaja f WHERE f.feccrea = :feccrea"),
     @NamedQuery(name = "FacCaja.findByUsrcrea", query = "SELECT f FROM FacCaja f WHERE f.usrcrea = :usrcrea"),
     @NamedQuery(name = "FacCaja.findByCodigoCaja", query = "SELECT f FROM FacCaja f WHERE f.codigoCaja = :codigoCaja"),
-    @NamedQuery(name = "FacCaja.findByActiva", query = "SELECT f FROM FacCaja f WHERE f.activa = :activa")})
+    @NamedQuery(name = "FacCaja.findByActiva", query = "SELECT f FROM FacCaja f WHERE f.activa = :activa"),
+    @NamedQuery(name = "FacCaja.findByBase", query = "SELECT f FROM FacCaja f WHERE f.base = :base")})
 public class FacCaja implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -72,6 +73,9 @@ public class FacCaja implements Serializable {
     private String codigoCaja;
     @Column(name = "activa")
     private Boolean activa;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "base", precision = 12)
+    private Float base;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
@@ -79,6 +83,8 @@ public class FacCaja implements Serializable {
     private List<SegUsuario> segUsuarioList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "faccajaidCaja")
     private List<FacMovcaja> facMovcajaList;
+    @OneToMany(mappedBy = "faccajaidCaja")
+    private List<FacDocumentosmaster> facDocumentosmasterList;
 
     public FacCaja() {
     }
@@ -139,6 +145,14 @@ public class FacCaja implements Serializable {
         return activa;
     }
 
+    public Float getBase() {
+        return base;
+    }
+
+    public void setBase(Float base) {
+        this.base = base;
+    }
+
     public void setCerrada(Boolean activa) {
         this.activa = activa;
     }
@@ -168,6 +182,15 @@ public class FacCaja implements Serializable {
     public void setFacMovcajaList(List<FacMovcaja> facMovcajaList) {
         this.facMovcajaList = facMovcajaList;
     }
+    
+    @XmlTransient
+    public List<FacDocumentosmaster> getFacDocumentosmasterList() {
+        return facDocumentosmasterList;
+    }
+
+    public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
+        this.facDocumentosmasterList = facDocumentosmasterList;
+    }    
 
     @Override
     public int hashCode() {

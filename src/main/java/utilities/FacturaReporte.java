@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class FacturaReporte extends NumberToLetterConverter {
 
-    private int numFactura;
+//    private int numFactura;
     private String numFac;
     private float subtotal;
     private float descuento;
@@ -27,17 +27,17 @@ public class FacturaReporte extends NumberToLetterConverter {
 
     }
 
-    private String determinarNumFac(int num) {
-        String aux = String.valueOf(num);
-        if (num < 10) {
-            aux = "0000".concat(aux);
-        } else if (num >= 10 && num < 100) {
-            aux = "000".concat(aux);
-        } else if (num >= 100 && num < 1000) {
-            aux = "00".concat(aux);
-        }
-        return aux;
-    }
+//    private String determinarNumFac(int num) {
+//        String aux = String.valueOf(num);
+//        if (num < 10) {
+//            aux = "0000".concat(aux);
+//        } else if (num >= 10 && num < 100) {
+//            aux = "000".concat(aux);
+//        } else if (num >= 100 && num < 1000) {
+//            aux = "00".concat(aux);
+//        }
+//        return aux;
+//    }
 
     public List<FacturaDetalleReporte> getDetalle() {
         return detalle;
@@ -97,13 +97,17 @@ public class FacturaReporte extends NumberToLetterConverter {
         return numFac;
     }
 
-    public int getNumFactura() {
-        return numFactura;
-    }
+//    public int getNumFactura() {
+//        return numFactura;
+//    }
 
-    public void setNumFactura(int numFactura) {
-        this.numFac = determinarNumFac(numFactura);
-        this.numFactura = numFactura;
+//    public void setNumFactura(int numFactura) {
+//        this.numFac = determinarNumFac(numFactura);
+//        this.numFactura = numFactura;
+//    }
+
+    public void setNumFac(String numFac) {
+        this.numFac = numFac;
     }
 
 }

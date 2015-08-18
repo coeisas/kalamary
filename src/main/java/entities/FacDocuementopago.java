@@ -94,7 +94,7 @@ public class FacDocuementopago implements Serializable {
     public void setFacDocumentosmaster(FacDocumentosmaster facDocumentosmaster) {
         this.facDocumentosmaster = facDocumentosmaster;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;
