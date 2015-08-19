@@ -103,6 +103,7 @@ public class FacturaMB implements Serializable {
     private float totalFactura;
     private float totalUSD;
     private String observacion;
+    private SegUsuario vendedorSeleccionado;
     private LazyDataModel<CfgProducto> listaProducto;
     private List<FacDocumentodetalle> listaDetalle;
     private LazyDataModel<CfgCliente> listaClientes;
@@ -110,6 +111,9 @@ public class FacturaMB implements Serializable {
     private List<CfgFormapago> listaFormapagos;
     private FacCaja cajaUsuario;//caja asignada al usuario
     private FacMovcaja movimientoCajaMaster;//contiene informacion del maestro del movimiento. Se crea uno cada vez que se habre caja. cuando se cierra se habilita
+    private List<SegUsuario> listaVendedor;
+    private String documentoVendedor;
+    private String nombreVendedor;
 
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
@@ -216,7 +220,7 @@ public class FacturaMB implements Serializable {
 
     public void buscarCliente() {
         if (!identificacionCliente.trim().isEmpty()) {
-            clienteSeleccionado = clienteFacade.buscarPorIdentificacionAndIdEmpresa(identificacionCliente, sedeActual.getCfgempresaidEmpresa());
+            clienteSeleccionado = clienteFacade.buscarPorIdentificacionAndIdEmpresa(identificacionCliente, empresaActual);
             if (clienteSeleccionado == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro cliente con esa identificacion"));
             }
@@ -224,6 +228,39 @@ public class FacturaMB implements Serializable {
             clienteSeleccionado = null;
         }
         cargarInformacionCliente();
+    }
+
+    public void cargarListaVendedores() {
+        if (empresaActual != null) {
+            listaVendedor = usuarioFacade.buscarVendedoresByEmpresa(empresaActual);
+        } else {
+            listaVendedor = new ArrayList();
+        }
+        RequestContext.getCurrentInstance().execute("PF('dlgVendedor').show()");
+        RequestContext.getCurrentInstance().update("FormModalVendedor");
+    }
+
+    public void buscarVendedor() {
+        if (empresaActual != null) {
+            if (!documentoVendedor.trim().isEmpty()) {
+                vendedorSeleccionado = usuarioFacade.buscarVendedorByEmpresaAndDocumento(empresaActual, documentoVendedor);
+            }
+        } else {
+            vendedorSeleccionado = null;
+        }
+        cargarInformacionVendedor();
+    }
+
+    public void cargarInformacionVendedor() {
+        if (vendedorSeleccionado != null) {
+            nombreVendedor = vendedorSeleccionado.nombreCompleto();
+            documentoVendedor = vendedorSeleccionado.getNumDoc();
+        } else {
+            nombreVendedor = null;
+            documentoVendedor = null;
+        }
+        RequestContext.getCurrentInstance().execute("PF('dlgVendedor').hide()");
+        RequestContext.getCurrentInstance().update("IdFormFactura");
     }
 
     public void cargarModalProductos() {
@@ -407,6 +444,10 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay cliente seleccionado"));
             return false;
         }
+        if (vendedorSeleccionado == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay vendedor seleccionado"));
+            return false;
+        }
         if (listaDetalle.isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
             return false;
@@ -448,6 +489,7 @@ public class FacturaMB implements Serializable {
             documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotalFactura(totalFactura);
+            documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);
             documentosmaster.setTotalFacturaUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setFaccajaidCaja(cajaUsuario);
@@ -659,6 +701,7 @@ public class FacturaMB implements Serializable {
             parametros.put("SUBREPORT_DIR", rutaReportes);
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
+            parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();
@@ -1192,5 +1235,37 @@ public class FacturaMB implements Serializable {
 
     public void setClienteSeleccionadoModal(CfgCliente clienteSeleccionadoModal) {
         this.clienteSeleccionadoModal = clienteSeleccionadoModal;
+    }
+
+    public SegUsuario getVendedorSeleccionado() {
+        return vendedorSeleccionado;
+    }
+
+    public void setVendedorSeleccionado(SegUsuario vendedorSeleccionado) {
+        this.vendedorSeleccionado = vendedorSeleccionado;
+    }
+
+    public List<SegUsuario> getListaVendedor() {
+        return listaVendedor;
+    }
+
+    public void setListaVendedor(List<SegUsuario> listaVendedor) {
+        this.listaVendedor = listaVendedor;
+    }
+
+    public String getDocumentoVendedor() {
+        return documentoVendedor;
+    }
+
+    public void setDocumentoVendedor(String documentoVendedor) {
+        this.documentoVendedor = documentoVendedor;
+    }
+
+    public String getNombreVendedor() {
+        return nombreVendedor;
+    }
+
+    public void setNombreVendedor(String nombreVendedor) {
+        this.nombreVendedor = nombreVendedor;
     }
 }

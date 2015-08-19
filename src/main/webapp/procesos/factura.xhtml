@@ -14,14 +14,21 @@
             <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>
             <div>
-                <p:outputLabel value="Cliente:" class="labelFormulario"/>
+                <p:outputLabel value="Cliente:" class="labelFormularioObligatorio"/>
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
                     <p:ajax event="blur" listener="#{facturaMB.buscarCliente}" update="@none"/> 
                 </p:inputText>
                 <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
                 <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
                 <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
-            </div>
+                <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
+                <p:inputText id="IdDocumentoVendedor" value="#{facturaMB.documentoVendedor}" class="campoFormulario">
+                    <p:ajax event="blur" listener="#{facturaMB.buscarVendedor}" update="@none"/>
+                </p:inputText>
+                <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
+                <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>
+                </div>
             <div style="clear: left">
                 <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{facturaMB.cargarModalProductos}"/>
             </div>
@@ -215,7 +222,19 @@
                 </p:panelGrid>
             </h:form>
         </p:dialog>
-        <p:dialog header="Crear Cliente" widgetVar="dlgCrearCliente" modal="true" width="70%" resizable="false">
+
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%">
+            <h:form id="FormModalVendedor">
+                <p:dataTable value="#{facturaMB.listaVendedor}" var="vendedor" selection="#{facturaMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single">
+                    <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
+                    <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{facturaMB.cargarInformacionVendedor}"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="70%" resizable="false">
             <h:form id="FormModalCliente">
                 <p:panelGrid class="panelGridSinBorder" style="width: 98%;">
                     <p:row>

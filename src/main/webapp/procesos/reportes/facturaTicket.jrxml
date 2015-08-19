@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="226" pageHeight="283" columnWidth="198" leftMargin="14" rightMargin="14" topMargin="14" bottomMargin="14" isIgnorePagination="true" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
 	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="184"/>
+	<property name="ireport.x" value="67"/>
+	<property name="ireport.y" value="240"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
 		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
 	</parameter>
@@ -16,6 +16,7 @@
 	<parameter name="observacion" class="java.lang.String"/>
 	<parameter name="caja" class="java.lang.String"/>
 	<parameter name="resdian" class="java.lang.String"/>
+	<parameter name="vendedor" class="java.lang.String"/>
 	<field name="numFac" class="java.lang.String"/>
 	<field name="subtotal" class="java.lang.Float"/>
 	<field name="descuento" class="java.lang.Float"/>
@@ -48,14 +49,14 @@
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{direccion}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["DIRECCION: "+$P{direccion}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="0" y="18" width="198" height="6" uuid="d012b436-b6fa-4324-80d3-36ba41ffba68"/>
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{telefono}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["TELFONO(S): " + $P{telefono}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -102,12 +103,12 @@
 					<pen lineWidth="0.25" lineStyle="Dashed"/>
 				</graphicElement>
 			</line>
-			<textField>
-				<reportElement x="0" y="19" width="198" height="6" uuid="c2b5e94f-21f7-4bc8-a998-a0f76e21dfa9"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="19" width="92" height="6" uuid="c2b5e94f-21f7-4bc8-a998-a0f76e21dfa9"/>
 				<textElement verticalAlignment="Middle">
 					<font size="4"/>
 				</textElement>
-				<textFieldExpression><![CDATA["CAJA: "+$P{caja}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["CAJA: "+$P{caja} + " - "+$P{usuario}  ]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="6" width="198" height="6" uuid="dc8a28e7-7129-41f2-b647-5206495d852e"/>
@@ -115,6 +116,20 @@
 					<font size="4"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{resdian}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="92" y="19" width="25" height="6" uuid="845d266e-ed6b-40d4-ab01-8f38ed7aacb0"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<text><![CDATA[VENDEDOR:]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="117" y="19" width="80" height="6" uuid="9ff80194-a6fe-4671-8d70-46d50eb0ff8f"/>
+				<textElement>
+					<font size="4"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{vendedor}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageHeader>
@@ -226,16 +241,9 @@
 				<textFieldExpression><![CDATA[$P{observacion}]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="10">
-			<textField>
-				<reportElement x="0" y="4" width="198" height="6" uuid="994846ec-4d28-4f67-878d-eb9189052ec4"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="4"/>
-				</textElement>
-				<textFieldExpression><![CDATA["FACTURA GENERADA POR " + $P{usuario}]]></textFieldExpression>
-			</textField>
+		<band height="6">
 			<staticText>
-				<reportElement x="0" y="0" width="198" height="5" uuid="11f61548-ceaf-4b0f-9740-c38465b623b7"/>
+				<reportElement x="-1" y="0" width="198" height="5" uuid="11f61548-ceaf-4b0f-9740-c38465b623b7"/>
 				<textElement textAlignment="Center">
 					<font size="4"/>
 				</textElement>

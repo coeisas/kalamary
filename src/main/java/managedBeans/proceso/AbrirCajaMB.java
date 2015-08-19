@@ -112,6 +112,10 @@ public class AbrirCajaMB implements Serializable {
             return;
         }
         movcajaActual = movcajaFacade.buscarMovimientoCaja(cajaActual);
+        if(trm <= 0){
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Necesita especificar el TRM. O este no es valido"));
+                return;            
+        }
         if (movcajaActual != null) {
             if (movcajaActual.getAbierta()) {
                 RequestContext.getCurrentInstance().update("IdFormAbrirCaja");

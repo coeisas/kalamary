@@ -38,11 +38,11 @@
                                 <f:convertNumber type="currency"/>
                             </h:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <!--p:outputLabel class="labelFormulario" value="Utilidad %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="# {kitMB.utilidad}">
-                                <p:ajax event="change" listener="# {kitMB.calcularPrecioKit}" update="IdPrecioKit"/>
+                            <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
+                            <p:inputText class="campoFormulario" size="3" value="#{kitMB.utilidad}">
+                                <p:ajax event="change" listener="#{kitMB.calcularPrecioKit}" update="IdPrecioKit"/>
                             </p:inputText>
-                            <div style="float: left;margin-left: 20px;height: 1.5em"/-->
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
                             <h:inputText id="IdPrecioKit" class="cajaH" style="float: left;width: 100px" value="#{kitMB.precio}" readonly="true">
                                 <f:convertNumber type="currency"/>

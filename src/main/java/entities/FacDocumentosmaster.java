@@ -93,6 +93,9 @@ public class FacDocumentosmaster implements Serializable {
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
+    @JoinColumn(name = "seg_usuario_idUsuario1", referencedColumnName = "idUsuario")
+    @ManyToOne
+    private SegUsuario segusuarioidUsuario1;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocumentodetalle> facDocumentodetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
@@ -240,6 +243,14 @@ public class FacDocumentosmaster implements Serializable {
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
     }
+    
+    public SegUsuario getSegusuarioidUsuario1() {
+        return segusuarioidUsuario1;
+    }
+
+    public void setSegusuarioidUsuario1(SegUsuario segusuarioidUsuario1) {
+        this.segusuarioidUsuario1 = segusuarioidUsuario1;
+    }    
 
     public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
         this.segusuarioidUsuario = segusuarioidUsuario;

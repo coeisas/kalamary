@@ -279,6 +279,7 @@ public class ListadoFacturaMB implements Serializable {
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
             parametros.put("SUBREPORT_DIR", rutaReportes);
             parametros.put("observacion", documento.getObservaciones());
+            parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
             if (documento.getFaccajaidCaja() != null) {
                 parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             } else {

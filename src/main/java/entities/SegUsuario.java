@@ -134,7 +134,7 @@ public class SegUsuario implements Serializable {
     private List<CfgProveedor> cfgProveedorList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa")
     @ManyToOne
-    private CfgEmpresa cfgempresaidEmpresa;    
+    private CfgEmpresa cfgempresaidEmpresa;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede")
     @ManyToOne
     private CfgEmpresasede cfgempresasedeidSede;
@@ -162,7 +162,9 @@ public class SegUsuario implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
     private List<CfgProducto> cfgProductoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "segusuarioidUsuario")
-    private List<FacDocumentosmaster> facDocumentosmasterList;
+    private List<FacDocumentosmaster> facDocumentosmasterList;//usuario que crea la factura (cajero)
+    @OneToMany(mappedBy = "segusuarioidUsuario1")
+    private List<FacDocumentosmaster> facDocumentosmasterList1;//usario que vende (vendedor)
     @Transient
     private HttpSession session;
 
@@ -356,7 +358,7 @@ public class SegUsuario implements Serializable {
     public void setCfgProveedorList(List<CfgProveedor> cfgProveedorList) {
         this.cfgProveedorList = cfgProveedorList;
     }
-    
+
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }
@@ -364,7 +366,7 @@ public class SegUsuario implements Serializable {
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
-    
+
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
     }
@@ -467,6 +469,15 @@ public class SegUsuario implements Serializable {
 
     public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
         this.facDocumentosmasterList = facDocumentosmasterList;
+    }
+
+    @XmlTransient
+    public List<FacDocumentosmaster> getFacDocumentosmasterList1() {
+        return facDocumentosmasterList1;
+    }
+
+    public void setFacDocumentosmasterList1(List<FacDocumentosmaster> facDocumentosmasterList1) {
+        this.facDocumentosmasterList1 = facDocumentosmasterList1;
     }
 
     @Override

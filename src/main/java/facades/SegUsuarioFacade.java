@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -52,10 +53,9 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
             query.setParameter(3, empresa);
             return (SegUsuario) query.getSingleResult();
         } catch (Exception e) {
-        return null;
+            return null;
         }
-        
-        
+
     }
 
 //    usado para comprabar existencia de un usuario super. Valor unico
@@ -113,4 +113,25 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
             return null;
         }
     }
+
+    public List<SegUsuario> buscarVendedoresByEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.cfgRolIdrol.codrol = '00003'");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public SegUsuario buscarVendedorByEmpresaAndDocumento(CfgEmpresa empresa, String documento) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.numDoc = ?2 AND u.cfgRolIdrol.codrol = '00003'");
+            query.setParameter(1, empresa);
+            query.setParameter(2, documento);
+            return (SegUsuario) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 }
