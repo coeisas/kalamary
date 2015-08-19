@@ -112,7 +112,7 @@ public class FacturaMB implements Serializable {
     private FacMovcaja movimientoCajaMaster;//contiene informacion del maestro del movimiento. Se crea uno cada vez que se habre caja. cuando se cierra se habilita
 
     private int tipoImpresion;
-//    private CfgEmpresa empresaActual;
+    private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
     private CfgCliente clienteSeleccionado;
     private CfgProducto productoSeleccionado;
@@ -194,15 +194,16 @@ public class FacturaMB implements Serializable {
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         sedeActual = sesionMB.getSedeActual();
-        if (sedeActual != null) {
+        empresaActual = sesionMB.getEmpresaActual();
+        if (empresaActual != null) {
             actualizarListadoClientes();
-            listaProducto = new LazyProductosModel(sedeActual.getCfgempresaidEmpresa(), null, null, null, productoFacade);
+            listaProducto = new LazyProductosModel(empresaActual, null, null, null, productoFacade);
             RequestContext.getCurrentInstance().update("FormModalProducto");
-            clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
+            clienteSeleccionado = clienteFacade.buscarClienteDefault(empresaActual);
             if (clienteSeleccionado != null) {
                 setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
             }
-            listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
+            listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
             cargarInformacionCliente();
         }
         if (usuarioActual != null) {
@@ -249,7 +250,7 @@ public class FacturaMB implements Serializable {
             listaImpuestos.clear();
         }
         listaDetalle.clear();
-        listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
+        listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
@@ -263,7 +264,7 @@ public class FacturaMB implements Serializable {
 
     private void actualizarListadoClientes() {
         if (sedeActual != null) {
-            listaClientes = new LazyClienteDataModel(clienteFacade, sedeActual.getCfgempresaidEmpresa());
+            listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
