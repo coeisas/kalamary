@@ -51,7 +51,7 @@
                         <p:column colspan="2">
                             <p:outputLabel class="labelFormulario" value="Sede:"/>
                             <h:inputText id="IdSede" class="campoFormulario cajaH" value="#{usuarioMB.sedeSeleccionada.nomSede}" readonly="true" style="width: 200px"/>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()" actionListener="#{usuarioMB.cargarSedes}"/>
                         </p:column>
                     </p:row>
 

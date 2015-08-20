@@ -127,43 +127,48 @@ public class ImpuestoMB implements Serializable {
 
     }
 
-    private void validacion() {
+    private boolean validacion() {
+        boolean ban = true;
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Empresa no seleccionada"));
-            return;
+            return false;
         }
         if (sedeSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Sede no seleccionada"));
-            return;
+            return false;
         }
         //        solo los usuarios super y admin pueden creary  modificar
-        if(usuarioActual == null){
+        if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
-            return;           
+            return false;
         }
         if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
-            return;
-        }        
-        if (codigoImpuesto.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo impuesto requerido"));
-            return;
+            return false;
         }
-        if (nombreImpuesto.isEmpty()) {
+        if (codigoImpuesto.trim().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Codigo impuesto requerido"));
+            return false;
+        }
+        if (nombreImpuesto.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Impuesto requerido"));
-            return;
+            return false;
         }
         if (porcentajeImpuesto == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Porcentaje impuesto requerido"));
-            return;
+            return false;
         }
         if (tipoEmpresa == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Tipo Empresa requerido"));
+            return false;
         }
+        return ban;
     }
 
     private void crearInpuesto() {
-        validacion();
+        if (!validacion()) {
+            return;
+        }
         if (impuestoSeleccionado != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ya existe un impuesto con ese codigo"));
             return;
@@ -189,7 +194,13 @@ public class ImpuestoMB implements Serializable {
     }
 
     private void editarImpuesto() {
-        validacion();
+        if (!validacion()) {
+            return;
+        }
+        if (impuestoSeleccionado != null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Impuesto no seleccionado"));
+            return;
+        }
         try {
             impuestoSeleccionado.setNomImpuesto(nombreImpuesto.toUpperCase());
             impuestoSeleccionado.setPorcentaje(porcentajeImpuesto);

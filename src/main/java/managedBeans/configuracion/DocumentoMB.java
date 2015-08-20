@@ -85,10 +85,8 @@ public class DocumentoMB implements Serializable {
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         listaAplicacionDocumento = aplicaciondocumentoFacade.findAll();
         usuarioActual = sesionMB.getUsuarioActual();
-        if (sesionMB.getSedeActual() != null) {
-            sedeSeleccionada = sesionMB.getSedeActual();
-            empresaSeleccionada = sedeSeleccionada.getCfgempresaidEmpresa();
-        }
+        sedeSeleccionada = sesionMB.getSedeActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
     }
 
     public void cargarListaSedes() {
@@ -209,10 +207,6 @@ public class DocumentoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta codigo del documento"));
             return false;
         }
-        if (tipoEmpresa == 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de empresa"));
-            return false;
-        }
         if (nombreDocumento.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Nombre Documento vacio"));
             return false;
@@ -253,8 +247,9 @@ public class DocumentoMB implements Serializable {
             CfgDocumento documento = new CfgDocumento();
             documento.setCfgempresasedeidSede(sedeSeleccionada);
             documento.setCodDocumento(codigoDocumento.trim().toUpperCase());
-            CfgTipoempresa tipoempresa = tipoempresaFacade.find(tipoEmpresa);
-            documento.setCfgTipoempresaId(tipoempresa);
+//            CfgTipoempresa tipoempresa = tipoempresaFacade.find(tipoEmpresa);
+//            documento.setCfgTipoempresaId(tipoempresa);
+            documento.setCfgTipoempresaId(empresaSeleccionada.getCfgTipoempresaId());
             documento.setNomDoc(nombreDocumento.trim().toUpperCase());
             documento.setAbreviatura(abreviatura.trim().toUpperCase());
             documento.setPrefijoDoc(prefijo.trim().toUpperCase());

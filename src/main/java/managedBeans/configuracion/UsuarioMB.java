@@ -234,15 +234,26 @@ public class UsuarioMB implements Serializable {
         }
     }
 
+    public void cargarSedes() {
+        if (empresaSeleccionada != null) {
+            listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
+            RequestContext.getCurrentInstance().update("FormModalSede");
+            RequestContext.getCurrentInstance().execute("PF('dlgSede').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se ha cargado la empresa. Reinicie sesion"));
+        }
+    }
+
     public void cargarInformacionUsuario() {
+        listaCajas.clear();
         if (usuarioSeleccionado != null) {
             opcion = "modificacion";
             displayActivoControl = "block";
             if (usuarioSeleccionado.getCfgempresasedeidSede() != null) {
                 setSedeSeleccionada(usuarioSeleccionado.getCfgempresasedeidSede());
+                setListaCajas(cajaFacade.buscarCajasPorSede(usuarioSeleccionado.getCfgempresasedeidSede()));
             } else {
                 setSedeSeleccionada(null);
-                listaCajas.clear();
             }
             setIdIdentificacion(usuarioSeleccionado.getCfgTipoidentificacionId().getId());
             setNumIdentificacion(usuarioSeleccionado.getNumDoc());

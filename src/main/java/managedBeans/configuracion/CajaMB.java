@@ -31,54 +31,55 @@ import org.primefaces.context.RequestContext;
 @ManagedBean
 @SessionScoped
 public class CajaMB implements Serializable {
-
+    
     private String codigoCaja;
     private String nombreCaja;
     private float baseCaja;
-
+    
     private List<CfgEmpresasede> listaSedes;
     private List<FacCaja> listaCajas;
-
+    
     private FacCaja cajaSeleccionada;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
     private SegUsuario usuarioActual;
     private SesionMB sesionMB;
-
+    
     @EJB
     CfgEmpresasedeFacade sedeFacade;
-
+    
     @EJB
     CfgEmpresaFacade empresaFacade;
-
+    
     @EJB
     FacCajaFacade cajaFacade;
-
+    
     public CajaMB() {
     }
-
+    
     @PostConstruct
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
-        if (sesionMB.getSedeActual() != null) {
-            sedeActual = sesionMB.getSedeActual();
-            empresaActual = getSedeActual().getCfgempresaidEmpresa();
+        sedeActual = sesionMB.getSedeActual();
+        empresaActual = sesionMB.getEmpresaActual();
+        if (sedeActual != null) {
             listaCajas = cajaFacade.buscarCajasPorSede(getSedeActual());
         }
     }
-
+    
     public void limpiarFormulario() {
         setCodigoCaja("");
         setNombreCaja("");
+        setBaseCaja(0);
     }
-
+    
     public void buscarCajaPorCodigo() {
         cajaSeleccionada = cajaFacade.buscarCajasPorSedeAndCodigo(getSedeActual(), codigoCaja);
         cargarInformacionCaja();
     }
-
+    
     private void cargarInformacionCaja() {
         if (cajaSeleccionada != null) {
             setCodigoCaja(cajaSeleccionada.getCodigoCaja());
@@ -87,28 +88,32 @@ public class CajaMB implements Serializable {
         }
         RequestContext.getCurrentInstance().update("IdFormCaja");
     }
-
+    
     public void cancelar() {
         limpiarFormulario();
         listaCajas = cajaFacade.buscarCajasPorSede(getSedeActual());
         RequestContext.getCurrentInstance().update("IdDataCaja");
         RequestContext.getCurrentInstance().update("IdFormCaja");
     }
-
+    
     public void accion() {
         if (cajaSeleccionada == null) {
             crearCaja();
         } else {
             modificarCaja();
         }
-
+        
     }
-
+    
     private void crearCaja() {
+        if (sedeActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay sede elegida"));
+            return;
+        }
         //        solo los usuarios super y admin pueden modificar
-        if(usuarioActual == null){
+        if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
-            return;           
+            return;
         }
         if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
@@ -149,12 +154,12 @@ public class CajaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Caja no creada"));
         }
     }
-
+    
     private void modificarCaja() {
         //        solo los usuarios super y admin pueden modificar
-        if(usuarioActual == null){
+        if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
-            return;           
+            return;
         }
         if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
@@ -179,61 +184,61 @@ public class CajaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Caja no modificada"));
         }
     }
-
+    
     public String getCodigoCaja() {
         return codigoCaja;
     }
-
+    
     public void setCodigoCaja(String codigoCaja) {
         this.codigoCaja = codigoCaja;
     }
-
+    
     public String getNombreCaja() {
         return nombreCaja;
     }
-
+    
     public void setNombreCaja(String nombreCaja) {
         this.nombreCaja = nombreCaja;
     }
-
+    
     public List<CfgEmpresasede> getListaSedes() {
         return listaSedes;
     }
-
+    
     public void setListaSedes(List<CfgEmpresasede> listaSedes) {
         this.listaSedes = listaSedes;
     }
-
+    
     public List<FacCaja> getListaCajas() {
         return listaCajas;
     }
-
+    
     public void setListaCajas(List<FacCaja> listaCajas) {
         this.listaCajas = listaCajas;
     }
-
+    
     public FacCaja getCajaSeleccionada() {
         return cajaSeleccionada;
     }
-
+    
     public void setCajaSeleccionada(FacCaja cajaSeleccionada) {
         this.cajaSeleccionada = cajaSeleccionada;
     }
-
+    
     public CfgEmpresa getEmpresaActual() {
         return empresaActual;
     }
-
+    
     public CfgEmpresasede getSedeActual() {
         return sedeActual;
     }
-
+    
     public float getBaseCaja() {
         return baseCaja;
     }
-
+    
     public void setBaseCaja(float baseCaja) {
         this.baseCaja = baseCaja;
     }
-
+    
 }

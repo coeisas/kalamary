@@ -591,7 +591,6 @@ public class FacturaMB implements Serializable {
     }
 
     public void onRowEdit(RowEditEvent event) {
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Entro a editar"));
         CfgFormapago formapago = (CfgFormapago) event.getObject();
         float aux = totalFormaPago();
         if (formapago.getSubtotal() < 0 || !validarFormaPago(aux)) {
@@ -660,7 +659,7 @@ public class FacturaMB implements Serializable {
                         documentoActual.getFacDocumentosmasterPK().getNumDocumento()
                 );
         byte[] bites = sedeActual.getLogo();
-        if (bites == null) {
+        if (bites != null) {
             bites = sedeActual.getCfgempresaidEmpresa().getLogo();
         }
         List<FacturaReporte> facturas = new ArrayList();
@@ -682,13 +681,15 @@ public class FacturaMB implements Serializable {
             ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
             String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
             Map<String, Object> parametros = new HashMap<>();
-            InputStream logo = new ByteArrayInputStream(bites);
+            if (bites != null) {
+                InputStream logo = new ByteArrayInputStream(bites);
+                parametros.put("logo", logo);
+            }
             CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
-            parametros.put("logo", logo);
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
             parametros.put("direccion", sedeActual.getDireccion() + " " + sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             String telefono = sedeActual.getTel1();
-            if (sedeActual.getTel2() != null || !sedeActual.getTel2().isEmpty()) {
+            if (sedeActual.getTel2() != null && !sedeActual.getTel2().isEmpty()) {
                 telefono = telefono + "-".concat(sedeActual.getTel2());
             }
             parametros.put("telefono", telefono);

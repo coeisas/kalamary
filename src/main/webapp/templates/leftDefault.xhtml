@@ -5,7 +5,7 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui">
     <h:form id="IdFormMenu">
-        <p:menu style="width: 95%" toggleable="true">
+        <p:slideMenu style="width: 95%;" backLabel="Regresar" >
             <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/procesos/factura.xhtml"/>
             <p:menuitem icon="ui-icon-script" value="Listado de Facturas" outcome="/procesos/listadoFacturas.xhtml"/>
             <p:menuitem icon="ui-icon-search" value="Consultar Precios" outcome="/procesos/main.xhtml" />
@@ -14,24 +14,26 @@
                 <p:menuitem icon="ui-icon-unlocked" value="Abrir Caja" outcome="/procesos/abrirCaja.xhtml"/>
                 <p:menuitem icon="ui-icon-locked" value="Cerrar Caja" outcome="/procesos/cerrarCaja.xhtml"/>                       
             </p:submenu>
-            <p:submenu label="Configuracion General" style="height: auto" expanded="false" >
-                <p:menuitem icon="ui-icon-suitcase" value="Empresa" outcome="/configuraciones/empresa.xhtml"/>
-                <p:menuitem icon="ui-icon-home" value="Sedes" outcome="/configuraciones/sede.xhtml" />
-                <p:menuitem icon="ui-icon-note" value="Documentos" outcome="/configuraciones/documento.xhtml" />
+            <p:submenu label="Configuracion" style="height: auto" >
+                <p:submenu label="General" style="height: auto" expanded="false">
+                    <p:menuitem icon="ui-icon-suitcase" value="Empresa" outcome="/configuraciones/empresa.xhtml"/>
+                    <p:menuitem icon="ui-icon-home" value="Sedes" outcome="/configuraciones/sede.xhtml" />
+                    <p:menuitem icon="ui-icon-note" value="Documentos" outcome="/configuraciones/documento.xhtml" />
+                </p:submenu>
+                <p:submenu label="Facturacion"  style="height: auto" expanded="false">
+                    <p:menuitem icon="ui-icon-contact" value="Clientes" outcome="/configuraciones/cliente.xhtml" />
+                    <p:menuitem icon="ui-icon-tag" value="Cajas" outcome="/configuraciones/caja.xhtml"/>
+                    <p:menuitem icon="ui-icon-document" value="Impuestos" outcome="/configuraciones/impuesto.xhtml" />
+                </p:submenu>
+                <p:submenu label="Inventario"  style="height: auto" expanded="false">
+                    <p:menuitem icon="ui-icon-pin-s" value="Productos" outcome="/configuraciones/producto.xhtml" />
+                    <p:menuitem icon="ui-icon-star" value="Kit" outcome="/configuraciones/kit.xhtml" />
+                </p:submenu>
+                <p:submenu label="Seguridad"  style="height: auto" expanded="false">
+                    <p:menuitem icon="ui-icon-person" value="Usuarios" outcome="/configuraciones/usuario.xhtml" />
+                </p:submenu>                
             </p:submenu>
-            <p:submenu label="Facturacion"  style="height: auto" expanded="false">
-                <p:menuitem icon="ui-icon-contact" value="Clientes" outcome="/configuraciones/cliente.xhtml" />
-                <p:menuitem icon="ui-icon-tag" value="Cajas" outcome="/configuraciones/caja.xhtml"/>
-                <p:menuitem icon="ui-icon-document" value="Impuestos" outcome="/configuraciones/impuesto.xhtml" />
-            </p:submenu>
-            <p:submenu label="Inventario"  style="height: auto" expanded="false">
-                <p:menuitem icon="ui-icon-pin-s" value="Productos" outcome="/configuraciones/producto.xhtml" />
-                <p:menuitem icon="ui-icon-star" value="Kit" outcome="/configuraciones/kit.xhtml" />
-            </p:submenu>
-            <p:submenu label="Seguridad"  style="height: auto" expanded="false">
-                <p:menuitem icon="ui-icon-person" value="Usuarios" outcome="/configuraciones/usuario.xhtml" />
-            </p:submenu>
-        </p:menu>
+        </p:slideMenu>
     </h:form>              
 </ui:composition>
 
