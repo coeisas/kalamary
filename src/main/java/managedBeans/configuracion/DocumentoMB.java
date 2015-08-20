@@ -87,6 +87,7 @@ public class DocumentoMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeSeleccionada = sesionMB.getSedeActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
+        activo = true;
     }
 
     public void cargarListaSedes() {
@@ -149,7 +150,7 @@ public class DocumentoMB implements Serializable {
         setNombreDocumento(null);
         setAbreviatura(null);
         setPrefijo(null);
-        setActivo(false);
+        setActivo(true);
         setRangoInicial(0);
         setRangoFinal(0);
         setNumActual(0);
