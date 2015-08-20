@@ -474,7 +474,11 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
             return;
         }
-        documento.setActDocumento(documento.getActDocumento() + 1);
+        if (documento.getActDocumento() == 0) {
+            documento.setActDocumento(documento.getIniDocumento());
+        } else {
+            documento.setActDocumento(documento.getActDocumento() + 1);
+        }
         if (!validarCampos(documento)) {
             return;
         }
@@ -704,7 +708,7 @@ public class FacturaMB implements Serializable {
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
-            parametros.put("resdian",documento.getCfgdocumento().getResDian());
+            parametros.put("resdian", documento.getCfgdocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();
