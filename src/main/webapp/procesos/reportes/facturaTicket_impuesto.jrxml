@@ -10,18 +10,18 @@
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="6" splitType="Stretch">
+		<band height="8" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="63" height="6" uuid="0e451a59-1138-4942-b250-fefbdada4b7d"/>
+				<reportElement x="0" y="0" width="63" height="8" uuid="0e451a59-1138-4942-b250-fefbdada4b7d"/>
 				<textElement>
-					<font size="4"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{impuesto}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="135" y="0" width="63" height="6" uuid="d1dbfb17-ef1d-49d7-bc38-733d4aaa2dec"/>
+				<reportElement x="135" y="0" width="63" height="8" uuid="d1dbfb17-ef1d-49d7-bc38-733d4aaa2dec"/>
 				<textElement textAlignment="Right">
-					<font size="4"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorImpuesto}]]></textFieldExpression>
 			</textField>

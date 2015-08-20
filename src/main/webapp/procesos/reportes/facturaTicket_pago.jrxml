@@ -9,18 +9,18 @@
 		<band splitType="Stretch"/>
 	</background>
 	<detail>
-		<band height="6" splitType="Stretch">
+		<band height="8" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="63" height="6" uuid="c5d65531-c37f-415a-9e7c-6c463448f874"/>
+				<reportElement x="0" y="0" width="63" height="8" uuid="c5d65531-c37f-415a-9e7c-6c463448f874"/>
 				<textElement>
-					<font size="4"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{formaPago}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0">
-				<reportElement x="135" y="0" width="63" height="6" uuid="5702d169-2e74-439b-954d-e2b0fb09056d"/>
+				<reportElement x="135" y="0" width="63" height="8" uuid="5702d169-2e74-439b-954d-e2b0fb09056d"/>
 				<textElement textAlignment="Right">
-					<font size="4"/>
+					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorPago}]]></textFieldExpression>
 			</textField>
