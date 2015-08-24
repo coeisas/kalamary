@@ -12,10 +12,10 @@
         <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormCliente">
             <div style="text-align: center">
-                <p:panelGrid class="panelGridSinBorder" style="width: 78%; margin: 0 auto">
+                <p:panelGrid style="width: 78%; margin: 0 auto">
 
                     <f:facet name="header">
-                        <p:row><p:column colspan="3">Cliente</p:column></p:row>
+                        <p:row><p:column colspan="2">Cliente</p:column></p:row>
                     </f:facet>
 
                     <p:row>
@@ -25,8 +25,7 @@
                                 <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
                             </p:inputText>
                             <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
-                        </p:column>
-                        <p:column>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
                             <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
@@ -54,8 +53,7 @@
                                 <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
                                 <p:ajax event="change" update="IdSelectMunicipios" listener="#{clienteMB.actualizarMunicipios}"/>
                             </p:selectOneMenu>
-                        </p:column>
-                        <p:column>                            
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
                             <p:selectOneMenu id="IdSelectMunicipios" value="#{clienteMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
@@ -66,7 +64,7 @@
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="2">
+                        <p:column>
                             <p:outputLabel for="IdTipoCliente" class="labelFormularioObligatorio" value="Tipo Cliente:"/>
                             <p:selectOneMenu id="IdTipoCliente" value="#{clienteMB.idTipoCliente}" class="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
@@ -78,8 +76,7 @@
                         <p:column>
                             <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
                             <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerNombre}"/>
-                        </p:column>
-                        <p:column>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
                             <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoNombre}"/>                        
                         </p:column>
@@ -89,17 +86,16 @@
                         <p:column>
                             <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
                             <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.primerApellido}" />
-                        </p:column>
-                        <p:column>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
                             <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{clienteMB.segundoApellido}" />                                                
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="3">
+                        <p:column colspan="2">
                             <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
-                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{clienteMB.direccion}"/>
+                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="65" value="#{clienteMB.direccion}"/>
                             <div style="float: left;margin-left: 25px;height: 1.5em"/>
                             <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
                             <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{clienteMB.telefono}"/>                        
@@ -107,7 +103,7 @@
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="3">
+                        <p:column colspan="2">
                             <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
                             <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{clienteMB.mail}"/>                      
                             <div style="float: left;margin-left: 25px;height: 1.5em"/>
@@ -117,18 +113,17 @@
                     </p:row>
 
                     <p:row>
-                        <p:column>
+                        <p:column colspan="2">
                             <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
                             <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{clienteMB.cupoCredito}" />
-                        </p:column>
-                        <p:column colspan="2">                            
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
                             <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{clienteMB.tarjetaMembresia}" />
                         </p:column>
                     </p:row>
 
                     <p:row>
-                        <p:column colspan="3" style="text-align: center">
+                        <p:column colspan="2" style="text-align: center">
                             <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{clienteMB.accion}"/>&nbsp;
                             <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{clienteMB.cancelar}"/>
                         </p:column>

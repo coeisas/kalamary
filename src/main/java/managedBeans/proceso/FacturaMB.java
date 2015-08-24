@@ -474,7 +474,11 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
             return;
         }
-        documento.setActDocumento(documento.getActDocumento() + 1);
+        if (documento.getActDocumento() == 0) {
+            documento.setActDocumento(documento.getIniDocumento());
+        } else {
+            documento.setActDocumento(documento.getActDocumento() + 1);
+        }
         if (!validarCampos(documento)) {
             return;
         }
@@ -687,7 +691,7 @@ public class FacturaMB implements Serializable {
             }
             CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
-            parametros.put("direccion", sedeActual.getDireccion() + " " + sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            parametros.put("direccion", sedeActual.getDireccion());
             String telefono = sedeActual.getTel1();
             if (sedeActual.getTel2() != null && !sedeActual.getTel2().isEmpty()) {
                 telefono = telefono + "-".concat(sedeActual.getTel2());
@@ -695,14 +699,16 @@ public class FacturaMB implements Serializable {
             parametros.put("telefono", telefono);
             parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
-            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
+            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
             parametros.put("fecha", documento.getFecCrea());
+            parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             parametros.put("usuario", usuarioActual.nombreCompleto());
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
             parametros.put("SUBREPORT_DIR", rutaReportes);
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
+            parametros.put("resdian", documento.getCfgdocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();
