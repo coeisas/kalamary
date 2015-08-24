@@ -80,7 +80,11 @@ public class CfgEmpresasede implements Serializable {
     private String tel2;
     @Lob
     @Column(name = "mail", length = 65535)
-    private String mail;    
+    private String mail;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresasedeidSede")
+    private List<InvMovimiento> invMovimientoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
+    private List<InvConsolidado> invConsolidadoList;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresasedeidSede")
     private List<FacCaja> facCajaList;
     @OneToMany(mappedBy = "cfgempresasedeidSede")
@@ -197,6 +201,24 @@ public class CfgEmpresasede implements Serializable {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+    
+    @XmlTransient
+    public List<InvMovimiento> getInvMovimientoList() {
+        return invMovimientoList;
+    }
+
+    public void setInvMovimientoList(List<InvMovimiento> invMovimientoList) {
+        this.invMovimientoList = invMovimientoList;
+    }
+
+    @XmlTransient
+    public List<InvConsolidado> getInvConsolidadoList() {
+        return invConsolidadoList;
+    }
+
+    public void setInvConsolidadoList(List<InvConsolidado> invConsolidadoList) {
+        this.invConsolidadoList = invConsolidadoList;
     }
     
     @XmlTransient

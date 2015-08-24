@@ -7,9 +7,12 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
@@ -17,12 +20,14 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -37,20 +42,20 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "CfgProveedor.findByNumDoc", query = "SELECT c FROM CfgProveedor c WHERE c.numDoc = :numDoc"),
     @NamedQuery(name = "CfgProveedor.findByNomProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.nomProveedor = :nomProveedor"),
     @NamedQuery(name = "CfgProveedor.findByContactoProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.contactoProveedor = :contactoProveedor"),
-    @NamedQuery(name = "CfgProveedor.findByIdFormaPago", query = "SELECT c FROM CfgProveedor c WHERE c.idFormaPago = :idFormaPago"),
     @NamedQuery(name = "CfgProveedor.findByDirProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.dirProveedor = :dirProveedor"),
     @NamedQuery(name = "CfgProveedor.findByTel1Proveedor", query = "SELECT c FROM CfgProveedor c WHERE c.tel1Proveedor = :tel1Proveedor"),
     @NamedQuery(name = "CfgProveedor.findByTel2Proveedor", query = "SELECT c FROM CfgProveedor c WHERE c.tel2Proveedor = :tel2Proveedor"),
     @NamedQuery(name = "CfgProveedor.findByWebsiteProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.websiteProveedor = :websiteProveedor"),
     @NamedQuery(name = "CfgProveedor.findByMailProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.mailProveedor = :mailProveedor"),
-    @NamedQuery(name = "CfgProveedor.findByFecCrea", query = "SELECT c FROM CfgProveedor c WHERE c.fecCrea = :fecCrea")})
+    @NamedQuery(name = "CfgProveedor.findByFecCrea", query = "SELECT c FROM CfgProveedor c WHERE c.fecCrea = :fecCrea"),
+    @NamedQuery(name = "CfgProveedor.findByMail2Proveedor", query = "SELECT c FROM CfgProveedor c WHERE c.mail2Proveedor = :mail2Proveedor")})
 public class CfgProveedor implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "idProveedor", nullable = false)
-    private Integer idProveedor;
+    private Long idProveedor;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
@@ -65,12 +70,6 @@ public class CfgProveedor implements Serializable {
     @Column(name = "contactoProveedor", length = 150)
     private String contactoProveedor;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "idFormaPago", nullable = false)
-    private int idFormaPago;
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 150)
     @Column(name = "dirProveedor", nullable = false, length = 150)
     private String dirProveedor;
     @Basic(optional = false)
@@ -84,20 +83,25 @@ public class CfgProveedor implements Serializable {
     @Size(max = 30)
     @Column(name = "websiteProveedor", length = 30)
     private String websiteProveedor;
-    @Size(max = 30)
-    @Column(name = "mailProveedor", length = 30)
+    @Column(name = "mailProveedor", length = 100)
     private String mailProveedor;
     @Lob
     @Column(name = "logo")
     private byte[] logo;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
+    @Column(name = "mail2Proveedor", length = 45)
+    private String mail2Proveedor;
+    @OneToMany(mappedBy = "cfgproveedoridProveedor")
+    private List<InvMovimiento> invMovimientoList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
+    @JoinColumn(name = "cfg_formaPago_proveedor_idFormaPago", referencedColumnName = "idFormaPago", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgformaPagoproveedor cfgformaPagoproveedoridFormaPago;
     @JoinColumns({
         @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio", nullable = false),
         @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
@@ -113,25 +117,24 @@ public class CfgProveedor implements Serializable {
     public CfgProveedor() {
     }
 
-    public CfgProveedor(Integer idProveedor) {
+    public CfgProveedor(Long idProveedor) {
         this.idProveedor = idProveedor;
     }
 
-    public CfgProveedor(Integer idProveedor, String numDoc, String nomProveedor, int idFormaPago, String dirProveedor, String tel1Proveedor, Date fecCrea) {
+    public CfgProveedor(Long idProveedor, String numDoc, String nomProveedor, String dirProveedor, String tel1Proveedor, Date fecCrea) {
         this.idProveedor = idProveedor;
         this.numDoc = numDoc;
         this.nomProveedor = nomProveedor;
-        this.idFormaPago = idFormaPago;
         this.dirProveedor = dirProveedor;
         this.tel1Proveedor = tel1Proveedor;
         this.fecCrea = fecCrea;
     }
 
-    public Integer getIdProveedor() {
+    public Long getIdProveedor() {
         return idProveedor;
     }
 
-    public void setIdProveedor(Integer idProveedor) {
+    public void setIdProveedor(Long idProveedor) {
         this.idProveedor = idProveedor;
     }
 
@@ -157,14 +160,6 @@ public class CfgProveedor implements Serializable {
 
     public void setContactoProveedor(String contactoProveedor) {
         this.contactoProveedor = contactoProveedor;
-    }
-
-    public int getIdFormaPago() {
-        return idFormaPago;
-    }
-
-    public void setIdFormaPago(int idFormaPago) {
-        this.idFormaPago = idFormaPago;
     }
 
     public String getDirProveedor() {
@@ -223,12 +218,37 @@ public class CfgProveedor implements Serializable {
         this.fecCrea = fecCrea;
     }
 
+    public String getMail2Proveedor() {
+        return mail2Proveedor;
+    }
+
+    public void setMail2Proveedor(String mail2Proveedor) {
+        this.mail2Proveedor = mail2Proveedor;
+    }
+
+    @XmlTransient
+    public List<InvMovimiento> getInvMovimientoList() {
+        return invMovimientoList;
+    }
+
+    public void setInvMovimientoList(List<InvMovimiento> invMovimientoList) {
+        this.invMovimientoList = invMovimientoList;
+    }
+
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }
 
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
+    }
+
+    public CfgformaPagoproveedor getCfgformaPagoproveedoridFormaPago() {
+        return cfgformaPagoproveedoridFormaPago;
+    }
+
+    public void setCfgformaPagoproveedoridFormaPago(CfgformaPagoproveedor cfgformaPagoproveedoridFormaPago) {
+        this.cfgformaPagoproveedoridFormaPago = cfgformaPagoproveedoridFormaPago;
     }
 
     public CfgMunicipio getCfgMunicipio() {

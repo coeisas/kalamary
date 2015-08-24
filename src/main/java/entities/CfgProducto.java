@@ -100,7 +100,14 @@ public class CfgProducto implements Serializable {
     private String color;
     @Lob
     @Column(name = "talla", length = 65535)
-    private String talla;    
+    private String talla;
+    @Basic(optional = false)
+    @Column(name = "esServicio", nullable = false)
+    private boolean esServicio;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
+    private List<InvMovimientoDetalle> invMovimientoDetalleList;    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
+    private List<InvConsolidado> invConsolidadoList;    
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -264,6 +271,32 @@ public class CfgProducto implements Serializable {
 
     public void setTalla(String talla) {
         this.talla = talla;
+    }
+    
+    public boolean getEsServicio() {
+        return esServicio;
+    }
+
+    public void setEsServicio(boolean esServicio) {
+        this.esServicio = esServicio;
+    }
+
+    @XmlTransient
+    public List<InvMovimientoDetalle> getInvMovimientoDetalleList() {
+        return invMovimientoDetalleList;
+    }
+
+    public void setInvMovimientoDetalleList(List<InvMovimientoDetalle> invMovimientoDetalleList) {
+        this.invMovimientoDetalleList = invMovimientoDetalleList;
+    }
+
+    @XmlTransient
+    public List<InvConsolidado> getInvConsolidadoList() {
+        return invConsolidadoList;
+    }
+
+    public void setInvConsolidadoList(List<InvConsolidado> invConsolidadoList) {
+        this.invConsolidadoList = invConsolidadoList;
     }
     
     @XmlTransient
