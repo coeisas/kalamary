@@ -48,7 +48,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgProveedor.findByWebsiteProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.websiteProveedor = :websiteProveedor"),
     @NamedQuery(name = "CfgProveedor.findByMailProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.mailProveedor = :mailProveedor"),
     @NamedQuery(name = "CfgProveedor.findByFecCrea", query = "SELECT c FROM CfgProveedor c WHERE c.fecCrea = :fecCrea"),
-    @NamedQuery(name = "CfgProveedor.findByMail2Proveedor", query = "SELECT c FROM CfgProveedor c WHERE c.mail2Proveedor = :mail2Proveedor")})
+    @NamedQuery(name = "CfgProveedor.findByMail2Proveedor", query = "SELECT c FROM CfgProveedor c WHERE c.mail2Proveedor = :mail2Proveedor"),
+    @NamedQuery(name = "CfgProveedor.findByCupoCredito", query = "SELECT c FROM CfgProveedor c WHERE c.cupoCredito = :cupoCredito")})
 public class CfgProveedor implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -94,6 +95,9 @@ public class CfgProveedor implements Serializable {
     private Date fecCrea;
     @Column(name = "mail2Proveedor", length = 45)
     private String mail2Proveedor;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "cupoCredito", precision = 12)
+    private Float cupoCredito;    
     @OneToMany(mappedBy = "cfgproveedoridProveedor")
     private List<InvMovimiento> invMovimientoList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -129,7 +133,7 @@ public class CfgProveedor implements Serializable {
         this.tel1Proveedor = tel1Proveedor;
         this.fecCrea = fecCrea;
     }
-
+    
     public Long getIdProveedor() {
         return idProveedor;
     }
@@ -225,6 +229,14 @@ public class CfgProveedor implements Serializable {
     public void setMail2Proveedor(String mail2Proveedor) {
         this.mail2Proveedor = mail2Proveedor;
     }
+    
+    public Float getCupoCredito() {
+        return cupoCredito;
+    }
+
+    public void setCupoCredito(Float cupoCredito) {
+        this.cupoCredito = cupoCredito;
+    }    
 
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
