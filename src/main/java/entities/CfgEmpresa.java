@@ -25,8 +25,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -57,59 +55,51 @@ public class CfgEmpresa implements Serializable {
     @Column(name = "idEmpresa", nullable = false)
     private Integer idEmpresa;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "numDoc", nullable = false, length = 20)
     private String numDoc;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 150)
     @Column(name = "nomEmpresa", nullable = false, length = 150)
     private String nomEmpresa;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 150)
     @Column(name = "dirEmpresa", nullable = false, length = 150)
     private String dirEmpresa;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "tel1", nullable = false, length = 10)
     private String tel1;
-    @Size(max = 10)
     @Column(name = "tel2", length = 10)
     private String tel2;
-    @Size(max = 30)
     @Column(name = "website", length = 30)
     private String website;
-    @Size(max = 30)
     @Column(name = "mail", length = 30)
     private String mail;
     @Lob
     @Column(name = "logo")
     private byte[] logo;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "cod_empresa", nullable = false, length = 5)
     private String codEmpresa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgCliente> cfgClienteList;    
+    private List<CfgCliente> cfgClienteList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgProveedor> cfgProveedorList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgFormapago> cfgFormapagoList;   
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgKitproductomaestro> cfgKitproductomaestroList;
+    private List<CfgformaPagoproveedor> cfgformaPagoproveedorList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
     private List<CfgReferenciaproducto> cfgReferenciaproductoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgMarcaproducto> cfgMarcaproductoList;    
+    private List<CfgMarcaproducto> cfgMarcaproductoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
+    private List<CfgProveedor> cfgProveedorList;
+    @OneToMany(mappedBy = "cfgempresaidEmpresa")
+    private List<SegUsuario> segUsuarioList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
+    private List<CfgFormapago> cfgFormapagoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
+    private List<CfgKitproductomaestro> cfgKitproductomaestroList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
+    private List<CfgMovInventarioMaestro> cfgMovInventarioMaestroList;
     @JoinColumns({
         @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio", nullable = false),
         @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
@@ -235,7 +225,7 @@ public class CfgEmpresa implements Serializable {
     public void setCodEmpresa(String codEmpresa) {
         this.codEmpresa = codEmpresa;
     }
-    
+
     @XmlTransient
     public List<CfgCliente> getCfgClienteList() {
         return cfgClienteList;
@@ -244,7 +234,17 @@ public class CfgEmpresa implements Serializable {
     public void setCfgClienteList(List<CfgCliente> cfgClienteList) {
         this.cfgClienteList = cfgClienteList;
     }
-      @XmlTransient
+
+    @XmlTransient
+    public List<CfgformaPagoproveedor> getCfgformaPagoproveedorList() {
+        return cfgformaPagoproveedorList;
+    }
+
+    public void setCfgformaPagoproveedorList(List<CfgformaPagoproveedor> cfgformaPagoproveedorList) {
+        this.cfgformaPagoproveedorList = cfgformaPagoproveedorList;
+    }
+
+    @XmlTransient
     public List<CfgReferenciaproducto> getCfgReferenciaproductoList() {
         return cfgReferenciaproductoList;
     }
@@ -261,7 +261,7 @@ public class CfgEmpresa implements Serializable {
     public void setCfgMarcaproductoList(List<CfgMarcaproducto> cfgMarcaproductoList) {
         this.cfgMarcaproductoList = cfgMarcaproductoList;
     }
-    
+
     @XmlTransient
     public List<CfgProveedor> getCfgProveedorList() {
         return cfgProveedorList;
@@ -269,6 +269,15 @@ public class CfgEmpresa implements Serializable {
 
     public void setCfgProveedorList(List<CfgProveedor> cfgProveedorList) {
         this.cfgProveedorList = cfgProveedorList;
+    }
+
+    @XmlTransient
+    public List<SegUsuario> getSegUsuarioList() {
+        return segUsuarioList;
+    }
+
+    public void setSegUsuarioList(List<SegUsuario> segUsuarioList) {
+        this.segUsuarioList = segUsuarioList;
     }
 
     @XmlTransient
@@ -287,6 +296,15 @@ public class CfgEmpresa implements Serializable {
 
     public void setCfgKitproductomaestroList(List<CfgKitproductomaestro> cfgKitproductomaestroList) {
         this.cfgKitproductomaestroList = cfgKitproductomaestroList;
+    }
+
+    @XmlTransient
+    public List<CfgMovInventarioMaestro> getCfgMovInventarioMaestroList() {
+        return cfgMovInventarioMaestroList;
+    }
+
+    public void setCfgMovInventarioMaestroList(List<CfgMovInventarioMaestro> cfgMovInventarioMaestroList) {
+        this.cfgMovInventarioMaestroList = cfgMovInventarioMaestroList;
     }
 
     public CfgMunicipio getCfgMunicipio() {

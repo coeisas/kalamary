@@ -10,7 +10,7 @@
     <ui:define name="title">Movimiento Inventario</ui:define>
     <ui:define name="content">
         <h:form id="IdFormMovimientoInventario">
-            <p:panelGrid style="margin: 0 auto">
+            <p:panelGrid style="margin: 0 auto;width: 50%">
                 <f:facet name="header">
                     <p:row>
                         <p:column>
@@ -19,53 +19,98 @@
                     </p:row>
                 </f:facet>
                 <p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
+                            <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{movimientoInventarioMB.buscarProveedor}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{movimientoInventarioMB.cargarProveedores}"/>                      
+                            <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.proveedor}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Forma de Pago:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.formaPago}">
+                                <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                                <f:selectItems value="#{movimientoInventarioMB.listaFormaPago}" var="formaPago" itemLabel="#{formaPago.descripcion}" itemValue="#{formaPago.idFormaPago}"/>
+                            </p:selectOneMenu>  
+                        </p:column>
+                    </p:row>                    
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Tipo Movimiento:"/>
-                        <p:selectOneMenu class="campoFormulario">
-                            <f:selectItem itemLabel="..." itemValue="0"/>
+                        <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioMaestro}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{movimientoInventarioMB.listaMovInventarioMaestro}" var="movInvMaestro" itemLabel="#{movInvMaestro.nombreMovimiento}" itemValue="#{movInvMaestro.idMovInventarioMaestro}"/>
+                            <p:ajax event="change" listener="#{movimientoInventarioMB.cargarListaMovInventarioDetalle}" update="@none"/>
                         </p:selectOneMenu>
-                        <p:selectOneMenu class="campoFormulario">
-                            <f:selectItem itemLabel="..." itemValue="0"/>
+                        <p:selectOneMenu id="IdListDetalleMovimiento" class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioDetalle}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{movimientoInventarioMB.listaMovInventarioDetalle}" var="movInvDetalle" itemLabel="#{movInvDetalle.nomMovimientoDetalle}" itemValue="#{movInvDetalle.idMovInventarioDetalle}"/>
                         </p:selectOneMenu>                        
                     </p:column>
                 </p:row>
                 <p:row>
-                    <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
-                        <p:inputText class="campoFormulario"/>
-                        <p:commandButton icon="ui-icon-search" class="campoFormulario"/>
-                        <p:outputLabel class="labelFormulario" value="Forma de Pago:"/>
-                        <p:inputText class="campoFormulario"/>
-                    </p:column>
-                </p:row>
-                <p:row>
                     <p:column style="text-align: center">
-                        <p:commandButton icon="ui-icon-plus" value="Insertar Producto" title="Insertar Producto"/>
+                        <p:commandButton icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{movimientoInventarioMB.cargarModalProductos}"/>
                     </p:column>
                 </p:row>
             </p:panelGrid>
             <br/>
             <p:dataTable
                 id="IdTableMovimientoInventario"
+                value="#{movimientoInventarioMB.listaItemsInventarioMovimiento}"
+                var="itemsInventario"
+                rowKey="#{itemsInventario.invMovimientoDetallePK}"
                 style="width: 90%;margin: 0 auto"
                 emptyMessage="No hay elemento insertado">
-                <p:column headerText="Codigo"></p:column>
-                <p:column headerText="Producto"></p:column>
-                <p:column headerText="Cantidad"></p:column>
-                <p:column headerText="Costo Adquisicion"></p:column>
-                <p:column headerText="Descuento"></p:column>
-                <p:column headerText="%IVA"></p:column>
-                <p:column headerText="%Flete"></p:column>
-                <p:column headerText="%Costo Indirecto"></p:column>
-                <p:column headerText="Costo Final"></p:column>
+                <p:column headerText="Codigo">#{itemsInventario.cfgProducto.codProducto}</p:column>
+                <p:column headerText="Producto">#{itemsInventario.cfgProducto.nomProducto}</p:column>
+                <p:column headerText="Cantidad">#{itemsInventario.cantidad}</p:column>
+                <p:column headerText="Costo Adquisicion">#{itemsInventario.costoAdquisicion}</p:column>
+                <p:column headerText="Descuento">#{itemsInventario.descuento}</p:column>
+                <p:column headerText="%IVA">#{itemsInventario.iva}</p:column>
+                <p:column headerText="%Flete">#{itemsInventario.flete}</p:column>
+                <p:column headerText="%Costo Indirecto">#{itemsInventario.costoIndirecto}</p:column>
+                <p:column headerText="Costo Final">#{itemsInventario.costoFinal}</p:column>
             </p:dataTable>
             <br/>
             <div style="text-align: center">
                 <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar Movimiento"/>&nbsp;
-                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"/>
-                
+                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"/>               
             </div>
         </h:form>
+        <p:dialog widgetVar="dlgProveedor" header="BUSCAR PROVEEDOR" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarProveedor">
+                <p:dataTable value="#{movimientoInventarioMB.listaProveedor}" var="proveedor" emptyMessage="No se encontraron proveedores" selectionMode="single" selection="#{movimientoInventarioMB.proveedorSeleccionado}" rows="10" rowKey="#{proveedor.idProveedor}" lazy="true" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{proveedor.cfgTipoidentificacionId.abreviatura} - #{proveedor.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{proveedor.nomProveedor}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{movimientoInventarioMB.cargarInformacionProveedor}"/>
+            </h:form>                                
+        </p:dialog>
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{movimientoInventarioMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{movimientoInventarioMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{producto.precio}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Insertar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+            </h:form>
+        </p:dialog>        
     </ui:define>
 
 </ui:composition>

@@ -6,9 +6,12 @@
 package facades;
 
 import entities.CfgMovInventarioDetalle;
+import entities.CfgMovInventarioMaestro;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class CfgMovInventarioDetalleFacade extends AbstractFacade<CfgMovInventarioDetalle> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -27,5 +31,15 @@ public class CfgMovInventarioDetalleFacade extends AbstractFacade<CfgMovInventar
     public CfgMovInventarioDetalleFacade() {
         super(CfgMovInventarioDetalle.class);
     }
-    
+
+    public List<CfgMovInventarioDetalle> buscarByMaestro(CfgMovInventarioMaestro maestro) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgMovInventarioDetalle d WHERE d.cfgmovinventariomaestroidMovInventarioMaestro = ?1");
+            query.setParameter(1, maestro);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

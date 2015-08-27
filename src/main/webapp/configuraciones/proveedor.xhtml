@@ -63,71 +63,71 @@
                         <p:selectOneMenu class="campoFormulario" value="#{proveedorMB.formaPago}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{proveedorMB.listaFormaPago}" var="formaPago" itemLabel="#{formaPago.descripcion}" itemValue="#{formaPago.idFormaPago}"/>
-                    </p:selectOneMenu>
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column>
-                    <p:outputLabel class="labelFormularioObligatorio" value="Direccion:"/>
-                    <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.direccion}" />
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column>
-                    <p:outputLabel class="labelFormularioObligatorio" value="Telefono 1:"/>
-                    <p:inputText class="campoFormulario" value="#{proveedorMB.telefono1}"/>
-                    <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                    <p:outputLabel class="labelFormulario" value="Telefono 2:"/>
-                    <p:inputText class="campoFormulario" value="#{proveedorMB.telefono2}"/>  
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column>
-                    <p:outputLabel class="labelFormulario" value="Website:"/>
-                    <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.website}"/>
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column>
-                    <p:outputLabel class="labelFormularioObligatorio" value="Mail 1:"/>
-                    <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail1}"/>
-                    <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                    <p:outputLabel class="labelFormulario" value="Mail 2:"/>
-                    <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail2}"/>
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column>
-                    <p:outputLabel class="labelFormulario" value="Cupo de Credito:"/>
-                    <p:inputText class="campoFormulario" value="#{proveedorMB.cupoCredito}"/>
-                    <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                    <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Logo"/>
-                </p:column>
-            </p:row>
-            <p:row>
-                <p:column style="text-align: center">
-                    <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{proveedorMB.accion}"/>&nbsp;
-                    <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{proveedorMB.cancelar}"/>
-                </p:column>
-            </p:row>
-        </p:panelGrid>
-    </h:form>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Direccion:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.direccion}" />
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Telefono 1:"/>
+                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono1}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Telefono 2:"/>
+                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono2}"/>  
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Website:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.website}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Mail 1:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail1}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Mail 2:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail2}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Cupo de Credito:"/>
+                        <p:inputText class="campoFormulario" value="#{proveedorMB.cupoCredito}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Logo"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{proveedorMB.accion}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{proveedorMB.cancelar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
 
-    <p:dialog widgetVar="dlgProveedor" header="BUSCAR PROVEEDOR" modal="true" resizable="false" width="50%">
-        <h:form id="FormBuscarProveedor">
-            <p:dataTable value="#{proveedorMB.listaProveedor}" var="proveedor" emptyMessage="No se encontraron proveedores" selectionMode="single" selection="#{proveedorMB.proveedorSeleccionado}" rows="10" rowKey="#{proveedor.idProveedor}" lazy="true" paginator="true" paginatorPosition="bottom">
-                <p:column headerText="Identificacion">
-                    <h:outputText value="#{proveedor.cfgTipoidentificacionId.abreviatura} - #{proveedor.numDoc}"/>
-                </p:column>
-                <p:column headerText="Nombre">
-                    <h:outputText value="#{proveedor.nomProveedor}"/>
-                </p:column>
-            </p:dataTable>
-            <p:separator/>
-            <p:commandButton value="Aceptar" actionListener="#{proveedorMB.cargarInformacionProveedor}"/>
-        </h:form>                                
-    </p:dialog>
-</ui:define>
+        <p:dialog widgetVar="dlgProveedor" header="BUSCAR PROVEEDOR" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarProveedor">
+                <p:dataTable value="#{proveedorMB.listaProveedor}" var="proveedor" emptyMessage="No se encontraron proveedores" selectionMode="single" selection="#{proveedorMB.proveedorSeleccionado}" rows="10" rowKey="#{proveedor.idProveedor}" lazy="true" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{proveedor.cfgTipoidentificacionId.abreviatura} - #{proveedor.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{proveedor.nomProveedor}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{proveedorMB.cargarInformacionProveedor}"/>
+            </h:form>                                
+        </p:dialog>
+    </ui:define>
 
 </ui:composition>
 

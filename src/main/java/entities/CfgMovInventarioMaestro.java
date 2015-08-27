@@ -14,6 +14,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -47,6 +49,9 @@ public class CfgMovInventarioMaestro implements Serializable {
     private String nombreMovimiento;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgmovinventariomaestroidMovInventarioMaestro")
     private List<CfgMovInventarioDetalle> cfgMovInventarioDetalleList;
+    @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgEmpresa cfgempresaidEmpresa;   
 
     public CfgMovInventarioMaestro() {
     }
@@ -92,6 +97,14 @@ public class CfgMovInventarioMaestro implements Serializable {
     public void setCfgMovInventarioDetalleList(List<CfgMovInventarioDetalle> cfgMovInventarioDetalleList) {
         this.cfgMovInventarioDetalleList = cfgMovInventarioDetalleList;
     }
+    
+    public CfgEmpresa getCfgempresaidEmpresa() {
+        return cfgempresaidEmpresa;
+    }
+
+    public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
+        this.cfgempresaidEmpresa = cfgempresaidEmpresa;
+    }  
 
     @Override
     public int hashCode() {
@@ -117,5 +130,5 @@ public class CfgMovInventarioMaestro implements Serializable {
     public String toString() {
         return "entities.CfgMovInventarioMaestro[ idMovInventarioMaestro=" + idMovInventarioMaestro + " ]";
     }
-    
+
 }

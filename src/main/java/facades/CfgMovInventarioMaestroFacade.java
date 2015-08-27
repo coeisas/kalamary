@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.CfgEmpresa;
 import entities.CfgMovInventarioMaestro;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +29,16 @@ public class CfgMovInventarioMaestroFacade extends AbstractFacade<CfgMovInventar
 
     public CfgMovInventarioMaestroFacade() {
         super(CfgMovInventarioMaestro.class);
+    }
+    
+    public List<CfgMovInventarioMaestro> buscarByEmpresa(CfgEmpresa empresa){
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
     }
     
 }
