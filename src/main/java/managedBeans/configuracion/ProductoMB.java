@@ -22,6 +22,7 @@ import javax.faces.context.FacesContext;
 import org.primefaces.context.RequestContext;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Date;
 import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -53,6 +54,7 @@ public class ProductoMB implements Serializable {
     private float utilidad;
     private float precio;
     private boolean activo;
+    private boolean esServicio;
 
     private String nombreEmpresa;
     private SesionMB sesionMB;
@@ -109,6 +111,7 @@ public class ProductoMB implements Serializable {
         listFormsModal.add("FormModalMarca");
         listFormsModal.add("FormModalProducto");
         activo = true;
+        esServicio = false;
     }
 
     private void limpiarFormulario() {
@@ -125,7 +128,8 @@ public class ProductoMB implements Serializable {
         setCostoFinal(0);
         utilidad = 0;
         setPrecio(0);
-        activo = false;
+        activo = true;
+        esServicio = false;
     }
 
     public void cargarInformacionCategoria() {
@@ -165,27 +169,27 @@ public class ProductoMB implements Serializable {
         }
     }
 
-    public void buscarProducto() {
-        if (empresaSeleccionada != null) {
-            if (marcaSeleccionada != null) {
-                productoSeleccionado = productoFacade.buscarPorEmpresaAndMarcaAndCodigo(empresaSeleccionada, marcaSeleccionada, codigoProducto.trim());
-            } else if (referenciaSeleccionada != null) {
-                productoSeleccionado = productoFacade.buscarPorEmpresaAndReferenciaAndCodigo(empresaSeleccionada, referenciaSeleccionada, codigoProducto.trim());
-            } else if (categoriaSeleccionada != null) {
-                productoSeleccionado = productoFacade.buscarPorEmpresaAndCategoriaAndCodigo(empresaSeleccionada, categoriaSeleccionada, codigoProducto.trim());
-            } else {
-                productoSeleccionado = productoFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, codigoProducto.trim());
-            }
-            cargarInformacionProducto();
-//            if (productoSeleccionado == null && !codigoProducto.trim().isEmpty()) {
-//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro el producto"));
+//    public void buscarProducto() {
+//        if (empresaSeleccionada != null) {
+//            if (marcaSeleccionada != null) {
+//                productoSeleccionado = productoFacade.buscarPorEmpresaAndMarcaAndCodigo(empresaSeleccionada, marcaSeleccionada, codigoProducto.trim());
+//            } else if (referenciaSeleccionada != null) {
+//                productoSeleccionado = productoFacade.buscarPorEmpresaAndReferenciaAndCodigo(empresaSeleccionada, referenciaSeleccionada, codigoProducto.trim());
+//            } else if (categoriaSeleccionada != null) {
+//                productoSeleccionado = productoFacade.buscarPorEmpresaAndCategoriaAndCodigo(empresaSeleccionada, categoriaSeleccionada, codigoProducto.trim());
+//            } else {
+//                productoSeleccionado = productoFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, codigoProducto.trim());
 //            }
-        } else {
-            productoSeleccionado = null;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la empresa"));
-        }
-
-    }
+//            cargarInformacionProducto();
+////            if (productoSeleccionado == null && !codigoProducto.trim().isEmpty()) {
+////                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro el producto"));
+////            }
+//        } else {
+//            productoSeleccionado = null;
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la empresa"));
+//        }
+//
+//    }
 
     public void cargarInformacionProducto() {
         if (productoSeleccionado != null) {
@@ -206,6 +210,7 @@ public class ProductoMB implements Serializable {
             setUtilidad(determinarValor(productoSeleccionado.getUtilidad()));
             setPrecio((float) productoSeleccionado.getPrecio());
             setActivo(productoSeleccionado.getActivo());
+            setEsServicio(productoSeleccionado.getEsServicio());
 
         } else {
             setCodigoBarra(null);
@@ -220,7 +225,8 @@ public class ProductoMB implements Serializable {
             setCostoFinal(0);
             setUtilidad(0);
             setPrecio(0);
-            setActivo(false);
+            setActivo(true);
+            setEsServicio(false);
         }
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
@@ -240,15 +246,18 @@ public class ProductoMB implements Serializable {
         }
         try {
             productoSeleccionado.setCfgmarcaproductoidMarca(marcaSeleccionada);
-            productoSeleccionado.setNomProducto(nombreProducto);
+            productoSeleccionado.setNomProducto(nombreProducto.toUpperCase());
             productoSeleccionado.setStockMin(stockMin);
             productoSeleccionado.setCostoAdquisicion(costoAdq);
+            productoSeleccionado.setColor(color.toUpperCase());
+            productoSeleccionado.setTalla(talla.toUpperCase());
             productoSeleccionado.setIva(iva);
             productoSeleccionado.setFlete(flete);
             productoSeleccionado.setCostoIndirecto(costoInd);
             productoSeleccionado.setCosto(getCostoFinal());
             productoSeleccionado.setUtilidad(utilidad);
             productoSeleccionado.setPrecio(getPrecio());
+            productoSeleccionado.setEsServicio(esServicio);
             productoFacade.edit(productoSeleccionado);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto modificado"));
         } catch (Exception e) {
@@ -276,8 +285,10 @@ public class ProductoMB implements Serializable {
         }
         try {
             CfgProducto producto = new CfgProducto();
+            producto.setCodProducto(codigoProducto.toUpperCase());
             producto.setCfgmarcaproductoidMarca(marcaSeleccionada);
-            producto.setNomProducto(nombreProducto);
+            producto.setNomProducto(nombreProducto.toUpperCase());
+            producto.setCodBarProducto(codigoBarra.toUpperCase());
             producto.setStockMin(stockMin);
             producto.setCostoAdquisicion(costoAdq);
             producto.setIva(iva);
@@ -285,11 +296,19 @@ public class ProductoMB implements Serializable {
             producto.setCostoIndirecto(costoInd);
             producto.setCosto(getCostoFinal());
             producto.setUtilidad(utilidad);
+            producto.setColor(color.toUpperCase());
+            producto.setTalla(talla.toUpperCase());            
             producto.setPrecio(getPrecio());
+            producto.setEsServicio(esServicio);
+            producto.setActivo(activo);
+            producto.setFecCrea(new Date());
+            producto.setCfgempresaidEmpresa(empresaSeleccionada);
+            producto.setSegusuarioidUsuario(usuarioActual);
             productoFacade.create(producto);
+            cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no creado"));
         }
     }
 
@@ -551,6 +570,14 @@ public class ProductoMB implements Serializable {
 
     public void setCostoFinal(float costoFinal) {
         this.costoFinal = costoFinal;
+    }
+
+    public boolean isEsServicio() {
+        return esServicio;
+    }
+
+    public void setEsServicio(boolean esServicio) {
+        this.esServicio = esServicio;
     }
 
 }

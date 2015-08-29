@@ -36,13 +36,13 @@
                     <p:row>
                         <p:column>
                             <p:outputLabel class="labelFormularioObligatorio" value="Codigo Producto:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.codigoProducto}">
-                                <p:ajax event="blur" listener="#{productoMB.buscarProducto}" update="@none"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.codigoProducto}">
+                                <!--p:ajax event="blur" listener="# {productoMB.buscarProducto}" update="@none"/-->
                             </p:inputText>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{productoMB.cargarProductos}"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Codigo Barras:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.codigoBarra}" size="15"/>
+                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.codigoBarra}" size="15"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Color:"/>
                             <p:inputText class="campoFormulario upperCase" value="#{productoMB.color}"/>
@@ -103,13 +103,16 @@
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
                             <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
+                            <p:outputLabel class="labelFormulario" value="Servicio:"/>
+                            <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.esServicio}" />                            
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column style="text-align: center">
                             <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{productoMB.determinarAccion}"/>
                             &nbsp;
-                            <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{productoMB.cancelar()}"/>
+                            <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{productoMB.cancelar}"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>

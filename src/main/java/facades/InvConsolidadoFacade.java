@@ -5,10 +5,14 @@
  */
 package facades;
 
+import entities.CfgEmpresasede;
+import entities.CfgProducto;
 import entities.InvConsolidado;
 import javax.ejb.Stateless;
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -28,4 +32,15 @@ public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
         super(InvConsolidado.class);
     }
     
+    public InvConsolidado buscarByEmpresaAndProducto(CfgEmpresasede sede, CfgProducto producto){
+        try {
+            Query query = em.createQuery("SELECT c FROM InvConsolidado c WHERE c.cfgEmpresasede = ?1 AND c.cfgProducto = ?2");
+            query.setParameter(1, sede);
+            query.setParameter(2, producto);
+            return (InvConsolidado) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+           
+    }
 }

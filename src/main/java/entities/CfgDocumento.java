@@ -24,8 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -58,42 +56,31 @@ public class CfgDocumento implements Serializable {
     @Column(name = "idDoc", nullable = false)
     private Integer idDoc;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "nomDoc", nullable = false, length = 25)
     private String nomDoc;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 3)
     @Column(name = "abreviatura", nullable = false, length = 3)
     private String abreviatura;
-    @Size(max = 5)
     @Column(name = "prefijoDoc", length = 5)
     private String prefijoDoc;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "activo", nullable = false)
     private boolean activo;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "iniDocumento", nullable = false)
     private int iniDocumento;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "finDocumento", nullable = false)
     private int finDocumento;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "actDocumento", nullable = false)
     private int actDocumento;
-    @Size(max = 200)
     @Column(name = "resDian", length = 200)
     private String resDian;
     @Lob
-    @Size(max = 65535)
     @Column(name = "obsDocumento", length = 65535)
     private String obsDocumento;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
@@ -103,6 +90,8 @@ public class CfgDocumento implements Serializable {
     @Basic(optional = false)
     @Column(name = "finalizado", nullable = false)
     private boolean finalizado;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgDocumento")
+    private List<InvMovimiento> invMovimientoList;
     @JoinColumn(name = "cfg_aplicaciondocumento_idaplicacion", referencedColumnName = "idaplicacion")
     @ManyToOne
     private CfgAplicaciondocumento cfgAplicaciondocumentoIdaplicacion;
@@ -241,6 +230,15 @@ public class CfgDocumento implements Serializable {
         this.finalizado = finalizado;
     }
 
+    @XmlTransient
+    public List<InvMovimiento> getInvMovimientoList() {
+        return invMovimientoList;
+    }
+
+    public void setInvMovimientoList(List<InvMovimiento> invMovimientoList) {
+        this.invMovimientoList = invMovimientoList;
+    }
+    
     public CfgAplicaciondocumento getCfgAplicaciondocumentoIdaplicacion() {
         return cfgAplicaciondocumentoIdaplicacion;
     }

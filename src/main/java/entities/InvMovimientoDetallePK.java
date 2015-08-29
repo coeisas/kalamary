@@ -17,8 +17,11 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class InvMovimientoDetallePK implements Serializable {
     @Basic(optional = false)
-    @Column(name = "inv_movimiento_idMovInventario", nullable = false)
-    private long invmovimientoidMovInventario;
+    @Column(name = "inv_movimiento_cfg_documento_idDoc", nullable = false)
+    private int invmovimientocfgdocumentoidDoc;
+    @Basic(optional = false)
+    @Column(name = "inv_movimiento_numDoc", nullable = false)
+    private int invmovimientonumDoc;
     @Basic(optional = false)
     @Column(name = "cfg_producto_idProducto", nullable = false)
     private int cfgproductoidProducto;
@@ -26,17 +29,26 @@ public class InvMovimientoDetallePK implements Serializable {
     public InvMovimientoDetallePK() {
     }
 
-    public InvMovimientoDetallePK(long invmovimientoidMovInventario, int cfgproductoidProducto) {
-        this.invmovimientoidMovInventario = invmovimientoidMovInventario;
+    public InvMovimientoDetallePK(int invmovimientocfgdocumentoidDoc, int invmovimientonumDoc, int cfgproductoidProducto) {
+        this.invmovimientocfgdocumentoidDoc = invmovimientocfgdocumentoidDoc;
+        this.invmovimientonumDoc = invmovimientonumDoc;
         this.cfgproductoidProducto = cfgproductoidProducto;
     }
 
-    public long getInvmovimientoidMovInventario() {
-        return invmovimientoidMovInventario;
+    public int getInvmovimientocfgdocumentoidDoc() {
+        return invmovimientocfgdocumentoidDoc;
     }
 
-    public void setInvmovimientoidMovInventario(long invmovimientoidMovInventario) {
-        this.invmovimientoidMovInventario = invmovimientoidMovInventario;
+    public void setInvmovimientocfgdocumentoidDoc(int invmovimientocfgdocumentoidDoc) {
+        this.invmovimientocfgdocumentoidDoc = invmovimientocfgdocumentoidDoc;
+    }
+
+    public int getInvmovimientonumDoc() {
+        return invmovimientonumDoc;
+    }
+
+    public void setInvmovimientonumDoc(int invmovimientonumDoc) {
+        this.invmovimientonumDoc = invmovimientonumDoc;
     }
 
     public int getCfgproductoidProducto() {
@@ -50,7 +62,8 @@ public class InvMovimientoDetallePK implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (int) invmovimientoidMovInventario;
+        hash += (int) invmovimientocfgdocumentoidDoc;
+        hash += (int) invmovimientonumDoc;
         hash += (int) cfgproductoidProducto;
         return hash;
     }
@@ -62,7 +75,10 @@ public class InvMovimientoDetallePK implements Serializable {
             return false;
         }
         InvMovimientoDetallePK other = (InvMovimientoDetallePK) object;
-        if (this.invmovimientoidMovInventario != other.invmovimientoidMovInventario) {
+        if (this.invmovimientocfgdocumentoidDoc != other.invmovimientocfgdocumentoidDoc) {
+            return false;
+        }
+        if (this.invmovimientonumDoc != other.invmovimientonumDoc) {
             return false;
         }
         if (this.cfgproductoidProducto != other.cfgproductoidProducto) {
@@ -73,7 +89,7 @@ public class InvMovimientoDetallePK implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.InvMovimientoDetallePK[ invmovimientoidMovInventario=" + invmovimientoidMovInventario + ", cfgproductoidProducto=" + cfgproductoidProducto + " ]";
+        return "entities.InvMovimientoDetallePK[ invmovimientocfgdocumentoidDoc=" + invmovimientocfgdocumentoidDoc + ", invmovimientonumDoc=" + invmovimientonumDoc + ", cfgproductoidProducto=" + cfgproductoidProducto + " ]";
     }
     
 }

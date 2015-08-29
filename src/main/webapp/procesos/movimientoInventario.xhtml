@@ -6,11 +6,14 @@
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:p="http://primefaces.org/ui"
     xmlns:f="http://xmlns.jcp.org/jsf/core"
-    template="../templates/layout.xhtml">
+    template="../templates/layout.xhtml"
+    xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <ui:define name="title">Movimiento Inventario</ui:define>
     <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
         <h:form id="IdFormMovimientoInventario">
-            <p:panelGrid style="margin: 0 auto;width: 50%">
+            <p:remoteCommand name="updateTabla" actionListener="#{movimientoInventarioMB.updateTabla}"/>
+            <p:panelGrid style="margin: 0 auto;width: 90%">
                 <f:facet name="header">
                     <p:row>
                         <p:column>
@@ -19,25 +22,25 @@
                     </p:row>
                 </f:facet>
                 <p:row>
-                    <p:row>
-                        <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
-                            <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
-                                <p:ajax event="blur" listener="#{movimientoInventarioMB.buscarProveedor}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{movimientoInventarioMB.cargarProveedores}"/>                      
-                            <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.proveedor}"/>
-                        </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Forma de Pago:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.formaPago}">
-                                <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
-                                <f:selectItems value="#{movimientoInventarioMB.listaFormaPago}" var="formaPago" itemLabel="#{formaPago.descripcion}" itemValue="#{formaPago.idFormaPago}"/>
-                            </p:selectOneMenu>  
-                        </p:column>
-                    </p:row>                    
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
+                        <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
+                            <p:ajax event="blur" listener="#{movimientoInventarioMB.buscarProveedor}" update="@none"/>
+                        </p:inputText>
+                        <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{movimientoInventarioMB.cargarProveedores}"/>                      
+                        <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.proveedor}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Forma de Pago:"/>
+                        <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.formaPago}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{movimientoInventarioMB.listaFormaPago}" var="formaPago" itemLabel="#{formaPago.descripcion}" itemValue="#{formaPago.idFormaPago}"/>
+                        </p:selectOneMenu>  
+                    </p:column>
+                </p:row>
+                <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Tipo Movimiento:"/>
                         <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioMaestro}">
@@ -64,21 +67,125 @@
                 var="itemsInventario"
                 rowKey="#{itemsInventario.invMovimientoDetallePK}"
                 style="width: 90%;margin: 0 auto"
+                editable="true" editMode="row"
                 emptyMessage="No hay elemento insertado">
+                <p:ajax event="rowEdit" listener="#{movimientoInventarioMB.onRowEdit}" update="@none" oncomplete="updateTabla()" />
+                <p:ajax event="rowEditCancel" listener="#{movimientoInventarioMB.onRowCancel}" update="@none" oncomplete="updateTabla()"/>
+                <p:column width="6%" style="text-align: center">
+                    <p:commandButton icon=" ui-icon-circle-minus" title="Quitar Item" actionListener="#{movimientoInventarioMB.quitarItem}">
+                        <f:attribute name="item" value="#{itemsInventario}"/>
+                    </p:commandButton>
+                </p:column>
                 <p:column headerText="Codigo">#{itemsInventario.cfgProducto.codProducto}</p:column>
                 <p:column headerText="Producto">#{itemsInventario.cfgProducto.nomProducto}</p:column>
-                <p:column headerText="Cantidad">#{itemsInventario.cantidad}</p:column>
-                <p:column headerText="Costo Adquisicion">#{itemsInventario.costoAdquisicion}</p:column>
-                <p:column headerText="Descuento">#{itemsInventario.descuento}</p:column>
-                <p:column headerText="%IVA">#{itemsInventario.iva}</p:column>
-                <p:column headerText="%Flete">#{itemsInventario.flete}</p:column>
-                <p:column headerText="%Costo Indirecto">#{itemsInventario.costoIndirecto}</p:column>
-                <p:column headerText="Costo Final">#{itemsInventario.costoFinal}</p:column>
+                <p:column headerText="Cantidad">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <p:spinner min="1" value="#{itemsInventario.cantidad}" size="5"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            #{itemsInventario.cantidad}
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Costo Adquisicion">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{itemsInventario.costoAdquisicion}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{itemsInventario.costoAdquisicion}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText>                            
+                        </f:facet>
+                    </p:cellEditor>  
+                </p:column>
+                <p:column headerText="%Descuento">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{itemsInventario.descuento}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            #{itemsInventario.descuento}
+                        </f:facet>
+                    </p:cellEditor>  
+                </p:column>
+                <p:column headerText="%IVA">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{itemsInventario.iva}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            #{itemsInventario.iva}
+                        </f:facet>
+                    </p:cellEditor>  
+                </p:column>
+                <p:column headerText="%Flete">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{itemsInventario.flete}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            #{itemsInventario.flete}
+                        </f:facet>
+                    </p:cellEditor>                    
+                </p:column>
+                <p:column headerText="%Costo Indirecto">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{itemsInventario.costoIndirecto}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            #{itemsInventario.costoIndirecto}
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Costo Final">
+                    <h:outputText value="#{itemsInventario.costoFinal}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>                   
+                </p:column>
+                <p:column headerText="Costo Final Individual">
+                    <h:outputText value="#{itemsInventario.costoFinalIndividual}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>                                      
+                </p:column>
+                <p:column style="width:32px">
+                    <p:rowEditor />
+                </p:column>
             </p:dataTable>
+            <p:panel id="IdSubTotal" style="width: 90%;margin: 0 auto;padding: 0;border: none">
+                <div class="divContent">
+                    <p:panelGrid columns="2">
+                        <p:outputLabel class="label" value="SUBTOTAL:"/>
+                        <p:outputLabel value="#{movimientoInventarioMB.subtotal}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <p:outputLabel class="label" value="DESCUENTO:"/> 
+                        <p:outputLabel value="#{movimientoInventarioMB.totalDescuento}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <p:outputLabel class="label" value="IVA:"/>
+                        <p:outputLabel value="#{movimientoInventarioMB.totalIva}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <p:outputLabel class="label" value="TOTAL"/> 
+                        <p:outputLabel value="#{movimientoInventarioMB.totalMovimiento}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                    </p:panelGrid>
+                </div>                   
+            </p:panel>           
+            <br/>
+            <div style="width: 75%;text-align: right">               
+                <p:inputTextarea id="IdObservacion" style="width: 92%" value="#{movimientoInventarioMB.observacion}"/>
+                <p:watermark for="IdObservacion" value="Observacion"/>
+            </div>
+            <div style="clear: right"/>
             <br/>
             <div style="text-align: center">
-                <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar Movimiento"/>&nbsp;
-                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"/>               
+                <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar Movimiento" actionListener="#{movimientoInventarioMB.guardar}"/>&nbsp;
+                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{movimientoInventarioMB.cancelar}"/>               
             </div>
         </h:form>
         <p:dialog widgetVar="dlgProveedor" header="BUSCAR PROVEEDOR" modal="true" resizable="false" width="50%">
@@ -101,11 +208,6 @@
                     <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
-                    <p:column headerText="Precio">
-                        <h:outputText value="#{producto.precio}">
-                            <f:convertNumber type="currency"/>
-                        </h:outputText>
-                    </p:column>
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Insertar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>

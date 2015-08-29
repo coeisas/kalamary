@@ -11,10 +11,8 @@ import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
@@ -37,20 +35,17 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "InvMovimiento.findAll", query = "SELECT i FROM InvMovimiento i"),
-    @NamedQuery(name = "InvMovimiento.findByIdMovInventario", query = "SELECT i FROM InvMovimiento i WHERE i.idMovInventario = :idMovInventario"),
+    @NamedQuery(name = "InvMovimiento.findByCfgdocumentoidDoc", query = "SELECT i FROM InvMovimiento i WHERE i.invMovimientoPK.cfgdocumentoidDoc = :cfgdocumentoidDoc"),
+    @NamedQuery(name = "InvMovimiento.findByNumDoc", query = "SELECT i FROM InvMovimiento i WHERE i.invMovimientoPK.numDoc = :numDoc"),
     @NamedQuery(name = "InvMovimiento.findBySubtotal", query = "SELECT i FROM InvMovimiento i WHERE i.subtotal = :subtotal"),
     @NamedQuery(name = "InvMovimiento.findByDescuento", query = "SELECT i FROM InvMovimiento i WHERE i.descuento = :descuento"),
     @NamedQuery(name = "InvMovimiento.findByIva", query = "SELECT i FROM InvMovimiento i WHERE i.iva = :iva"),
     @NamedQuery(name = "InvMovimiento.findByTotal", query = "SELECT i FROM InvMovimiento i WHERE i.total = :total"),
     @NamedQuery(name = "InvMovimiento.findByFecha", query = "SELECT i FROM InvMovimiento i WHERE i.fecha = :fecha")})
 public class InvMovimiento implements Serializable {
-
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "idMovInventario", nullable = false)
-    private Long idMovInventario;
+    @EmbeddedId
+    protected InvMovimientoPK invMovimientoPK;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "subtotal", precision = 12)
     private Float subtotal;
@@ -67,6 +62,9 @@ public class InvMovimiento implements Serializable {
     @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false, insertable = false, updatable = false)
+    @ManyToOne(optional = false)
+    private CfgDocumento cfgDocumento;
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
@@ -93,21 +91,25 @@ public class InvMovimiento implements Serializable {
     public InvMovimiento() {
     }
 
-    public InvMovimiento(Long idMovInventario) {
-        this.idMovInventario = idMovInventario;
+    public InvMovimiento(InvMovimientoPK invMovimientoPK) {
+        this.invMovimientoPK = invMovimientoPK;
     }
 
-    public InvMovimiento(Long idMovInventario, Date fecha) {
-        this.idMovInventario = idMovInventario;
+    public InvMovimiento(InvMovimientoPK invMovimientoPK, Date fecha) {
+        this.invMovimientoPK = invMovimientoPK;
         this.fecha = fecha;
     }
 
-    public Long getIdMovInventario() {
-        return idMovInventario;
+    public InvMovimiento(int cfgdocumentoidDoc, int numDoc) {
+        this.invMovimientoPK = new InvMovimientoPK(cfgdocumentoidDoc, numDoc);
     }
 
-    public void setIdMovInventario(Long idMovInventario) {
-        this.idMovInventario = idMovInventario;
+    public InvMovimientoPK getInvMovimientoPK() {
+        return invMovimientoPK;
+    }
+
+    public void setInvMovimientoPK(InvMovimientoPK invMovimientoPK) {
+        this.invMovimientoPK = invMovimientoPK;
     }
 
     public Float getSubtotal() {
@@ -158,12 +160,28 @@ public class InvMovimiento implements Serializable {
         this.fecha = fecha;
     }
 
+    public CfgDocumento getCfgDocumento() {
+        return cfgDocumento;
+    }
+
+    public void setCfgDocumento(CfgDocumento cfgDocumento) {
+        this.cfgDocumento = cfgDocumento;
+    }
+
     public CfgEmpresasede getCfgempresasedeidSede() {
         return cfgempresasedeidSede;
     }
 
     public void setCfgempresasedeidSede(CfgEmpresasede cfgempresasedeidSede) {
         this.cfgempresasedeidSede = cfgempresasedeidSede;
+    }
+
+    public CfgformaPagoproveedor getCfgformaPagoproveedoridFormaPago() {
+        return cfgformaPagoproveedoridFormaPago;
+    }
+
+    public void setCfgformaPagoproveedoridFormaPago(CfgformaPagoproveedor cfgformaPagoproveedoridFormaPago) {
+        this.cfgformaPagoproveedoridFormaPago = cfgformaPagoproveedoridFormaPago;
     }
 
     public CfgMovInventarioDetalle getCfgmovinventariodetalleidMovInventarioDetalle() {
@@ -210,7 +228,7 @@ public class InvMovimiento implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idMovInventario != null ? idMovInventario.hashCode() : 0);
+        hash += (invMovimientoPK != null ? invMovimientoPK.hashCode() : 0);
         return hash;
     }
 
@@ -221,7 +239,7 @@ public class InvMovimiento implements Serializable {
             return false;
         }
         InvMovimiento other = (InvMovimiento) object;
-        if ((this.idMovInventario == null && other.idMovInventario != null) || (this.idMovInventario != null && !this.idMovInventario.equals(other.idMovInventario))) {
+        if ((this.invMovimientoPK == null && other.invMovimientoPK != null) || (this.invMovimientoPK != null && !this.invMovimientoPK.equals(other.invMovimientoPK))) {
             return false;
         }
         return true;
@@ -229,7 +247,7 @@ public class InvMovimiento implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.InvMovimiento[ idMovInventario=" + idMovInventario + " ]";
+        return "entities.InvMovimiento[ invMovimientoPK=" + invMovimientoPK + " ]";
     }
 
 }

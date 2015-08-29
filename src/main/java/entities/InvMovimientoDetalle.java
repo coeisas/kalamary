@@ -11,10 +11,12 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -26,7 +28,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "InvMovimientoDetalle.findAll", query = "SELECT i FROM InvMovimientoDetalle i"),
-    @NamedQuery(name = "InvMovimientoDetalle.findByInvmovimientoidMovInventario", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.invMovimientoDetallePK.invmovimientoidMovInventario = :invmovimientoidMovInventario"),
+    @NamedQuery(name = "InvMovimientoDetalle.findByInvmovimientocfgdocumentoidDoc", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.invMovimientoDetallePK.invmovimientocfgdocumentoidDoc = :invmovimientocfgdocumentoidDoc"),
+    @NamedQuery(name = "InvMovimientoDetalle.findByInvmovimientonumDoc", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.invMovimientoDetallePK.invmovimientonumDoc = :invmovimientonumDoc"),
     @NamedQuery(name = "InvMovimientoDetalle.findByCfgproductoidProducto", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.invMovimientoDetallePK.cfgproductoidProducto = :cfgproductoidProducto"),
     @NamedQuery(name = "InvMovimientoDetalle.findByCantidad", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.cantidad = :cantidad"),
     @NamedQuery(name = "InvMovimientoDetalle.findByCostoAdquisicion", query = "SELECT i FROM InvMovimientoDetalle i WHERE i.costoAdquisicion = :costoAdquisicion"),
@@ -63,9 +66,17 @@ public class InvMovimientoDetalle implements Serializable {
     @JoinColumn(name = "cfg_producto_idProducto", referencedColumnName = "idProducto", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgProducto cfgProducto;
-    @JoinColumn(name = "inv_movimiento_idMovInventario", referencedColumnName = "idMovInventario", nullable = false, insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "inv_movimiento_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "inv_movimiento_numDoc", referencedColumnName = "numDoc", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private InvMovimiento invMovimiento;
+    @Transient
+    private float valorDescuento;//usado en movimiento inventario para guardar el valor descuento
+//    @Transient
+//    private float valorIva;
+    @Transient
+    private float  costoFinalIndividual;//usado en movimiento inventario para determinar el costo del producto independiente de la cantidad comprada
 
     public InvMovimientoDetalle() {
     }
@@ -85,8 +96,8 @@ public class InvMovimientoDetalle implements Serializable {
         this.costoFinal = costoFinal;
     }
 
-    public InvMovimientoDetalle(long invmovimientoidMovInventario, int cfgproductoidProducto) {
-        this.invMovimientoDetallePK = new InvMovimientoDetallePK(invmovimientoidMovInventario, cfgproductoidProducto);
+    public InvMovimientoDetalle(int invmovimientocfgdocumentoidDoc, int invmovimientonumDoc, int cfgproductoidProducto) {
+        this.invMovimientoDetallePK = new InvMovimientoDetallePK(invmovimientocfgdocumentoidDoc, invmovimientonumDoc, cfgproductoidProducto);
     }
 
     public InvMovimientoDetallePK getInvMovimientoDetallePK() {
@@ -169,6 +180,30 @@ public class InvMovimientoDetalle implements Serializable {
         this.invMovimiento = invMovimiento;
     }
 
+    public float getValorDescuento() {
+        return valorDescuento;
+    }
+
+    public void setValorDescuento(float valorDescuento) {
+        this.valorDescuento = valorDescuento;
+    }
+
+//    public float getValorIva() {
+//        return valorIva;
+//    }
+//
+//    public void setValorIva(float valorIva) {
+//        this.valorIva = valorIva;
+//    }
+
+    public float getCostoFinalIndividual() {
+        return costoFinalIndividual;
+    }
+
+    public void setCostoFinalIndividual(float costoFinalIndividual) {
+        this.costoFinalIndividual = costoFinalIndividual;
+    }    
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -193,5 +228,5 @@ public class InvMovimientoDetalle implements Serializable {
     public String toString() {
         return "entities.InvMovimientoDetalle[ invMovimientoDetallePK=" + invMovimientoDetallePK + " ]";
     }
-    
+   
 }

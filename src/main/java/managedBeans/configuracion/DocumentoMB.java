@@ -105,11 +105,13 @@ public class DocumentoMB implements Serializable {
             if (!codigoDocumento.trim().isEmpty()) {
                 documentoSeleccionado = documentoFacade.buscarDocumentoPorSedeAndCodigo(sedeSeleccionada, codigoDocumento);
                 cargarInformacionDocumento();
+            } else {
+                RequestContext.getCurrentInstance().update("IdFormDocumento");
             }
         } else {
             limpiarInformacionDocumento();
-            RequestContext.getCurrentInstance().update("IdFormDocumento");
         }
+        RequestContext.getCurrentInstance().update("IdFormDocumento");
     }
 
     public void cargarListaDocumento() {
@@ -145,7 +147,7 @@ public class DocumentoMB implements Serializable {
     }
 
     private void limpiarInformacionDocumento() {
-        setCodigoDocumento(null);
+//        setCodigoDocumento(null);
         setTipoEmpresa(0);
         setNombreDocumento(null);
         setAbreviatura(null);
@@ -159,6 +161,7 @@ public class DocumentoMB implements Serializable {
     }
 
     private void limpiarFormulario() {
+        setCodigoDocumento(null);
         documentoSeleccionado = null;
         limpiarInformacionDocumento();
     }
@@ -217,7 +220,7 @@ public class DocumentoMB implements Serializable {
             return false;
         }
         if (prefijo.trim().isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Prefijo vaci0"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Prefijo vacio"));
             return false;
         }
         validarAplicacion();
