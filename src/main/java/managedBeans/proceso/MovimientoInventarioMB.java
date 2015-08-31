@@ -354,6 +354,10 @@ public class MovimientoInventarioMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione el tipo de movimiento"));
             return false;
         }
+        if (listaItemsInventarioMovimiento.isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay elementos insertados"));
+            return false;
+        }
         return ban;
     }
 
@@ -397,6 +401,7 @@ public class MovimientoInventarioMB implements Serializable {
             invMovimientoMaestro.setSubtotal(subtotal);
             invMovimientoMaestro.setTotal(totalMovimiento);
             inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
+            documentoFacade.edit(documento);
 
 //            CREACION DEL DETALLE MOVIMIENTO
             for (InvMovimientoDetalle detalleMovimiento : listaItemsInventarioMovimiento) {
@@ -416,15 +421,18 @@ public class MovimientoInventarioMB implements Serializable {
     private void actualizarTablaProducto(InvMovimientoDetalle detalle) {
         try {
             CfgProducto producto = detalle.getCfgProducto();
-            producto.setCostoAdquisicion(detalle.getCostoAdquisicion());
-            producto.setIva(detalle.getIva());
-            producto.setFlete(detalle.getFlete());
-            producto.setCostoIndirecto(detalle.getCostoIndirecto());
-            producto.setCosto(detalle.getCostoFinalIndividual());
-            producto.setUtilidad(producto.getUtilidad());
-            float utilidad = producto.getCosto() * producto.getUtilidad() / (float) 100;
-            producto.setPrecio(producto.getCosto() + utilidad);
-            productoFacade.edit(producto);
+            //se actualiza la informacion del producto cuando el tipo de movimiento es de entrada
+            if (tipoDocumento.equals("3")) {
+                producto.setCostoAdquisicion(detalle.getCostoAdquisicion());
+                producto.setIva(detalle.getIva());
+                producto.setFlete(detalle.getFlete());
+                producto.setCostoIndirecto(detalle.getCostoIndirecto());
+                producto.setCosto(detalle.getCostoFinalIndividual());
+                producto.setUtilidad(producto.getUtilidad());
+                float utilidad = producto.getCosto() * producto.getUtilidad() / (float) 100;
+                producto.setPrecio(producto.getCosto() + utilidad);
+                productoFacade.edit(producto);
+            }
             actualizarTablaConsolidado(producto, detalle);
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion de los productos involucrados"));
