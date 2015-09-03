@@ -10,6 +10,7 @@
     <ui:define name="title">Factura</ui:define>
     <ui:define name="content">
         <p:growl autoUpdate="true" showDetail="true"/>
+        <p:growl id="msg" showDetail="true"/>
         <h:form id="IdFormFactura">
             <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>

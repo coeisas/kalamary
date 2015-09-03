@@ -34,9 +34,19 @@ public class CfgMovInventarioDetalleFacade extends AbstractFacade<CfgMovInventar
 
     public List<CfgMovInventarioDetalle> buscarByMaestro(CfgMovInventarioMaestro maestro) {
         try {
-            Query query = em.createQuery("SELECT d FROM CfgMovInventarioDetalle d WHERE d.cfgmovinventariomaestroidMovInventarioMaestro = ?1");
+            Query query = em.createQuery("SELECT d FROM CfgMovInventarioDetalle d WHERE d.cfgmovinventariomaestroidMovInventarioMaestro = ?1 AND d.visible = TRUE");
             query.setParameter(1, maestro);
             return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgMovInventarioDetalle buscarSalidaVentaByMaestro(CfgMovInventarioMaestro movInventarioMaestro) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgMovInventarioDetalle d WHERE d.cfgmovinventariomaestroidMovInventarioMaestro = ?1 AND d.codMovInvetarioDetalle LIKE '4'");
+            query.setParameter(1, movInventarioMaestro);
+            return (CfgMovInventarioDetalle) query.getSingleResult();
         } catch (Exception e) {
             return null;
         }

@@ -41,8 +41,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "InvMovimiento.findByDescuento", query = "SELECT i FROM InvMovimiento i WHERE i.descuento = :descuento"),
     @NamedQuery(name = "InvMovimiento.findByIva", query = "SELECT i FROM InvMovimiento i WHERE i.iva = :iva"),
     @NamedQuery(name = "InvMovimiento.findByTotal", query = "SELECT i FROM InvMovimiento i WHERE i.total = :total"),
-    @NamedQuery(name = "InvMovimiento.findByFecha", query = "SELECT i FROM InvMovimiento i WHERE i.fecha = :fecha")})
+    @NamedQuery(name = "InvMovimiento.findByFecha", query = "SELECT i FROM InvMovimiento i WHERE i.fecha = :fecha"),
+    @NamedQuery(name = "InvMovimiento.findByDocumentoSoporte", query = "SELECT i FROM InvMovimiento i WHERE i.documentoSoporte = :documentoSoporte")})
 public class InvMovimiento implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected InvMovimientoPK invMovimientoPK;
@@ -62,6 +64,8 @@ public class InvMovimiento implements Serializable {
     @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecha;
+    @Column(name = "documentoSoporte", length = 15)
+    private String documentoSoporte;    
     @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgDocumento cfgDocumento;
@@ -159,7 +163,15 @@ public class InvMovimiento implements Serializable {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
+    
+    public String getDocumentoSoporte() {
+        return documentoSoporte;
+    }
 
+    public void setDocumentoSoporte(String documentoSoporte) {
+        this.documentoSoporte = documentoSoporte;
+    }
+    
     public CfgDocumento getCfgDocumento() {
         return cfgDocumento;
     }

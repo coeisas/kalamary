@@ -40,5 +40,14 @@ public class CfgMovInventarioMaestroFacade extends AbstractFacade<CfgMovInventar
             return null;
         }
     }
-    
+
+    public CfgMovInventarioMaestro buscarMovimientoSalidaByEmpresa(CfgEmpresa empresa){
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.cfgempresaidEmpresa = ?1 AND m.codMovInvetario LIKE '2'");
+            query.setParameter(1, empresa);
+            return (CfgMovInventarioMaestro) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 }

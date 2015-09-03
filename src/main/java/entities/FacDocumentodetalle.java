@@ -64,6 +64,8 @@ public class FacDocumentodetalle implements Serializable {
     private float valorDescuento;
     @Transient
     private float precioOriginal;
+    @Transient
+    private int cantidadPosible;//cantidad posible dependiendo del inventario
 
     public FacDocumentodetalle() {
     }
@@ -156,6 +158,14 @@ public class FacDocumentodetalle implements Serializable {
         this.precioOriginal = precioOriginal;
     }
 
+    public int getCantidadPosible() {
+        return cantidadPosible;
+    }
+
+    public void setCantidadPosible(int cantidadPosible) {
+        this.cantidadPosible = cantidadPosible;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

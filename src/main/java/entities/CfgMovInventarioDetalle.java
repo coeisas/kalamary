@@ -34,7 +34,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgMovInventarioDetalle.findAll", query = "SELECT c FROM CfgMovInventarioDetalle c"),
     @NamedQuery(name = "CfgMovInventarioDetalle.findByIdMovInventarioDetalle", query = "SELECT c FROM CfgMovInventarioDetalle c WHERE c.idMovInventarioDetalle = :idMovInventarioDetalle"),
     @NamedQuery(name = "CfgMovInventarioDetalle.findByCodMovInvetarioDetalle", query = "SELECT c FROM CfgMovInventarioDetalle c WHERE c.codMovInvetarioDetalle = :codMovInvetarioDetalle"),
-    @NamedQuery(name = "CfgMovInventarioDetalle.findByNomMovimientoDetalle", query = "SELECT c FROM CfgMovInventarioDetalle c WHERE c.nomMovimientoDetalle = :nomMovimientoDetalle")})
+    @NamedQuery(name = "CfgMovInventarioDetalle.findByNomMovimientoDetalle", query = "SELECT c FROM CfgMovInventarioDetalle c WHERE c.nomMovimientoDetalle = :nomMovimientoDetalle"),
+    @NamedQuery(name = "CfgMovInventarioDetalle.findByVisible", query = "SELECT c FROM CfgMovInventarioDetalle c WHERE c.visible = :visible")})
 public class CfgMovInventarioDetalle implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -47,6 +48,9 @@ public class CfgMovInventarioDetalle implements Serializable {
     @Basic(optional = false)
     @Column(name = "nomMovimientoDetalle", nullable = false, length = 50)
     private String nomMovimientoDetalle;
+    @Basic(optional = false)
+    @Column(name = "visible", nullable = false)
+    private boolean visible;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgmovinventariodetalleidMovInventarioDetalle")
     private List<InvMovimiento> invMovimientoList;
     @JoinColumn(name = "cfg_mov_inventario_maestro_idMovInventarioMaestro", referencedColumnName = "idMovInventarioMaestro", nullable = false)
@@ -60,9 +64,10 @@ public class CfgMovInventarioDetalle implements Serializable {
         this.idMovInventarioDetalle = idMovInventarioDetalle;
     }
 
-    public CfgMovInventarioDetalle(Integer idMovInventarioDetalle, String nomMovimientoDetalle) {
+    public CfgMovInventarioDetalle(Integer idMovInventarioDetalle, String nomMovimientoDetalle, boolean visible) {
         this.idMovInventarioDetalle = idMovInventarioDetalle;
         this.nomMovimientoDetalle = nomMovimientoDetalle;
+        this.visible = visible;
     }
 
     public Integer getIdMovInventarioDetalle() {
@@ -88,7 +93,15 @@ public class CfgMovInventarioDetalle implements Serializable {
     public void setNomMovimientoDetalle(String nomMovimientoDetalle) {
         this.nomMovimientoDetalle = nomMovimientoDetalle;
     }
+    
+    public boolean getVisible() {
+        return visible;
+    }
 
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+    
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
         return invMovimientoList;
@@ -130,5 +143,5 @@ public class CfgMovInventarioDetalle implements Serializable {
     public String toString() {
         return "entities.CfgMovInventarioDetalle[ idMovInventarioDetalle=" + idMovInventarioDetalle + " ]";
     }
-    
+
 }

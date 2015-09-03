@@ -61,6 +61,7 @@ public class MovimientoInventarioMB implements Serializable {
     private String numIdentificacion;
     private String proveedor;
     private String observacion;
+    private String documentoSoporte;
     private float subtotal;
     private float totalDescuento;
     private float totalIva;
@@ -175,6 +176,7 @@ public class MovimientoInventarioMB implements Serializable {
         totalDescuento = 0;
         totalIva = 0;
         totalMovimiento = 0;
+        documentoSoporte = null;
     }
 
     public void cargarModalProductos() {
@@ -299,12 +301,15 @@ public class MovimientoInventarioMB implements Serializable {
         float costoFinalIndividual = 0;
         float costoAdq = detalle.getCostoAdquisicion();
         costoAdq = validarValor(costoAdq);
+        float descuento = costoAdq * (detalle.getDescuento() / (float) 100);
+        descuento = validarValor(descuento);
         float iva = detalle.getIva();
         iva = validarValor(iva);
         float flete = detalle.getFlete();
         flete = validarValor(flete);
         float costoInd = detalle.getCostoIndirecto();
         costoInd = validarValor(costoInd);
+        costoAdq -= descuento;
         iva = costoAdq * (iva / 100);
         costoFinalIndividual = costoAdq + iva;
         costoFinalIndividual = costoFinalIndividual + (costoFinalIndividual * (flete / 100));
@@ -397,6 +402,7 @@ public class MovimientoInventarioMB implements Serializable {
             invMovimientoMaestro.setFecha(new Date());
             invMovimientoMaestro.setIva(totalIva);
             invMovimientoMaestro.setObservacion(observacion);
+            invMovimientoMaestro.setDocumentoSoporte(documentoSoporte.toUpperCase());
             invMovimientoMaestro.setSegusuarioidUsuario(usuarioActual);
             invMovimientoMaestro.setSubtotal(subtotal);
             invMovimientoMaestro.setTotal(totalMovimiento);
@@ -423,7 +429,8 @@ public class MovimientoInventarioMB implements Serializable {
             CfgProducto producto = detalle.getCfgProducto();
             //se actualiza la informacion del producto cuando el tipo de movimiento es de entrada
             if (tipoDocumento.equals("3")) {
-                producto.setCostoAdquisicion(detalle.getCostoAdquisicion());
+                float aux = detalle.getCostoAdquisicion() * (detalle.getDescuento() / (float) 100);
+                producto.setCostoAdquisicion(detalle.getCostoAdquisicion() - aux);
                 producto.setIva(detalle.getIva());
                 producto.setFlete(detalle.getFlete());
                 producto.setCostoIndirecto(detalle.getCostoIndirecto());
@@ -597,6 +604,14 @@ public class MovimientoInventarioMB implements Serializable {
 
     public void setObservacion(String observacion) {
         this.observacion = observacion;
+    }
+
+    public String getDocumentoSoporte() {
+        return documentoSoporte;
+    }
+
+    public void setDocumentoSoporte(String documentoSoporte) {
+        this.documentoSoporte = documentoSoporte;
     }
 
 }
