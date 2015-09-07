@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Marca</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormMarca">
+            <p:panelGrid style="margin: 0 auto">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Marca</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
+                        <h:inputText class="campoFormulario cajaH" value="#{marcaMB.referencia}" readonly="true"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Referencia" actionListener="#{marcaMB.cargarReferencias}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{marcaMB.codigoMarca}" size="8" maxlength="5">
+                            <p:ajax event="blur" listener="#{marcaMB.buscarMarca}" update="@none"/>
+                        </p:inputText>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Marca:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{marcaMB.nombreMarca}" size="60" maxlength="50">
+                        </p:inputText>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{marcaMB.accion}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"  actionListener="#{marcaMB.cancelar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <p:dataTable
+                id="IdTablaMarca"
+                value="#{marcaMB.listaMarca}"
+                var="marca"
+                rowKey="#{marca.idMarca}"
+                paginator="true"
+                style="width: 80%;margin: 0 auto"
+                rows="10"
+                disabledSelection="true"
+                paginatorPosition="bottom">
+                <p:column headerText="Referencia">
+                    #{marca.cfgreferenciaproductoidReferencia.nombreReferencia}
+                </p:column>
+                <p:column headerText="Codigo">
+                    #{marca.codigoMarca}
+                </p:column>
+                <p:column headerText="Marca">
+                    #{marca.nombreMarca}
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        <p:dialog id="IdModalReferencia" widgetVar="dlgReferencia" header="BUSCAR REFERENCIA" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalReferencia">
+                <p:dataTable value="#{marcaMB.listaReferencia}" var="referencia" emptyMessage="No hay referencias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{marcaMB.referenciaSeleccionada}" rowKey="#{referencia.idReferencia}" selectionMode="single">
+                    <p:column headerText="Codigo" filterBy="#{referencia.codigoReferencia}"  filterStyle="width:90%">#{referencia.codigoReferencia}</p:column>
+                    <p:column headerText="Referencia" filterBy="#{referencia.nombreReferencia}" filterMatchMode="contains"  filterStyle="width:90%">#{referencia.nombreReferencia}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{marcaMB.cargarInformacionReferencia}"/>
+            </h:form>
+        </p:dialog>        
+    </ui:define>
+</ui:composition>

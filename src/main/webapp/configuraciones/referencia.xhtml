@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Referencia</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormReferencia">
+            <p:panelGrid style="margin: 0 auto">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Referencia</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
+                        <h:inputText class="campoFormulario cajaH" value="#{referenciaMB.categoria}" readonly="true"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Categoria" actionListener="#{referenciaMB.cargarCategoria}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{referenciaMB.codigoReferencia}" size="8" maxlength="5">
+                            <p:ajax event="blur" listener="#{referenciaMB.buscarReferencia}" update="@none"/>
+                        </p:inputText>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{referenciaMB.nombreReferencia}" size="60" maxlength="50">
+                        </p:inputText>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{referenciaMB.accion}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"  actionListener="#{referenciaMB.cancelar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <p:dataTable
+                id="IdTablaReferencia"
+                value="#{referenciaMB.listaReferencias}"
+                var="referencia"
+                rowKey="#{Categoria.idReferencia}"
+                paginator="true"
+                style="width: 80%;margin: 0 auto"
+                rows="10"
+                disabledSelection="true"
+                paginatorPosition="bottom">
+                <p:column headerText="Categoria">
+                    #{referencia.cfgcategoriaproductoidCategoria.nombreCategoria}
+                </p:column>
+                <p:column headerText="Codigo">
+                    #{referencia.codigoReferencia}
+                </p:column>
+                <p:column headerText="Referencia">
+                    #{referencia.nombreReferencia}
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        
+         <p:dialog id="IdModalCategoria" widgetVar="dlgCategoria" header="BUSCAR CATEGORIA" resizable="false" width="500px" modal="true">
+            <h:form id="FormModalCategoria">
+                <p:dataTable value="#{referenciaMB.listaCategorias}" var="categoria" emptyMessage="No hay categorias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{referenciaMB.categoriaSeleccionada}" rowKey="#{categoria.idCategoria}" selectionMode="single">
+                    <p:column headerText="Codigo" filterBy="#{categoria.codigoCategoria}" filterStyle="width:90%">#{categoria.codigoCategoria}</p:column>
+                    <p:column headerText="Categoria" filterBy="#{categoria.nombreCategoria}" filterMatchMode="contains" filterStyle="width:90%">#{categoria.nombreCategoria}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{referenciaMB.cargarInformacionCategoria}"/>
+            </h:form>
+        </p:dialog>       
+    </ui:define>
+</ui:composition>
+

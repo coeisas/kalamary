@@ -5,6 +5,7 @@
  */
 package facades;
 
+import entities.CfgEmpresa;
 import entities.CfgMarcaproducto;
 import entities.CfgReferenciaproducto;
 import javax.ejb.Stateless;
@@ -46,6 +47,27 @@ public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
         try {
             Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgreferenciaproductoidReferencia = ?1 AND m.codigoMarca = ?2");
             query.setParameter(1, referenciaproducto);
+            query.setParameter(2, codigo);
+            return (CfgMarcaproducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<CfgMarcaproducto> buscarPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgMarcaproducto buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1 AND m.codigoMarca LIKE ?2");
+            query.setParameter(1, empresa);
             query.setParameter(2, codigo);
             return (CfgMarcaproducto) query.getSingleResult();
         } catch (Exception e) {

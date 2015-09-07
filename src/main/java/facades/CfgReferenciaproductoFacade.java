@@ -6,6 +6,7 @@
 package facades;
 
 import entities.CfgCategoriaproducto;
+import entities.CfgEmpresa;
 import entities.CfgReferenciaproducto;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -44,8 +45,29 @@ public class CfgReferenciaproductoFacade extends AbstractFacade<CfgReferenciapro
 
     public CfgReferenciaproducto buscarPorCategoriaAndCodigo(CfgCategoriaproducto categoriaproducto, String codigo) {
         try {
-            Query query = em.createQuery(codigo);
+            Query query = em.createQuery("SELECT r FROM CfgReferenciaproducto r WHERE r.cfgcategoriaproductoidCategoria = ?1 AND r.codigoReferencia = ?2");
             query.setParameter(1, categoriaproducto);
+            query.setParameter(2, codigo);
+            return (CfgReferenciaproducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<CfgReferenciaproducto> buscarPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT r FROM CfgReferenciaproducto r WHERE r.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgReferenciaproducto buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT r FROM CfgReferenciaproducto r WHERE r.cfgempresaidEmpresa = ?1 AND r.codigoReferencia = ?2");
+            query.setParameter(1, empresa);
             query.setParameter(2, codigo);
             return (CfgReferenciaproducto) query.getSingleResult();
         } catch (Exception e) {
