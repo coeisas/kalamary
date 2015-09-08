@@ -9,45 +9,44 @@ import entities.CfgCliente;
 import entities.CfgEmpresasede;
 import entities.FacDocumentosmaster;
 import facades.FacDocumentosmasterFacade;
-import org.primefaces.model.LazyDataModel;
 import java.util.List;
-import java.util.Calendar;
 import java.util.Map;
+import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
+import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
 /**
  *
  * @author mario
  */
-public class LazyFacturaDataModel extends LazyDataModel<FacDocumentosmaster> {
+public class LazyCotizacionDataModel extends LazyDataModel<FacDocumentosmaster> {
 
     private final FacDocumentosmasterFacade documentosmasterFacade;
     private final CfgEmpresasede sede;
     private CfgCliente cliente;
-    private Calendar fechaIncial;
-    private Calendar fechaFinal;
-    private int numFactura;
 
-    public LazyFacturaDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede) {
+    public LazyCotizacionDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede) {
         this.documentosmasterFacade = documentosmasterFacade;
         this.sede = sede;
     }
 
-    public LazyFacturaDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede, CfgCliente cliente, Calendar fechaIncial, Calendar fechaFinal, int numFactura) {
+    public LazyCotizacionDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede, CfgCliente cliente) {
         this.documentosmasterFacade = documentosmasterFacade;
         this.sede = sede;
         this.cliente = cliente;
-        this.fechaIncial = fechaIncial;
-        this.fechaFinal = fechaFinal;
-        if (fechaFinal != null) {
-            fechaFinal.add(Calendar.DATE, 1);//se incremente un dia por en la base de datos se guarda con hora y el valor enviado es a las 0 horas
-        }
-        this.numFactura = numFactura;
     }
 
     @Override
     public Object getRowKey(FacDocumentosmaster documentosmaster) {
         return documentosmaster.getFacDocumentosmasterPK();
+    }
+
+    @Override
+    public FacDocumentosmaster getRowData(String key) {
+        String[] aux = key.split(",");
+        Long documento = Long.parseLong(aux[0]);
+        Long numDoc = Long.parseLong(aux[1]);
+        return documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sede, documento, numDoc);
     }
 
     @Override
@@ -72,8 +71,8 @@ public class LazyFacturaDataModel extends LazyDataModel<FacDocumentosmaster> {
 
     private List<FacDocumentosmaster> loadDocuementoMaster(int first, int pageSize, Map<String, Object> filters) {
         List<FacDocumentosmaster> data;
-        data = documentosmasterFacade.buscarFacturasBySedeLazy(sede, cliente, numFactura, fechaIncial, fechaFinal, first, pageSize);
-        this.setRowCount(documentosmasterFacade.totalFacturasBySede(sede, cliente, numFactura, fechaIncial, fechaFinal));
+        data = documentosmasterFacade.buscarCotizacionesBySedeLazy(sede, cliente, first, pageSize);
+        this.setRowCount(documentosmasterFacade.totalCotizacionesBySede(sede, cliente));
         return data;
     }
 

@@ -1,0 +1,310 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"               
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Cotización</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <p:growl id="msg" showDetail="true"/>
+        <h:form id="IdFormCotizacion">
+            <p:remoteCommand name="update" actionListener="#{cotizacionMB.updateTabla}"/>
+            <div>
+                <p:outputLabel value="Cliente:" class="labelFormularioObligatorio"/>
+                <p:inputText class="campoFormulario" value="#{cotizacionMB.identificacionCliente}">
+                    <p:ajax event="blur" listener="#{cotizacionMB.buscarCliente}" update="@none"/> 
+                </p:inputText>
+                <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
+                <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
+                <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{cotizacionMB.nombreCliente}"/>
+                <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
+                <p:inputText id="IdDocumentoVendedor" value="#{cotizacionMB.documentoVendedor}" class="campoFormulario">
+                    <p:ajax event="blur" listener="#{cotizacionMB.buscarVendedor}" update="@none"/>
+                </p:inputText>
+                <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{cotizacionMB.cargarListaVendedores}"/>
+                <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{cotizacionMB.nombreVendedor}"/>
+            </div>
+            <div style="clear: left">
+                <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{cotizacionMB.cargarModalProductos}"/>
+            </div>
+            <p:dataTable
+                id="IdTableItemCotizacion"
+                value="#{cotizacionMB.listaDetalle}"
+                var="itemCotizacion"
+                style="width: 70%;margin-top: .5em;margin: 0 auto"
+                rows="15"
+                rowKey="#{itemCotizacion.facDocumentodetallePK}"
+                editable="true" editMode="cell"
+                emptyMessage="No se han insertado items a la cotizacion">
+                <p:ajax event="cellEdit" listener="#{cotizacionMB.onCellEdit}" oncomplete="update()" update="@none"/>
+                <f:facet name="header">Items Factura</f:facet>
+                <p:column headerText="Producto" width="45%">
+                    #{itemCotizacion.cfgProducto.nomProducto}
+                </p:column>
+                <p:column headerText="Cantidad">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{itemCotizacion.cantidad}" /></f:facet>
+                        <f:facet name="input"><p:spinner value="#{itemCotizacion.cantidad}" min="1"  size="5"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Valor Unit">
+                    <p:cellEditor>
+                        <f:facet name="output">
+                            <h:outputText value="#{itemCotizacion.valorUnitario}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText> 
+                        </f:facet>
+                        <f:facet name="input"><h:inputText value="#{itemCotizacion.valorUnitario}"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="%Descuento">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputText value="#{itemCotizacion.descuento}"/></f:facet>
+                        <f:facet name="input"><p:spinner value="#{itemCotizacion.descuento}" min="0" size="5"/></f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Total">
+                    <h:outputText value="#{itemCotizacion.valorTotal}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>                
+                <p:column width="6%" style="text-align: center">
+                    <p:commandButton icon=" ui-icon-circle-minus" title="Quitar Item" actionListener="#{cotizacionMB.quitarItem}">
+                        <f:attribute name="item" value="#{itemCotizacion}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <p:panel id="IdSubTotal" style="width: 70%;margin: 0 auto;padding: 0;border: none">
+                <div class="divContent">
+                    <p:panelGrid columns="2">
+                        <p:outputLabel class="label" value="SUBTOTAL:"/>
+                        <p:outputLabel value="#{cotizacionMB.subtotal}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <p:outputLabel class="label" value="DESCUENTO:"/> 
+                        <p:outputLabel value="#{cotizacionMB.totalDescuento}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <c:forEach items="#{cotizacionMB.listaImpuestos}" var="impuesto">
+                            <p:outputLabel class="label" value="#{impuesto.nomImpuesto}:"/> 
+                            <p:outputLabel value="#{impuesto.totalImpuesto}">
+                                <f:convertNumber type="currency"/>
+                            </p:outputLabel>
+
+                        </c:forEach>
+                        <p:outputLabel class="label" value="TOTAL:"/>
+                        <p:outputLabel value="#{cotizacionMB.totalFactura}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                        <p:outputLabel class="label" value="TOTAL USD:"/> 
+                        <p:outputLabel value="#{cotizacionMB.totalUSD}">
+                            <f:convertNumber type="currency"/>
+                        </p:outputLabel>
+                    </p:panelGrid>
+                </div>                   
+            </p:panel>
+            <div style="clear: right"/>
+            <br/>
+            <div style="margin: 0 auto;width: 80%">               
+                <p:inputTextarea id="IdObservacion" style="width: 99%" value="#{cotizacionMB.observacion}"/>
+                <p:watermark for="IdObservacion" value="Observacion"/>
+            </div>
+            <br/>
+            <div style="text-align: center;">
+                <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{cotizacionMB.guardarCotizacion}" title="Facturar"/>&nbsp;
+                <p:commandButton icon="ui-icon-print" value="Generar PDF" actionListener="#{cotizacionMB.impresion}" title="Generar PDF"/>
+            </div>
+        </h:form>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{cotizacionMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{cotizacionMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Empresa">
+                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{cotizacionMB.cargarInformacionCliente}" />&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{cotizacionMB.deseleccionarCliente}"/>
+                </div>
+            </h:form>                                
+        </p:dialog>
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{cotizacionMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cotizacionMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{producto.precio}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Insertar" actionListener="#{cotizacionMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog widgetVar="dlgResult" modal="true" header="TIPO DE IMPRESION" resizable="false" width="15%">
+            <h:form>
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <p:row>
+                        <p:column>
+                            <p:selectOneRadio value="#{cotizacionMB.tipoImpresion}">
+                                <p:ajax update="@none" event="change"/>
+                                <f:selectItem itemLabel="Ticket" itemValue="1" />
+                                <f:selectItem itemLabel="Carta" itemValue="2" />
+                            </p:selectOneRadio>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-circle-check" value="&nbsp;" actionListener="#{cotizacionMB.generarPDF}" ajax="false" onclick="this.form.target = '_blank'"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%">
+            <h:form id="FormModalVendedor">
+                <p:dataTable value="#{cotizacionMB.listaVendedor}" var="vendedor" selection="#{cotizacionMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single">
+                    <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
+                    <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{cotizacionMB.cargarInformacionVendedor}"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="70%" resizable="false">
+            <h:form id="FormModalCliente">
+                <p:panelGrid class="panelGridSinBorder" style="width: 98%;">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{cotizacionMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{cotizacionMB.buscarClienteModal}" update="@none"/>
+                            </p:inputText>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{cotizacionMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column rowspan="5">
+                            <div style="text-align: center">
+                                <p:panel rendered="#{cotizacionMB.clienteSeleccionado != null}">
+                                    <p:graphicImage  value="#{cotizacionMB.image}" style="width: 75px; height: 100px;text-align: center" rendered="#{cotizacionMB.clienteSeleccionado.foto != null}" >
+                                        <f:param name="id" value="#{cotizacionMB.clienteSeleccionado.idCliente}"/>
+                                    </p:graphicImage>                                  
+                                </p:panel>
+                                <p:separator/>
+                                <p:commandButton value="Foto" icon="ui-icon-image" onclick="PF('dlgFoto').show()"/>
+                            </div>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
+                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{cotizacionMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
+                                <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
+                                <p:ajax event="change" update="IdSelectMunicipios" listener="#{cotizacionMB.actualizarMunicipios}"/>
+                            </p:selectOneMenu> 
+                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
+                            <p:selectOneMenu id="IdSelectMunicipios" value="#{cotizacionMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
+                                <f:selectItems value="#{cotizacionMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdTipoCliente" class="labelFormularioObligatorio" value="Tipo Cliente:"/>
+                            <p:selectOneMenu id="IdTipoCliente" value="#{cotizacionMB.idTipoCliente}" class="campoFormulario" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoCliente" itemLabel="#{tipoCliente.descripcion}" itemValue="#{tipoCliente.id}"/>
+                            </p:selectOneMenu>                        
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
+                            <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{cotizacionMB.primerNombre}"/>
+                            <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
+                            <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{cotizacionMB.segundoNombre}"/>                        
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
+                            <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{cotizacionMB.primerApellido}" />
+                            <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
+                            <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{cotizacionMB.segundoApellido}" />                                                
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
+                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{cotizacionMB.direccion}"/>
+                            <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
+                            <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{cotizacionMB.telefono}"/>                        
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column colspan="2">
+
+                            <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
+                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{cotizacionMB.mail}"/>
+                            <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
+                            <p:calendar id="IdFechaNacimiento"  class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{cotizacionMB.fechaNacimiento}"/>
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column colspan="2">
+                            <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
+                            <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{cotizacionMB.cupoCredito}" />
+                            <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
+                            <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{cotizacionMB.tarjetaMembresia}" />
+                        </p:column>
+                    </p:row>
+
+                    <p:row>
+                        <p:column colspan="2" style="text-align: center">
+                            <p:commandButton value="Guardar" icon="ui-icon-disk" actionListener="#{cotizacionMB.accion}"/>&nbsp;
+                            <p:commandButton value="Cancelar" icon="ui-icon-cancel" actionListener="#{cotizacionMB.cancelar}"/>
+                        </p:column>
+                    </p:row>
+
+                </p:panelGrid>  
+            </h:form>
+        </p:dialog>
+        <p:dialog id="IdModalFoto" widgetVar="dlgFoto" header="Cargar Foto" modal="true" width="600px" resizable="false">
+            <h:form>
+                <p:fileUpload value="#{cotizacionMB.file}" fileUploadListener="#{cotizacionMB.handleFileUpload}" label="Buscar Imagen" cancelLabel="Cancelar" uploadLabel="Cargar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" update="@none" sizeLimit="16777215"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>
+

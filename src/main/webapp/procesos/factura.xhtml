@@ -21,6 +21,7 @@
                 </p:inputText>
                 <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
                 <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
+                <p:commandButton icon="ui-icon-script" title="Cargar Cotizacion" class="campoFormulario" actionListener="#{facturaMB.cargarCotizaciones}"/>
                 <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
                 <div style="float: left;margin-left: 20px;height: 1.5em"/>
                 <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
@@ -29,7 +30,7 @@
                 </p:inputText>
                 <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
                 <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>
-                </div>
+            </div>
             <div style="clear: left">
                 <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{facturaMB.cargarModalProductos}"/>
             </div>
@@ -142,6 +143,27 @@
                 </div>
             </h:form>                                
         </p:dialog>
+        <p:dialog widgetVar="dlgCotizacion" header="BUSCAR COTIZACION" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCotizacion">
+                <p:dataTable value="#{facturaMB.listadoCotizacion}"  emptyMessage="No se encontraron cotizaciones" var="cotizacion" selectionMode="single" lazy="true" selection="#{facturaMB.cotizacionSeleccionada}" rowKey="#{cotizacion.facDocumentosmasterPK}" rows="10" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Cliente">
+                        <h:outputText value="#{cotizacion.cfgclienteidCliente.nombreCompleto()}"/>
+                    </p:column>
+                    <p:column headerText="Fecha Creacion">
+                        <h:outputText value="#{cotizacion.fecCrea}">
+                            <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="dd/MM/yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Total">
+                        <h:outputText value="#{cotizacion.totalFactura}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{facturaMB.cargarInformacionCotizacion}" />
+                </div>
+            </h:form>                                
+        </p:dialog>        
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
                 <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">

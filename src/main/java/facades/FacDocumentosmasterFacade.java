@@ -56,10 +56,11 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             return new ArrayList();
         }
     }
-
-    public List<FacDocumentosmaster> buscarBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin, int offset, int limit) {
+    
+//documentos de facturacion
+    public List<FacDocumentosmaster> buscarFacturasBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin, int offset, int limit) {
         try {
-            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1";
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'";
             if (cliente != null) {
                 consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
             }
@@ -95,11 +96,11 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             return null;
         }
     }
-
-    public int totalBySede(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin) {
+    
+//total documentos de facturacion
+    public int totalFacturasBySede(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin) {
         try {
-
-            String consulta = "SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1";
+            String consulta = "SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'";
             if (cliente != null) {
                 consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
             }
@@ -133,4 +134,41 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             return 0;
         }
     }
+//documentos de cotizacion
+    public List<FacDocumentosmaster> buscarCotizacionesBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int offset, int limit) {
+        try {
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '5' AND d.estado LIKE 'PENDIENTE'";
+            if (cliente != null) {
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
+            }
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, sede);
+            if (cliente != null) {
+                query.setParameter(2, cliente);
+            }
+            query.setMaxResults(limit);
+            query.setFirstResult(offset);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+//total documentos de cotizacion
+    public int totalCotizacionesBySede(CfgEmpresasede sede, CfgCliente cliente) {
+        try {
+            String consulta = "SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '5' AND d.estado LIKE 'PENDIENTE'";
+            if (cliente != null) {
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
+            }
+//            System.out.println(consulta);
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, sede);
+            if (cliente != null) {
+                query.setParameter(2, cliente);
+            }
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }    
 }

@@ -16,6 +16,7 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class FacDocumentosmasterPK implements Serializable {
+
     @Basic(optional = false)
     @Column(name = "cfg_documento_idDoc", nullable = false)
     private int cfgdocumentoidDoc;
@@ -73,7 +74,7 @@ public class FacDocumentosmasterPK implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.FacDocumentosmasterPK[ cfgdocumentoidDoc=" + cfgdocumentoidDoc + ", numDocumento=" + numDocumento + " ]";
+        return cfgdocumentoidDoc + "," + numDocumento;
     }
-    
+
 }

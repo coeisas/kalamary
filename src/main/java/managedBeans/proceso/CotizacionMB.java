@@ -9,18 +9,11 @@ import entities.CfgCliente;
 import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
-import entities.CfgFormapago;
 import entities.CfgImpuesto;
-import entities.CfgMovInventarioDetalle;
-import entities.CfgMovInventarioMaestro;
 import entities.CfgMunicipio;
 import entities.CfgMunicipioPK;
 import entities.CfgProducto;
 import entities.CfgTipoempresa;
-import entities.InvConsolidado;
-import entities.FacCaja;
-import entities.FacDocuementopago;
-import entities.FacDocuementopagoPK;
 import entities.FacDocumentodetalle;
 import entities.FacDocumentodetallePK;
 import entities.FacDocumentoimpuesto;
@@ -28,11 +21,7 @@ import entities.FacDocumentoimpuestoPK;
 import entities.FacDocumentosmaster;
 import entities.FacDocumentosmasterPK;
 import entities.FacMovcaja;
-import entities.FacMovcajadetalle;
-import entities.InvMovimiento;
-import entities.InvMovimientoDetalle;
-import entities.InvMovimientoDetallePK;
-import entities.InvMovimientoPK;
+import entities.InvConsolidado;
 import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
@@ -54,52 +43,49 @@ import facades.InvConsolidadoFacade;
 import facades.InvMovimientoDetalleFacade;
 import facades.InvMovimientoFacade;
 import facades.SegUsuarioFacade;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.InputStream;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
-import java.util.Date;
-import javax.annotation.PostConstruct;
-import org.primefaces.context.RequestContext;
-import javax.faces.context.FacesContext;
-import javax.ejb.EJB;
-import javax.faces.application.FacesMessage;
-import javax.faces.event.ActionEvent;
-import managedBeans.seguridad.SesionMB;
-import org.primefaces.event.CellEditEvent;
-import org.primefaces.event.RowEditEvent;
-import org.primefaces.model.LazyDataModel;
-import utilities.LazyProductosModel;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.el.ELException;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.PhaseId;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import managedBeans.seguridad.SesionMB;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import utilities.FacturaReporte;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.el.ELException;
-import javax.faces.event.PhaseId;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import utilities.FacturaDetalleReporte;
 import utilities.FacturaImpuestoReporte;
-import utilities.FacturaPagoReporte;
+import utilities.FacturaReporte;
 import utilities.LazyClienteDataModel;
-import utilities.LazyCotizacionDataModel;
+import utilities.LazyProductosModel;
 
 /**
  *
@@ -107,8 +93,8 @@ import utilities.LazyCotizacionDataModel;
  */
 @ManagedBean
 @SessionScoped
-public class FacturaMB implements Serializable {
-    
+public class CotizacionMB implements Serializable {
+
     private String identificacionCliente;
     private String nombreCliente;
     private float subtotal;
@@ -120,25 +106,22 @@ public class FacturaMB implements Serializable {
     private LazyDataModel<CfgProducto> listaProducto;
     private List<FacDocumentodetalle> listaDetalle;
     private LazyDataModel<CfgCliente> listaClientes;
-    private LazyDataModel<FacDocumentosmaster> listadoCotizacion;
     private List<CfgImpuesto> listaImpuestos;
-    private List<CfgFormapago> listaFormapagos;
-    private FacCaja cajaUsuario;//caja asignada al usuario
+//    private FacCaja cajaUsuario;//caja asignada al usuario
     private FacMovcaja movimientoCajaMaster;//contiene informacion del maestro del movimiento. Se crea uno cada vez que se habre caja. cuando se cierra se habilita
     private List<SegUsuario> listaVendedor;
     private String documentoVendedor;
     private String nombreVendedor;
-    
+
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
     private CfgCliente clienteSeleccionado;
     private CfgProducto productoSeleccionado;
-    private FacDocumentosmaster cotizacionSeleccionada;
     private SegUsuario usuarioActual;
     private FacDocumentosmaster documentoActual;
     private boolean enableBtnPrint;
-    
+
     private SesionMB sesionMB;
 
 //--------------------------------------------------------
@@ -161,11 +144,11 @@ public class FacturaMB implements Serializable {
     private String tarjetaMembresia;
     private float cupoCredito;
     private StreamedContent image;
-    
+
     private CfgCliente clienteSeleccionadoModal;
-    
+
     private List<CfgMunicipio> listaMunicipios;
-    
+
     @EJB
     SegUsuarioFacade usuarioFacade;
     @EJB
@@ -208,11 +191,11 @@ public class FacturaMB implements Serializable {
     CfgMovInventarioDetalleFacade movInventarioDetalleFacade;
     @EJB
     CfgMovInventarioMaestroFacade movInventarioMaestroFacade;
-    
-    public FacturaMB() {
-        
+
+    public CotizacionMB() {
+
     }
-    
+
     @PostConstruct
     private void init() {
         //si es super usuario o admin permitir escoger la empresa y la sede
@@ -234,17 +217,10 @@ public class FacturaMB implements Serializable {
             if (clienteSeleccionado != null) {
                 setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
             }
-            listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
             cargarInformacionCliente();
         }
-        if (usuarioActual != null) {
-            cajaUsuario = usuarioActual.getFaccajaidCaja();
-            if (cajaUsuario != null) {
-                movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
-            }
-        }
     }
-    
+
     public void buscarCliente() {
         if (!identificacionCliente.trim().isEmpty()) {
             clienteSeleccionado = clienteFacade.buscarPorIdentificacionAndIdEmpresa(identificacionCliente, empresaActual);
@@ -256,7 +232,7 @@ public class FacturaMB implements Serializable {
         }
         cargarInformacionCliente();
     }
-    
+
     public void cargarListaVendedores() {
         if (empresaActual != null) {
             listaVendedor = usuarioFacade.buscarVendedoresByEmpresa(empresaActual);
@@ -266,7 +242,7 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('dlgVendedor').show()");
         RequestContext.getCurrentInstance().update("FormModalVendedor");
     }
-    
+
     public void buscarVendedor() {
         if (empresaActual != null) {
             if (!documentoVendedor.trim().isEmpty()) {
@@ -277,7 +253,7 @@ public class FacturaMB implements Serializable {
         }
         cargarInformacionVendedor();
     }
-    
+
     public void cargarInformacionVendedor() {
         if (vendedorSeleccionado != null) {
             nombreVendedor = vendedorSeleccionado.nombreCompleto();
@@ -287,73 +263,17 @@ public class FacturaMB implements Serializable {
             documentoVendedor = null;
         }
         RequestContext.getCurrentInstance().execute("PF('dlgVendedor').hide()");
-        RequestContext.getCurrentInstance().update("IdFormFactura");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion");
     }
-    
+
     public void cargarModalProductos() {
-        movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
-        if (movimientoCajaMaster != null) {
-            if (movimientoCajaMaster.getAbierta()) {
-                RequestContext.getCurrentInstance().execute("PF('dlgProducto').show()");
-            } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
-            }
-            
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Abra la caja por primera vez"));
-        }
-    }
-    
-    public void cargarCotizaciones() {
         if (empresaActual != null) {
-            listadoCotizacion = new LazyCotizacionDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado);
-            RequestContext.getCurrentInstance().update("FormBuscarCotizacion");
-            RequestContext.getCurrentInstance().execute("PF('dlgCotizacion').show()");
+            RequestContext.getCurrentInstance().execute("PF('dlgProducto').show()");
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la empresa"));
         }
     }
-    
-    public void cargarInformacionCotizacion() {
-        listaDetalle.clear();
-        subtotal = 0;
-        totalDescuento = 0;
-        if (cotizacionSeleccionada != null) {
-            clienteSeleccionado = cotizacionSeleccionada.getCfgclienteidCliente();
-            cargarInformacionCliente();
-            vendedorSeleccionado = cotizacionSeleccionada.getSegusuarioidUsuario1();
-            cargarInformacionVendedor();
-            for (FacDocumentodetalle detalle : cotizacionSeleccionada.getFacDocumentodetalleList()) {
-                CfgProducto producto = detalle.getCfgProducto();
-                InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, producto);
-                if (consolidado == null) {//el producto no esta en el inventario
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + producto.getNomProducto() + " en el inventario"));
-                    return;
-                }
-                if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + producto.getNomProducto()));
-                    return;
-                }
-                //se determina como cantidad posible el total de las existencias en el inventario
-                detalle.setCantidadPosible(consolidado.getExistencia());
-                //el valor del documento master no es el definitivo
-                detalle.setFacDocumentodetallePK(new FacDocumentodetallePK(producto.getIdProducto(), 1, 1));
-                detalle.setPrecioOriginal(detalle.getValorUnitario());
-                float descuento = detalle.getDescuento() * detalle.getValorTotal() / (float) 100;
-                descuento = Redondear(descuento, 0);
-                detalle.setValorDescuento(descuento);
-                listaDetalle.add(detalle);
-            }
-            calcularSubtotal();
-            calcularTotalDescuento();
-            calcularImpuesto();
-            calcularTotalFactura();
-            calcularTotalUSD();
-        }
-        RequestContext.getCurrentInstance().update("IdFormFactura");
-        RequestContext.getCurrentInstance().execute("PF('dlgCotizacion').hide()");
-    }
-    
+
     public void cargarInformacionCliente() {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
@@ -364,30 +284,29 @@ public class FacturaMB implements Serializable {
             listaImpuestos.clear();
         }
         listaDetalle.clear();
-        listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
         totalUSD = 0;
         setEnableBtnPrint(false);
         RequestContext.getCurrentInstance().execute("PF('dlgCliente').hide()");
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdNomCliente");
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
-        RequestContext.getCurrentInstance().update("IdFormFactura");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdNomCliente");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdSubTotal");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion");
     }
-    
+
     private void actualizarListadoClientes() {
         if (sedeActual != null) {
             listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
-    
+
     public void deseleccionarCliente() {
         clienteSeleccionado = null;
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
-    
+
     public void insertarItemProducto() {
         if (listaDetalle.isEmpty()) {
             subtotal = 0;
@@ -434,11 +353,11 @@ public class FacturaMB implements Serializable {
             calcularImpuesto();
             calcularTotalFactura();
             calcularTotalUSD();
-            RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
-            RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
+            RequestContext.getCurrentInstance().update("IdFormCotizacion:IdTableItemCotizacion");
+            RequestContext.getCurrentInstance().update("IdFormCotizacion:IdSubTotal");
         }
     }
-    
+
     private FacDocumentodetalle obtenerItemEnLista(CfgProducto cfgProducto) {
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
             if (documentodetalle.getCfgProducto().equals(cfgProducto)) {
@@ -447,7 +366,7 @@ public class FacturaMB implements Serializable {
         }
         return null;
     }
-    
+
     public void quitarItem(ActionEvent actionEvent) {
         FacDocumentodetalle item = (FacDocumentodetalle) actionEvent.getComponent().getAttributes().get("item");
         listaDetalle.remove(item);
@@ -460,10 +379,10 @@ public class FacturaMB implements Serializable {
         calcularImpuesto();
         calcularTotalFactura();
         calcularTotalUSD();
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdTableItemCotizacion");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdSubTotal");
     }
-    
+
     public void onCellEdit(CellEditEvent event) {
         int index = event.getRowIndex();
         if (listaDetalle.get(index).getValorUnitario() < listaDetalle.get(index).getPrecioOriginal()) {
@@ -486,13 +405,13 @@ public class FacturaMB implements Serializable {
         calcularImpuesto();
         calcularTotalFactura();
         calcularTotalUSD();
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdSubTotal");
     }
-    
+
     public void updateTabla() {
-        RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion:IdTableItemCotizacion");
     }
-    
+
     private void calcularTotalDescuento() {
         totalDescuento = 0;
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
@@ -500,14 +419,6 @@ public class FacturaMB implements Serializable {
         }
     }
 
-    //se usa unicamente cuando se cargar una autorizacion
-    private void calcularSubtotal() {
-        subtotal = 0;
-        for (FacDocumentodetalle documentodetalle : listaDetalle) {
-            subtotal += documentodetalle.getValorTotal();
-        }
-    }
-    
     private void calcularImpuesto() {
         float aux;
         for (CfgImpuesto impuesto : listaImpuestos) {
@@ -516,14 +427,14 @@ public class FacturaMB implements Serializable {
             impuesto.setTotalImpuesto(aux);
         }
     }
-    
+
     private void calcularTotalFactura() {
         totalFactura = subtotal - totalDescuento;
         for (CfgImpuesto impuesto : listaImpuestos) {
             totalFactura += impuesto.getTotalImpuesto();
         }
     }
-    
+
     private void calcularTotalUSD() {
         if (movimientoCajaMaster != null) {
             if (movimientoCajaMaster.getAbierta()) {
@@ -538,13 +449,13 @@ public class FacturaMB implements Serializable {
             }
         }
     }
-    
+
     public float Redondear(float pNumero, int pCantidadDecimales) {
         BigDecimal value = new BigDecimal(pNumero);
         value = value.setScale(pCantidadDecimales, RoundingMode.HALF_UP);
         return value.floatValue();
     }
-    
+
     private boolean validarCampos(CfgDocumento documento) {
         boolean ban = true;
         if (clienteSeleccionado == null) {
@@ -556,30 +467,24 @@ public class FacturaMB implements Serializable {
             return false;
         }
         if (listaDetalle.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de cotizacion"));
             return false;
         }
         if (documento.getFinDocumento() < documento.getActDocumento()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de factura. Revice la configuracion de documentos"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de cotizacion. Revice la configuracion de documentos"));
             return false;
         }
         if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento.getIdDoc(), documento.getActDocumento()) != null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Consecutivo de factura duplicado. Revice la configuracion de documentos"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Consecutivo de cotizacion duplicado. Revice la configuracion de documentos"));
             return false;
         }
         return ban;
     }
-    
-    public void guardarFactura() {
-        movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
-        if (!movimientoCajaMaster.getAbierta()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
-            return;
-        }
-        CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
-        CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
+
+    public void guardarCotizacion() {
+        CfgDocumento documento = documentoFacade.buscarDocumentoDeCotizacionBySede(sedeActual);
         if (documento == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a cotizacion"));
             return;
         }
         if (documento.getActDocumento() == 0) {
@@ -590,10 +495,6 @@ public class FacturaMB implements Serializable {
         if (!validarCampos(documento)) {
             return;
         }
-        if (documentoMovInventario == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a movimiento de inventario de salida"));
-            return;
-        }
         try {
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
@@ -602,13 +503,11 @@ public class FacturaMB implements Serializable {
             documentosmaster.setCfgempresasedeidSede(sedeActual);
             documentosmaster.setDescuento(totalDescuento);
             documentosmaster.setFecCrea(new Date());
-            documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotalFactura(totalFactura);
-            documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);
+            documentosmaster.setSegusuarioidUsuario1(usuarioActual);
             documentosmaster.setTotalFacturaUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
-            documentosmaster.setFaccajaidCaja(cajaUsuario);
             documentosmaster.setEstado("PENDIENTE");
             documentosmasterFacade.create(documentosmaster);
             if (documento.getActDocumento() == documento.getFinDocumento()) {
@@ -620,7 +519,6 @@ public class FacturaMB implements Serializable {
                 documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
                 documentodetalle.setFacDocumentosmaster(documentosmaster);
                 documentodetalleFacade.create(documentodetalle);
-                actualizarTablaConsolidado(documentodetalle);
             }
             for (CfgImpuesto impuesto : listaImpuestos) {
                 FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
@@ -631,179 +529,22 @@ public class FacturaMB implements Serializable {
                 documentoimpuesto.setPorcentajeImpuesto(impuesto.getPorcentaje());
                 documentoimpuestoFacade.create(documentoimpuesto);
             }
-            for (CfgFormapago formapago : listaFormapagos) {
-                if (formapago.getSubtotal() > 0) {
-                    FacDocuementopago docuementopago = new FacDocuementopago();
-                    docuementopago.setFacDocuementopagoPK(new FacDocuementopagoPK(formapago.getIdFormaPago(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
-                    docuementopago.setCfgFormapago(formapago);
-                    docuementopago.setFacDocumentosmaster(documentosmaster);
-                    docuementopago.setValorPago(formapago.getSubtotal());
-                    docuementopagoFacade.create(docuementopago);
-                }
-            }
-            if (cotizacionSeleccionada != null) {
-                cotizacionSeleccionada.setEstado("FACTURADA");
-                documentosmasterFacade.edit(cotizacionSeleccionada);
-            }
             documentoActual = documentosmaster;
-            crearMovimientoInventario(listaDetalle, documentosmaster);
-            generarMovimientoCaja(documentosmaster);
             limpiarFormulario();
-            RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Cotizacion creada"));
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cotizacion no creada"));
         }
     }
-    
-    private void generarMovimientoCaja(FacDocumentosmaster documentosmaster) {
-        List<FacDocuementopago> listaformapago = docuementopagoFacade.buscarByDocumentoMaster(documentosmaster);
-        try {
-            for (FacDocuementopago formapago : listaformapago) {
-                FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
-                movcajadetalle.setFacDocumentosmaster(documentosmaster);
-                movcajadetalle.setFecha(new Date());
-                movcajadetalle.setFacmovcajaidMovimiento(movimientoCajaMaster);
-                movcajadetalle.setCfgformapagoidFormaPago(formapago.getCfgFormapago());
-                movcajadetalle.setValor(formapago.getValorPago());
-                movcajadetalleFacade.create(movcajadetalle);
-            }
-            documentosmaster.setEstado("CANCELADA");
-            documentosmasterFacade.edit(documentosmaster);
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro registrar el pago. Cancele la factura " + documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
-        }
-    }
-    
-    private void actualizarTablaConsolidado(FacDocumentodetalle documentodetalle) {
-        try {
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, documentodetalle.getCfgProducto());
-            if (consolidado != null) {
-                consolidado.setFechaUltSalida(new Date());
-                consolidado.setExistencia(consolidado.getExistencia() - documentodetalle.getCantidad());
-                consolidado.setSalidas(consolidado.getSalidas() + documentodetalle.getCantidad());
-                consolidadoFacade.edit(consolidado);
-            }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario para el producto " + documentodetalle.getCfgProducto().getNomProducto()));
-        }
-    }
-    
-    private void crearMovimientoInventario(List<FacDocumentodetalle> listaDetalle, FacDocumentosmaster documentosmaster) {
-        CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
-        if (documento.getActDocumento() == 0) {
-            documento.setActDocumento(documento.getIniDocumento());
-        } else {
-            documento.setActDocumento(documento.getActDocumento() + 1);
-        }
-        CfgMovInventarioMaestro movInventarioMaestro = movInventarioMaestroFacade.buscarMovimientoSalidaByEmpresa(empresaActual);
-        CfgMovInventarioDetalle movInventarioDetalle = movInventarioDetalleFacade.buscarSalidaVentaByMaestro(movInventarioMaestro);
-        try {
-//            CREACION DEL MAESTRO MOVIMIENTO 
-            InvMovimiento invMovimientoMaestro = new InvMovimiento();
-            invMovimientoMaestro.setInvMovimientoPK(new InvMovimientoPK(documento.getIdDoc(), documento.getActDocumento()));
-            invMovimientoMaestro.setCfgDocumento(documento);
-            invMovimientoMaestro.setCfgempresasedeidSede(sedeActual);
-            invMovimientoMaestro.setCfgmovinventariodetalleidMovInventarioDetalle(movInventarioDetalle);
-            invMovimientoMaestro.setDescuento(totalDescuento);
-            invMovimientoMaestro.setFacDocumentosmaster(documentosmaster);
-            invMovimientoMaestro.setFecha(new Date());
-//            invMovimientoMaestro.setIva(totalIva);
-            invMovimientoMaestro.setSegusuarioidUsuario(usuarioActual);
-            invMovimientoMaestro.setSubtotal(subtotal);
-            invMovimientoMaestro.setTotal(totalFactura);
-            inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
-            documentoFacade.edit(documento);
 
-//            CREACION DEL DETALLE MOVIMIENTO
-            for (FacDocumentodetalle detalleFactura : listaDetalle) {
-                InvMovimientoDetalle detalle = new InvMovimientoDetalle();
-                detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc(), detalleFactura.getCfgProducto().getIdProducto()));
-                detalle.setInvMovimiento(invMovimientoMaestro);
-                detalle.setCantidad(detalleFactura.getCantidad());
-                detalle.setCfgProducto(detalleFactura.getCfgProducto());
-                detalle.setCostoAdquisicion(detalleFactura.getValorUnitario());
-                detalle.setDescuento(detalleFactura.getDescuento());
-                detalle.setCostoFinal(detalleFactura.getValorTotal());
-                inventarioMovimientoDetalleFacade.create(detalle);
-            }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo el inventario en el inventario"));
-        }
-    }
-    
-    public void facturacion() {
-        if (cajaUsuario == null) {
-            //se vuelve a buscar la caja del usario. Por si el usuario la creo en el transcurso de la sesion
-            usuarioActual = usuarioFacade.find(usuarioActual.getIdUsuario());
-            cajaUsuario = usuarioActual.getFaccajaidCaja();
-            if (cajaUsuario == null) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El usuario no tiene caja asignada"));
-                return;
-            } else {
-                sesionMB.getUsuarioActual().setFaccajaidCaja(cajaUsuario);
-            }
-        }
-        movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
-        if (movimientoCajaMaster == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Abra la caja por primera vez"));
-            return;
-        }
-        if (!movimientoCajaMaster.getAbierta()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
-            return;
-        }
-        if (!listaDetalle.isEmpty()) {
-            RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').show()");
-            RequestContext.getCurrentInstance().update("FormModalFactura");
-        } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
-        }
-    }
-    
     public void impresion() {
         if (documentoActual != null) {
             RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
         } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay una factura reciente"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay una cotizacion reciente"));
         }
     }
-    
-    public void onRowEdit(RowEditEvent event) {
-        CfgFormapago formapago = (CfgFormapago) event.getObject();
-        float aux = totalFormaPago();
-        if (formapago.getSubtotal() < 0 || !validarFormaPago(aux)) {
-            formapago.setSubtotal(0);
-        }
-        setEnableBtnPrint(totalFactura == aux);
-    }
-    
-    public void onRowCancel(RowEditEvent event) {
-//        FacesMessage msg = new FacesMessage("Edit Cancelled", ((CfgFormapago) event.getObject()).getNomFormaPago());
-//        FacesContext.getCurrentInstance().addMessage(null, msg);
-        CfgFormapago formapago = (CfgFormapago) event.getObject();
-        formapago.setSubtotal(0);
-        float aux = totalFormaPago();
-        setEnableBtnPrint(totalFactura == aux);
-    }
-    
-    private float totalFormaPago() {
-        float aux = 0;
-        for (CfgFormapago formapago : listaFormapagos) {
-            aux += formapago.getSubtotal();
-        }
-        return aux;
-    }
-    
-    private boolean validarFormaPago(float aux) {
-        return aux <= totalFactura;
-    }
-    
-    public void actualizarTablaFormaPago() {
-        RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
-        RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
-    }
-    
+
     public void generarPDF() {
 //        guardarFactura();
         if (documentoActual != null) {
@@ -827,9 +568,9 @@ public class FacturaMB implements Serializable {
             }
 //            documentoActual = null;
         }
-        
+
     }
-    
+
     private void generarFactura(String ruta) throws IOException, JRException {
         FacDocumentosmaster documento
                 = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
@@ -850,7 +591,6 @@ public class FacturaMB implements Serializable {
         facturaReporte.setTotalFactura(documento.getTotalFactura());
         facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
-        facturaReporte.setPago(crearListadoPago(docuementopagoFacade.buscarByDocumentoMaster(documento)));
         facturas.add(facturaReporte);
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(facturas);
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -889,7 +629,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().responseComplete();
         }
     }
-    
+
     private List<FacturaDetalleReporte> crearListadoDetalle(List<FacDocumentodetalle> detalles) {
         List<FacturaDetalleReporte> list = new ArrayList();
         for (FacDocumentodetalle detalle : detalles) {
@@ -904,18 +644,7 @@ public class FacturaMB implements Serializable {
         }
         return list;
     }
-    
-    private List<FacturaPagoReporte> crearListadoPago(List<FacDocuementopago> pagos) {
-        List<FacturaPagoReporte> list = new ArrayList();
-        for (FacDocuementopago pago : pagos) {
-            FacturaPagoReporte facturaPagoReporte = new FacturaPagoReporte();
-            facturaPagoReporte.setFormaPago(pago.getCfgFormapago().getNomFormaPago());
-            facturaPagoReporte.setValorPago(pago.getValorPago());
-            list.add(facturaPagoReporte);
-        }
-        return list;
-    }
-    
+
     private List<FacturaImpuestoReporte> crearListadoImpuesto(List<FacDocumentoimpuesto> impuestos) {
         List<FacturaImpuestoReporte> list = new ArrayList();
         for (FacDocumentoimpuesto impuesto : impuestos) {
@@ -927,22 +656,20 @@ public class FacturaMB implements Serializable {
         }
         return list;
     }
-    
+
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
         setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
-        listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
         totalUSD = 0;
-        cotizacionSeleccionada = null;
         setEnableBtnPrint(false);
-        RequestContext.getCurrentInstance().update("IdFormFactura");
+        RequestContext.getCurrentInstance().update("IdFormCotizacion");
         RequestContext.getCurrentInstance().update("FormModalFactura");
-        
+
     }
 //------------------------------------    
 //    METODOS PARA CREAR CLIENTE
@@ -960,14 +687,14 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
     }
-    
+
     public void actualizarMunicipios() {
         listaMunicipios.clear();
         if (idDepartamento != null) {
             listaMunicipios = municipioFacade.buscarPorDepartamento(idDepartamento);
         }
     }
-    
+
     public void handleFileUpload(FileUploadEvent event) {
         file = event.getFile();
         if (file != null) {
@@ -975,7 +702,7 @@ public class FacturaMB implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('dlgFoto').hide()");
         }
     }
-    
+
     public void cargarInformacionClienteModal() {
         if (getClienteSeleccionadoModal() != null) {
             setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
@@ -1009,7 +736,7 @@ public class FacturaMB implements Serializable {
         }
         RequestContext.getCurrentInstance().update("FormModalCliente");
     }
-    
+
     private void limpiarFormularioModal() {
         setIdIdentificacion(0);
 //        setNumIdentificacion(null);
@@ -1030,7 +757,7 @@ public class FacturaMB implements Serializable {
         setFechaNacimiento(null);
 //        opcion = "creacion";
     }
-    
+
     public void accion() {
         if (clienteSeleccionadoModal != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No es posible modificar al cliente."));
@@ -1038,16 +765,12 @@ public class FacturaMB implements Serializable {
             crearCliente();
         }
     }
-    
+
     private boolean validarCamposFormulario() {
         if (sedeActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
             return false;
         }
-//        if (codigoCliente.isEmpty()) {
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Asigne un codigo al cliente"));
-//            return false;
-//        }
         if (idIdentificacion == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de identificacion"));
             return false;
@@ -1067,7 +790,7 @@ public class FacturaMB implements Serializable {
         if (direccion.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Direccion vacia"));
             return false;
-            
+
         }
         if (telefono.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero telefonico"));
@@ -1075,7 +798,7 @@ public class FacturaMB implements Serializable {
         }
         return true;
     }
-    
+
     private void crearCliente() {
         if (!validarCamposFormulario()) {
             return;
@@ -1120,269 +843,258 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no creado"));
         }
     }
-    
+
     public void cancelar() {
         clienteSeleccionadoModal = null;
-//        empresaSeleccionada = null;
         listaMunicipios.clear();
-//        setCodEmpresa(null);
-//        setCodigoCliente(null);
         limpiarFormularioModal();
         RequestContext.getCurrentInstance().update("FormModalCliente");
     }
-    
+
     public List<FacDocumentodetalle> getListaDetalle() {
         return listaDetalle;
     }
-    
+
     public void setListaDetalle(List<FacDocumentodetalle> listaDetalle) {
         this.listaDetalle = listaDetalle;
     }
-    
+
     public CfgCliente getClienteSeleccionado() {
         return clienteSeleccionado;
     }
-    
+
     public void setClienteSeleccionado(CfgCliente clienteSeleccionado) {
         this.clienteSeleccionado = clienteSeleccionado;
     }
-    
+
     public LazyDataModel<CfgCliente> getListaClientes() {
         return listaClientes;
     }
-    
+
     public void setListaClientes(LazyDataModel<CfgCliente> listaClientes) {
         this.listaClientes = listaClientes;
     }
-    
+
     public String getIdentificacionCliente() {
         return identificacionCliente;
     }
-    
+
     public void setIdentificacionCliente(String identificacionCliente) {
         this.identificacionCliente = identificacionCliente;
     }
-    
+
     public String getNombreCliente() {
         return nombreCliente;
     }
-    
+
     public void setNombreCliente(String nombreCliente) {
         this.nombreCliente = nombreCliente;
     }
-    
+
     public LazyDataModel<CfgProducto> getListaProducto() {
         return listaProducto;
     }
-    
+
     public void setListaProducto(LazyDataModel<CfgProducto> listaProducto) {
         this.listaProducto = listaProducto;
     }
-    
+
     public CfgProducto getProductoSeleccionado() {
         return productoSeleccionado;
     }
-    
+
     public void setProductoSeleccionado(CfgProducto productoSeleccionado) {
         this.productoSeleccionado = productoSeleccionado;
     }
-    
+
     public float getSubtotal() {
         return subtotal;
     }
-    
+
     public void setSubtotal(float subtotal) {
         this.subtotal = subtotal;
     }
-    
+
     public float getTotalDescuento() {
         return totalDescuento;
     }
-    
+
     public void setTotalDescuento(float totalDescuento) {
         this.totalDescuento = totalDescuento;
     }
-    
+
     public List<CfgImpuesto> getListaImpuestos() {
         return listaImpuestos;
     }
-    
+
     public void setListaImpuestos(List<CfgImpuesto> listaImpuestos) {
         this.listaImpuestos = listaImpuestos;
     }
-    
+
     public float getTotalFactura() {
         return totalFactura;
     }
-    
+
     public void setTotalFactura(float totalFactura) {
         this.totalFactura = totalFactura;
     }
-    
-    public List<CfgFormapago> getListaFormapagos() {
-        return listaFormapagos;
-    }
-    
-    public void setListaFormapagos(List<CfgFormapago> listaFormapagos) {
-        this.listaFormapagos = listaFormapagos;
-    }
-    
+
     public int getTipoImpresion() {
         return tipoImpresion;
     }
-    
+
     public void setTipoImpresion(int tipoImpresion) {
         this.tipoImpresion = tipoImpresion;
     }
-    
+
     public boolean isEnableBtnPrint() {
         return enableBtnPrint;
     }
-    
+
     public void setEnableBtnPrint(boolean enableBtnPrint) {
         this.enableBtnPrint = enableBtnPrint;
     }
-    
+
     public float getTotalUSD() {
         return totalUSD;
     }
-    
+
     public String getObservacion() {
         return observacion;
     }
-    
+
     public void setObservacion(String observacion) {
         this.observacion = observacion;
     }
-    
+
     public String getIdDepartamento() {
         return idDepartamento;
     }
-    
+
     public void setIdDepartamento(String idDepartamento) {
         this.idDepartamento = idDepartamento;
     }
-    
+
     public String getIdMunicipio() {
         return idMunicipio;
     }
-    
+
     public void setIdMunicipio(String idMunicipio) {
         this.idMunicipio = idMunicipio;
     }
-    
+
     public int getIdIdentificacion() {
         return idIdentificacion;
     }
-    
+
     public void setIdIdentificacion(int idIdentificacion) {
         this.idIdentificacion = idIdentificacion;
     }
-    
+
     public String getNumIdentificacion() {
         return numIdentificacion;
     }
-    
+
     public void setNumIdentificacion(String numIdentificacion) {
         this.numIdentificacion = numIdentificacion;
     }
-    
+
     public int getIdTipoCliente() {
         return idTipoCliente;
     }
-    
+
     public void setIdTipoCliente(int idTipoCliente) {
         this.idTipoCliente = idTipoCliente;
     }
-    
+
     public String getPrimerNombre() {
         return primerNombre;
     }
-    
+
     public void setPrimerNombre(String primerNombre) {
         this.primerNombre = primerNombre;
     }
-    
+
     public String getSegundoNombre() {
         return segundoNombre;
     }
-    
+
     public void setSegundoNombre(String segundoNombre) {
         this.segundoNombre = segundoNombre;
     }
-    
+
     public String getPrimerApellido() {
         return primerApellido;
     }
-    
+
     public void setPrimerApellido(String primerApellido) {
         this.primerApellido = primerApellido;
     }
-    
+
     public String getSegundoApellido() {
         return segundoApellido;
     }
-    
+
     public void setSegundoApellido(String segundoApellido) {
         this.segundoApellido = segundoApellido;
     }
-    
+
     public UploadedFile getFile() {
         return file;
     }
-    
+
     public void setFile(UploadedFile file) {
         this.file = file;
     }
-    
+
     public String getDireccion() {
         return direccion;
     }
-    
+
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    
+
     public String getTelefono() {
         return telefono;
     }
-    
+
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    
+
     public String getMail() {
         return mail;
     }
-    
+
     public void setMail(String mail) {
         this.mail = mail;
     }
-    
+
     public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
-    
+
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
-    
+
     public String getTarjetaMembresia() {
         return tarjetaMembresia;
     }
-    
+
     public void setTarjetaMembresia(String tarjetaMembresia) {
         this.tarjetaMembresia = tarjetaMembresia;
     }
-    
+
     public float getCupoCredito() {
         return cupoCredito;
     }
-    
+
     public void setCupoCredito(float cupoCredito) {
         this.cupoCredito = cupoCredito;
     }
-    
+
     public StreamedContent getImage() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
@@ -1399,68 +1111,57 @@ public class FacturaMB implements Serializable {
             }
         }
     }
-    
+
     public void setImage(StreamedContent image) {
         this.image = image;
     }
-    
+
     public List<CfgMunicipio> getListaMunicipios() {
         return listaMunicipios;
     }
-    
+
     public void setListaMunicipios(List<CfgMunicipio> listaMunicipios) {
         this.listaMunicipios = listaMunicipios;
     }
-    
+
     public CfgCliente getClienteSeleccionadoModal() {
         return clienteSeleccionadoModal;
     }
-    
+
     public void setClienteSeleccionadoModal(CfgCliente clienteSeleccionadoModal) {
         this.clienteSeleccionadoModal = clienteSeleccionadoModal;
     }
-    
+
     public SegUsuario getVendedorSeleccionado() {
         return vendedorSeleccionado;
     }
-    
+
     public void setVendedorSeleccionado(SegUsuario vendedorSeleccionado) {
         this.vendedorSeleccionado = vendedorSeleccionado;
     }
-    
+
     public List<SegUsuario> getListaVendedor() {
         return listaVendedor;
     }
-    
+
     public void setListaVendedor(List<SegUsuario> listaVendedor) {
         this.listaVendedor = listaVendedor;
     }
-    
+
     public String getDocumentoVendedor() {
         return documentoVendedor;
     }
-    
+
     public void setDocumentoVendedor(String documentoVendedor) {
         this.documentoVendedor = documentoVendedor;
     }
-    
+
     public String getNombreVendedor() {
         return nombreVendedor;
     }
-    
+
     public void setNombreVendedor(String nombreVendedor) {
         this.nombreVendedor = nombreVendedor;
     }
-    
-    public LazyDataModel<FacDocumentosmaster> getListadoCotizacion() {
-        return listadoCotizacion;
-    }
-    
-    public FacDocumentosmaster getCotizacionSeleccionada() {
-        return cotizacionSeleccionada;
-    }
-    
-    public void setCotizacionSeleccionada(FacDocumentosmaster cotizacionSeleccionada) {
-        this.cotizacionSeleccionada = cotizacionSeleccionada;
-    }
+
 }
