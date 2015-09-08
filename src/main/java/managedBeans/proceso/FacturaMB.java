@@ -320,10 +320,11 @@ public class FacturaMB implements Serializable {
         totalDescuento = 0;
         if (cotizacionSeleccionada != null) {
             clienteSeleccionado = cotizacionSeleccionada.getCfgclienteidCliente();
+            List<FacDocumentodetalle> lista = documentodetalleFacade.buscarByDocumentoMaster(cotizacionSeleccionada);
             cargarInformacionCliente();
             vendedorSeleccionado = cotizacionSeleccionada.getSegusuarioidUsuario1();
             cargarInformacionVendedor();
-            for (FacDocumentodetalle detalle : cotizacionSeleccionada.getFacDocumentodetalleList()) {
+            for (FacDocumentodetalle detalle : lista) {
                 CfgProducto producto = detalle.getCfgProducto();
                 InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, producto);
                 if (consolidado == null) {//el producto no esta en el inventario

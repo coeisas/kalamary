@@ -113,6 +113,7 @@ public class CotizacionMB implements Serializable {
     private String documentoVendedor;
     private String nombreVendedor;
 
+    private String numCotizacion;
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
@@ -218,6 +219,12 @@ public class CotizacionMB implements Serializable {
                 setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
             }
             cargarInformacionCliente();
+        }
+        if (usuarioActual != null) {
+            if (usuarioActual.getCfgRolIdrol() != null) {
+                vendedorSeleccionado = usuarioActual.getCfgRolIdrol().getCodrol().equals("00003") ? usuarioActual : null;
+                cargarInformacionVendedor();
+            }
         }
     }
 
@@ -505,8 +512,8 @@ public class CotizacionMB implements Serializable {
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotalFactura(totalFactura);
-            documentosmaster.setSegusuarioidUsuario(usuarioActual);//vendedor            
-            documentosmaster.setSegusuarioidUsuario1(usuarioActual);//vendedor
+            documentosmaster.setSegusuarioidUsuario(vendedorSeleccionado);//vendedor            
+            documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);//vendedor
             documentosmaster.setTotalFacturaUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setEstado("PENDIENTE");
@@ -540,6 +547,8 @@ public class CotizacionMB implements Serializable {
 
     public void impresion() {
         if (documentoActual != null) {
+            setNumCotizacion(documentoActual.determinarNumFactura());
+            RequestContext.getCurrentInstance().update("IdFormConfirmacion");
             RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay una cotizacion reciente"));
@@ -547,32 +556,21 @@ public class CotizacionMB implements Serializable {
     }
 
     public void generarPDF() {
-//        guardarFactura();
         if (documentoActual != null) {
             ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-            String ruta = null;
-            switch (tipoImpresion) {
-                case 1:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaTicket.jasper");
-                    break;
-                case 2:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaCarta.jasper");
-                    break;
-            }
-//            setTipoImpresion(2);
+            String ruta = servletContext.getRealPath("/procesos/reportes/cotizacion.jasper");
             try {
-                generarFactura(ruta);
+                generarCotizacion(ruta);
             } catch (IOException ex) {
                 Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
             } catch (JRException ex) {
                 Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
             }
-//            documentoActual = null;
         }
 
     }
 
-    private void generarFactura(String ruta) throws IOException, JRException {
+    private void generarCotizacion(String ruta) throws IOException, JRException {
         FacDocumentosmaster documento
                 = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
                         sedeActual,
@@ -622,7 +620,6 @@ public class CotizacionMB implements Serializable {
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
             parametros.put("SUBREPORT_DIR", rutaReportes);
             parametros.put("observacion", documento.getObservaciones());
-            parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
             parametros.put("resdian", documento.getCfgdocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
@@ -1163,6 +1160,14 @@ public class CotizacionMB implements Serializable {
 
     public void setNombreVendedor(String nombreVendedor) {
         this.nombreVendedor = nombreVendedor;
+    }
+
+    public String getNumCotizacion() {
+        return numCotizacion;
+    }
+
+    public void setNumCotizacion(String numCotizacion) {
+        this.numCotizacion = numCotizacion;
     }
 
 }

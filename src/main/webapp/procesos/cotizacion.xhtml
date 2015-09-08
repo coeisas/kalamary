@@ -101,10 +101,6 @@
                         <p:outputLabel value="#{cotizacionMB.totalFactura}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="TOTAL USD:"/> 
-                        <p:outputLabel value="#{cotizacionMB.totalUSD}">
-                            <f:convertNumber type="currency"/>
-                        </p:outputLabel>
                     </p:panelGrid>
                 </div>                   
             </p:panel>
@@ -116,7 +112,7 @@
             </div>
             <br/>
             <div style="text-align: center;">
-                <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{cotizacionMB.guardarCotizacion}" title="Facturar"/>&nbsp;
+                <p:commandButton icon="ui-icon-disk" value="Guardar Cotizacion" actionListener="#{cotizacionMB.guardarCotizacion}" title="Guardar Cotización"/>&nbsp;
                 <p:commandButton icon="ui-icon-print" value="Generar PDF" actionListener="#{cotizacionMB.impresion}" title="Generar PDF"/>
             </div>
         </h:form>
@@ -158,16 +154,13 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog widgetVar="dlgResult" modal="true" header="TIPO DE IMPRESION" resizable="false" width="15%">
-            <h:form>
+        <p:dialog widgetVar="dlgResult" modal="true" header="CONFIRMAR IMPRESION" resizable="false" width="25%">
+            <h:form id="IdFormConfirmacion">
                 <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
                     <p:row>
                         <p:column>
-                            <p:selectOneRadio value="#{cotizacionMB.tipoImpresion}">
-                                <p:ajax update="@none" event="change"/>
-                                <f:selectItem itemLabel="Ticket" itemValue="1" />
-                                <f:selectItem itemLabel="Carta" itemValue="2" />
-                            </p:selectOneRadio>
+                            <p:outputLabel class="labelFormulario" value="Cotizacion:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{cotizacionMB.numCotizacion}"/>
                         </p:column>
                     </p:row>
                     <p:row>
