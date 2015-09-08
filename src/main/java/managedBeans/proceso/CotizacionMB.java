@@ -505,7 +505,8 @@ public class CotizacionMB implements Serializable {
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotalFactura(totalFactura);
-            documentosmaster.setSegusuarioidUsuario1(usuarioActual);
+            documentosmaster.setSegusuarioidUsuario(usuarioActual);//vendedor            
+            documentosmaster.setSegusuarioidUsuario1(usuarioActual);//vendedor
             documentosmaster.setTotalFacturaUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setEstado("PENDIENTE");
