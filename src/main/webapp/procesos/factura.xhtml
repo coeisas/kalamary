@@ -149,13 +149,18 @@
                     <p:column headerText="Cliente">
                         <h:outputText value="#{cotizacion.cfgclienteidCliente.nombreCompleto()}"/>
                     </p:column>
+                    <p:column headerText="Cotizacion">
+                        <h:outputText value="#{cotizacion.determinarNumFactura()}"/>
+                    </p:column>
                     <p:column headerText="Fecha Creacion">
                         <h:outputText value="#{cotizacion.fecCrea}">
                             <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="dd/MM/yyyy"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Total">
-                        <h:outputText value="#{cotizacion.totalFactura}"/>
+                        <h:outputText value="#{cotizacion.totalFactura}"> 
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
                     </p:column>
                 </p:dataTable>
                 <p:separator/>

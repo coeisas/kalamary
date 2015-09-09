@@ -86,6 +86,7 @@ import utilities.FacturaImpuestoReporte;
 import utilities.FacturaReporte;
 import utilities.LazyClienteDataModel;
 import utilities.LazyProductosModel;
+import java.util.Calendar;
 
 /**
  *
@@ -613,8 +614,18 @@ public class CotizacionMB implements Serializable {
             parametros.put("telefono", telefono);
             parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
-            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
+            parametros.put("tipoDoc", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura());
+            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());           
             parametros.put("fecha", documento.getFecCrea());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(documento.getFecCrea());
+            calendar.add(Calendar.DATE, 8);
+            parametros.put("vencimiento", calendar.getTime());
+            CfgCliente cliente = documento.getCfgclienteidCliente();
+            parametros.put("dircli", cliente.getDirCliente());
+            parametros.put("telcli", cliente.getTel1());
+            parametros.put("ciudadcli", cliente.getCfgMunicipio().getNomMunicipio());
+            parametros.put("emailcli", cliente.getMail());
             parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             parametros.put("usuario", usuarioActual.nombreCompleto());
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
