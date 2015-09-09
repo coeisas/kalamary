@@ -9,11 +9,19 @@
                 template="../templates/layout.xhtml">
     <ui:define name="title">Factura</ui:define>
     <ui:define name="content">
+        <script>
+            function focusValorFormaPago(idFormaPago, valor) {
+                if (valor == 0) {
+                    determinarValorFormaPago([{name: 'idPago', value: idFormaPago}, {name: 'valor', value: valor}]);
+                }
+            }
+        </script>
         <p:growl autoUpdate="true" showDetail="true"/>
         <p:growl id="msg" showDetail="true"/>
         <h:form id="IdFormFactura">
             <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>
+            <p:remoteCommand name="determinarValorFormaPago" actionListener="#{facturaMB.determinarValorFormaPago}"/>
             <div>
                 <p:outputLabel value="Cliente:" class="labelFormularioObligatorio"/>
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
@@ -201,7 +209,7 @@
                                     <f:convertNumber type="currency"/>
                                 </h:outputText>
                             </f:facet>
-                            <f:facet name="input"><h:inputText value="#{formaPago.subtotal}"/></f:facet>
+                            <f:facet name="input"><h:inputText value="#{formaPago.subtotal}" onfocus="focusValorFormaPago('#{formaPago.idFormaPago}', '#{formaPago.subtotal}');"/></f:facet>
                         </p:cellEditor>                        
                     </p:column>
                     <p:column style="width:32px">

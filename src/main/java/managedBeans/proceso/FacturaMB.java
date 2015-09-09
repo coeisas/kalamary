@@ -807,6 +807,22 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
     }
 
+    public void determinarValorFormaPago() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        int idFormaPago = Integer.valueOf(params.get("idPago"));
+        float aux = totalFormaPago();
+        for (CfgFormapago fpago : listaFormapagos) {
+            if (fpago.getIdFormaPago() == idFormaPago && fpago.getSubtotal() == 0) {
+                fpago.setSubtotal(totalFactura - aux);
+                break;
+            }
+        }
+        aux = totalFormaPago();
+        setEnableBtnPrint(totalFactura == aux);
+        RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
+        RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
+    }
+
     public void generarPDF() {
 //        guardarFactura();
         if (documentoActual != null) {
