@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 import javax.faces.application.FacesMessage;
 import org.primefaces.context.RequestContext;
 import javax.faces.event.ActionEvent;
+import javax.faces.model.SelectItem;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +58,7 @@ import utilities.FacturaDetalleReporte;
 import utilities.FacturaImpuestoReporte;
 import utilities.FacturaPagoReporte;
 import utilities.FacturaReporte;
+import utilities.LazyFacturaEspecialDataModel;
 
 /**
  *
@@ -77,6 +79,9 @@ public class ListadoFacturaMB implements Serializable {
     private Date fechaFinal;
     private CfgCliente clienteSeleccionado;
     private boolean renderTablaFactura;
+
+    private List<SelectItem> listaTipoFactura;//los tipos de factura son: normal y remision.
+    private int tipoFactura;
 
     private int tipoImpresion;
     private Calendar fechaIni;
@@ -111,6 +116,11 @@ public class ListadoFacturaMB implements Serializable {
             sedeActual = sesionMB.getSedeActual();
             listadoClientes = new LazyClienteDataModel(clienteFacade, sedeActual.getCfgempresaidEmpresa());
 //            listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual);
+            listaTipoFactura = new ArrayList();
+            SelectItem aux = new SelectItem(1, "NORMAL");
+            listaTipoFactura.add(aux);
+            aux = new SelectItem(2, "ESPECIAL");
+            listaTipoFactura.add(aux);
         }
         fechaIncial = new Date();
         fechaFinal = new Date();
@@ -123,6 +133,14 @@ public class ListadoFacturaMB implements Serializable {
     }
 
     public void buscarFactura() {
+        if (sedeActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha encontrado informacion de la sede"));
+            return;
+        }
+        if (tipoFactura == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha Seleccionado el tipo de factura"));
+            return;
+        }
         if (!factura.trim().isEmpty()) {
             try {
                 numFactura = Integer.parseInt(factura);
@@ -139,7 +157,12 @@ public class ListadoFacturaMB implements Serializable {
                     numFactura = 0;
                 }
                 if (numFactura == 0) {
-                    CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+                    CfgDocumento documento;
+                    if (tipoFactura == 1) {
+                        documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+                    } else {
+                        documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+                    }
                     String aux = documento.getPrefijoDoc();
                     int init = aux.length();
                     if (init < factura.length()) {
@@ -161,7 +184,11 @@ public class ListadoFacturaMB implements Serializable {
         }
         if (clienteSeleccionado != null || numFactura != 0 || fechaIncial != null || fechaFinal != null) {
             cargarFechasCalendar();
-            listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
+            if (tipoFactura == 1) {//muestra las facturas normales
+                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
+            } else {
+                listadoFacturas = new LazyFacturaEspecialDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
+            }
             renderTablaFactura = true;
         } else {
             listadoFacturas = null;
@@ -418,6 +445,18 @@ public class ListadoFacturaMB implements Serializable {
 
     public void setFactura(String factura) {
         this.factura = factura;
+    }
+
+    public List<SelectItem> getListaTipoFactura() {
+        return listaTipoFactura;
+    }
+
+    public int getTipoFactura() {
+        return tipoFactura;
+    }
+
+    public void setTipoFactura(int tipoFactura) {
+        this.tipoFactura = tipoFactura;
     }
 
 }

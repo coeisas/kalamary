@@ -39,7 +39,18 @@
                 <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
                 <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>
             </div>
-            <div style="clear: left">
+            <div style="clear: left"/>
+            <br/>
+            <div>
+                <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
+                <p:selectOneMenu class="campoFormulario" value="#{facturaMB.tipoFactura}">
+                    <p:ajax event="change" listener="#{facturaMB.validarTipoFacturacion}" update="@none"/>
+                    <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                    <f:selectItems value="#{facturaMB.listaTipoFactura}"/>
+                </p:selectOneMenu>
+            </div>
+            <div style="clear: left"/>
+            <div>
                 <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{facturaMB.cargarModalProductos}"/>
             </div>
             <p:dataTable

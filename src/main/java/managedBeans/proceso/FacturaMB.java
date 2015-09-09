@@ -92,6 +92,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.el.ELException;
 import javax.faces.event.PhaseId;
+import javax.faces.model.SelectItem;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -129,6 +130,9 @@ public class FacturaMB implements Serializable {
     private List<SegUsuario> listaVendedor;
     private String documentoVendedor;
     private String nombreVendedor;
+
+    private List<SelectItem> listaTipoFactura;//los tipos de factura son: normal y remision.
+    private int tipoFactura;
 
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
@@ -237,6 +241,11 @@ public class FacturaMB implements Serializable {
             }
             listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
             cargarInformacionCliente();
+            listaTipoFactura = new ArrayList();
+            SelectItem aux = new SelectItem(1, "NORMAL");
+            listaTipoFactura.add(aux);
+            aux = new SelectItem(2, "ESPECIAL");
+            listaTipoFactura.add(aux);
         }
         if (usuarioActual != null) {
             cajaUsuario = usuarioActual.getFaccajaidCaja();
@@ -289,6 +298,22 @@ public class FacturaMB implements Serializable {
         }
         RequestContext.getCurrentInstance().execute("PF('dlgVendedor').hide()");
         RequestContext.getCurrentInstance().update("IdFormFactura");
+    }
+
+    public void validarTipoFacturacion() {
+        if (sedeActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la sede"));
+            return;
+        }
+        CfgDocumento documento = null;
+        if (tipoFactura == 1) {//se valida la existencia del documento aplicado a facturacion
+            documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+        } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
+            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+        }
+        if (tipoFactura != 0 && documento == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplique al tipo de factura seleccionada"));
+        }
     }
 
     public void cargarModalProductos() {
@@ -578,8 +603,16 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
             return;
         }
-        CfgDocumento documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
-        CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
+        if (tipoFactura == 0) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione el tipo de Factura"));
+            return;
+        }
+        CfgDocumento documento = null;
+        if (tipoFactura == 1) {//se valida la existencia del documento aplicado a facturacion
+            documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+        } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
+            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+        }
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
             return;
@@ -592,11 +625,13 @@ public class FacturaMB implements Serializable {
         if (!validarCampos(documento)) {
             return;
         }
+        CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
         if (documentoMovInventario == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a movimiento de inventario de salida"));
             return;
         }
         try {
+//            CREANDO EL DOCUEMENTO MASTER DE LA FACTURA ESPECIAL O NORMAL
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
             documentosmaster.setCfgDocumento(documento);
@@ -618,21 +653,52 @@ public class FacturaMB implements Serializable {
                 documento.setActivo(false);
             }
             documentoFacade.edit(documento);
+            
+//            MODIFICANDO EL DETALLE 
             for (FacDocumentodetalle documentodetalle : listaDetalle) {
                 documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
                 documentodetalle.setFacDocumentosmaster(documentosmaster);
+                if (tipoFactura == 2) {//para la factura especial. los impuestos no estan discriminados. Se incluyen en el producto
+                    float precionUnitario = documentodetalle.getValorUnitario();
+                    for (CfgImpuesto impuesto : listaImpuestos) {//recorre los impuestos aplicados al cliente y su valor se adiciona al precioUnitario del producto
+                        float valorImpuesto = documentodetalle.getValorUnitario() * impuesto.getPorcentaje() / (float) 100;
+                        valorImpuesto = Redondear(valorImpuesto, 0);
+                        precionUnitario += valorImpuesto;
+                    }
+                    //se realiza  los respectivos cambios en precio unitario, total y descuento
+                    documentodetalle.setValorUnitario(precionUnitario);
+                    documentodetalle.setValorTotal(precionUnitario * documentodetalle.getCantidad());
+                    float valorDescuento = documentodetalle.getValorTotal() * documentodetalle.getDescuento() / (float) 100;
+                    valorDescuento = Redondear(valorDescuento, 0);
+                    documentodetalle.setValorDescuento(valorDescuento);
+                }
                 documentodetalleFacade.create(documentodetalle);
                 actualizarTablaConsolidado(documentodetalle);
             }
-            for (CfgImpuesto impuesto : listaImpuestos) {
-                FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
-                documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(impuesto.getIdImpuesto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
-                documentoimpuesto.setCfgImpuesto(impuesto);
-                documentoimpuesto.setFacDocumentosmaster(documentosmaster);
-                documentoimpuesto.setValorImpuesto(impuesto.getTotalImpuesto());
-                documentoimpuesto.setPorcentajeImpuesto(impuesto.getPorcentaje());
-                documentoimpuestoFacade.create(documentoimpuesto);
+            if (tipoFactura == 2) {//si el tipo de factura es especial. Se actualiza el subtotal y el totaldescuento en el documentomaster
+                calcularSubtotal();
+                calcularTotalDescuento();
+                documentosmaster.setDescuento(totalDescuento);
+                documentosmaster.setSubtotal(subtotal);
             }
+            
+            //GUARDANDO LOS IMPUESTOS APLICADOS A LA FACTURA
+            List<FacDocumentoimpuesto> listaDocumentoImpuesto = new ArrayList();
+            if (tipoFactura == 1) {//para la factura normal. los impuestos estan discriminados
+                for (CfgImpuesto impuesto : listaImpuestos) {
+                    FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
+                    documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(impuesto.getIdImpuesto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
+                    documentoimpuesto.setCfgImpuesto(impuesto);
+                    documentoimpuesto.setFacDocumentosmaster(documentosmaster);
+                    documentoimpuesto.setValorImpuesto(impuesto.getTotalImpuesto());
+                    documentoimpuesto.setPorcentajeImpuesto(impuesto.getPorcentaje());
+                    documentoimpuestoFacade.create(documentoimpuesto);
+                    listaDocumentoImpuesto.add(documentoimpuesto);
+                }
+            }
+            
+            //GUARDANDO LAS FORMAS DE PAGOS DE LA FACTURA
+            List<FacDocuementopago> listaDocumentoPago = new ArrayList();
             for (CfgFormapago formapago : listaFormapagos) {
                 if (formapago.getSubtotal() > 0) {
                     FacDocuementopago docuementopago = new FacDocuementopago();
@@ -641,12 +707,26 @@ public class FacturaMB implements Serializable {
                     docuementopago.setFacDocumentosmaster(documentosmaster);
                     docuementopago.setValorPago(formapago.getSubtotal());
                     docuementopagoFacade.create(docuementopago);
+                    listaDocumentoPago.add(docuementopago);
                 }
             }
+            
+//            ASOCIANDO LAS LISTAS: DETALLE, IMPUESTOS Y PAGOS AL DOCUMENTOMASTER
+            documentosmaster.setFacDocumentodetalleList(listaDetalle);
+            if (!listaDocumentoImpuesto.isEmpty()) {
+                documentosmaster.setFacDocumentoimpuestoList(listaDocumentoImpuesto);
+            }
+            if (!listaDocumentoPago.isEmpty()) {
+                documentosmaster.setFacDocuementopagoList(listaDocumentoPago);
+            }
+            documentosmasterFacade.edit(documentosmaster);
+            
+//            SI LA FACTURA PROVIENE DE UNA COTIZACION. SE CAMBIARA EL ESTADO DE LA COTIZACION A FACTURADA
             if (cotizacionSeleccionada != null) {
                 cotizacionSeleccionada.setEstado("FACTURADA");
                 documentosmasterFacade.edit(cotizacionSeleccionada);
             }
+            
             documentoActual = documentosmaster;
             crearMovimientoInventario(listaDetalle, documentosmaster);
             generarMovimientoCaja(documentosmaster);
@@ -957,6 +1037,7 @@ public class FacturaMB implements Serializable {
         setTotalDescuento(0);
         setTotalFactura(0);
         totalUSD = 0;
+        tipoFactura = 0;
         cotizacionSeleccionada = null;
         setEnableBtnPrint(false);
         RequestContext.getCurrentInstance().update("IdFormFactura");
@@ -1481,5 +1562,17 @@ public class FacturaMB implements Serializable {
 
     public void setCotizacionSeleccionada(FacDocumentosmaster cotizacionSeleccionada) {
         this.cotizacionSeleccionada = cotizacionSeleccionada;
+    }
+
+    public List<SelectItem> getListaTipoFactura() {
+        return listaTipoFactura;
+    }
+
+    public int getTipoFactura() {
+        return tipoFactura;
+    }
+
+    public void setTipoFactura(int tipoFactura) {
+        this.tipoFactura = tipoFactura;
     }
 }

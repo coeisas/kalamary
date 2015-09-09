@@ -6,6 +6,7 @@
 package entities;
 
 import com.google.common.base.Strings;
+import facades.FacDocuementopagoFacade;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.ejb.EJB;
 
 /**
  *
@@ -45,6 +47,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
 public class FacDocumentosmaster implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
@@ -312,13 +315,12 @@ public class FacDocumentosmaster implements Serializable {
         }
         return pago;
     }
-    
-    public String determinarNumFactura(){
-        String numfac = "";
+
+    public String determinarNumFactura() {
         int fin = cfgDocumento.getFinDocumento();
         String aux = String.valueOf(fin);
         String numDocumento = String.valueOf(getFacDocumentosmasterPK().getNumDocumento());
-        return cfgDocumento.getPrefijoDoc().concat(Strings.padStart(numDocumento, aux.length(), '0'));       
+        return cfgDocumento.getPrefijoDoc().concat(Strings.padStart(numDocumento, aux.length(), '0'));
     }
 
     @Override

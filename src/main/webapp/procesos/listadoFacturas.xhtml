@@ -14,19 +14,26 @@
             <p:panelGrid style="margin: 0 auto">
                 <f:facet name="header">
                     <p:row>
-                        <p:column colspan="2">
+                        <p:column colspan="3">
                             Buscar Factura
                         </p:column>
                     </p:row>
                 </f:facet>
                 <p:row>
-                    <p:column colspan="2">
+                    <p:column colspan="3">
                         <p:outputLabel class="labelFormulario" value="Cliente:"/>
                         <h:inputText class="campoFormulario cajaH" style="width: 300px" readonly="true" value="${listadoFacturaMB.clienteSeleccionado.nombreCompleto()}"/>
                         <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" onclick="PF('dlgCliente').show()"/>
                     </p:column>
                 </p:row>
                 <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
+                        <p:selectOneMenu class="campoFormulario" value="#{listadoFacturaMB.tipoFactura}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{listadoFacturaMB.listaTipoFactura}"/>
+                        </p:selectOneMenu>                        
+                    </p:column>
                     <p:column>
                         <p:outputLabel class="labelFormulario" value="Numero Factura:"/>
                         <p:inputText value="#{listadoFacturaMB.factura}"/>
@@ -39,7 +46,7 @@
                     </p:column>
                 </p:row>
                 <p:row>
-                    <p:column  colspan="2" style="text-align: center">
+                    <p:column  colspan="3" style="text-align: center">
                         <p:commandButton value="Buscar" icon="ui-icon-search" actionListener="#{listadoFacturaMB.buscarFactura}"/>&nbsp;
                         <p:commandButton value="Limpiar" icon=" ui-icon-arrowrefresh-1-n" actionListener="#{listadoFacturaMB.limpiar}"/>                        
                     </p:column>
