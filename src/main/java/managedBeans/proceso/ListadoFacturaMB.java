@@ -288,7 +288,7 @@ public class ListadoFacturaMB implements Serializable {
             } else {
                 parametros.put("caja", null);
             }
-            parametros.put("resdian", documento.getCfgdocumento().getResDian());
+            parametros.put("resdian", documento.getCfgDocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();

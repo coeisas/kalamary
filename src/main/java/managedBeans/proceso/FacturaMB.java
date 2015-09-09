@@ -29,6 +29,7 @@ import entities.FacDocumentosmaster;
 import entities.FacDocumentosmasterPK;
 import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
+import entities.FacMovcajadetallePK;
 import entities.InvMovimiento;
 import entities.InvMovimientoDetalle;
 import entities.InvMovimientoDetallePK;
@@ -108,7 +109,7 @@ import utilities.LazyCotizacionDataModel;
 @ManagedBean
 @SessionScoped
 public class FacturaMB implements Serializable {
-    
+
     private String identificacionCliente;
     private String nombreCliente;
     private float subtotal;
@@ -128,7 +129,7 @@ public class FacturaMB implements Serializable {
     private List<SegUsuario> listaVendedor;
     private String documentoVendedor;
     private String nombreVendedor;
-    
+
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
@@ -138,7 +139,7 @@ public class FacturaMB implements Serializable {
     private SegUsuario usuarioActual;
     private FacDocumentosmaster documentoActual;
     private boolean enableBtnPrint;
-    
+
     private SesionMB sesionMB;
 
 //--------------------------------------------------------
@@ -161,11 +162,11 @@ public class FacturaMB implements Serializable {
     private String tarjetaMembresia;
     private float cupoCredito;
     private StreamedContent image;
-    
+
     private CfgCliente clienteSeleccionadoModal;
-    
+
     private List<CfgMunicipio> listaMunicipios;
-    
+
     @EJB
     SegUsuarioFacade usuarioFacade;
     @EJB
@@ -208,11 +209,11 @@ public class FacturaMB implements Serializable {
     CfgMovInventarioDetalleFacade movInventarioDetalleFacade;
     @EJB
     CfgMovInventarioMaestroFacade movInventarioMaestroFacade;
-    
+
     public FacturaMB() {
-        
+
     }
-    
+
     @PostConstruct
     private void init() {
         //si es super usuario o admin permitir escoger la empresa y la sede
@@ -244,7 +245,7 @@ public class FacturaMB implements Serializable {
             }
         }
     }
-    
+
     public void buscarCliente() {
         if (!identificacionCliente.trim().isEmpty()) {
             clienteSeleccionado = clienteFacade.buscarPorIdentificacionAndIdEmpresa(identificacionCliente, empresaActual);
@@ -256,7 +257,7 @@ public class FacturaMB implements Serializable {
         }
         cargarInformacionCliente();
     }
-    
+
     public void cargarListaVendedores() {
         if (empresaActual != null) {
             listaVendedor = usuarioFacade.buscarVendedoresByEmpresa(empresaActual);
@@ -266,7 +267,7 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('dlgVendedor').show()");
         RequestContext.getCurrentInstance().update("FormModalVendedor");
     }
-    
+
     public void buscarVendedor() {
         if (empresaActual != null) {
             if (!documentoVendedor.trim().isEmpty()) {
@@ -277,7 +278,7 @@ public class FacturaMB implements Serializable {
         }
         cargarInformacionVendedor();
     }
-    
+
     public void cargarInformacionVendedor() {
         if (vendedorSeleccionado != null) {
             nombreVendedor = vendedorSeleccionado.nombreCompleto();
@@ -289,7 +290,7 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().execute("PF('dlgVendedor').hide()");
         RequestContext.getCurrentInstance().update("IdFormFactura");
     }
-    
+
     public void cargarModalProductos() {
         movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
         if (movimientoCajaMaster != null) {
@@ -298,12 +299,12 @@ public class FacturaMB implements Serializable {
             } else {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La caja no esta abierta"));
             }
-            
+
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Abra la caja por primera vez"));
         }
     }
-    
+
     public void cargarCotizaciones() {
         if (empresaActual != null) {
             listadoCotizacion = new LazyCotizacionDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado);
@@ -313,7 +314,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la empresa"));
         }
     }
-    
+
     public void cargarInformacionCotizacion() {
         listaDetalle.clear();
         subtotal = 0;
@@ -354,7 +355,7 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormFactura");
         RequestContext.getCurrentInstance().execute("PF('dlgCotizacion').hide()");
     }
-    
+
     public void cargarInformacionCliente() {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
@@ -376,19 +377,19 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
         RequestContext.getCurrentInstance().update("IdFormFactura");
     }
-    
+
     private void actualizarListadoClientes() {
         if (sedeActual != null) {
             listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
-    
+
     public void deseleccionarCliente() {
         clienteSeleccionado = null;
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
-    
+
     public void insertarItemProducto() {
         if (listaDetalle.isEmpty()) {
             subtotal = 0;
@@ -439,7 +440,7 @@ public class FacturaMB implements Serializable {
             RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
         }
     }
-    
+
     private FacDocumentodetalle obtenerItemEnLista(CfgProducto cfgProducto) {
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
             if (documentodetalle.getCfgProducto().equals(cfgProducto)) {
@@ -448,7 +449,7 @@ public class FacturaMB implements Serializable {
         }
         return null;
     }
-    
+
     public void quitarItem(ActionEvent actionEvent) {
         FacDocumentodetalle item = (FacDocumentodetalle) actionEvent.getComponent().getAttributes().get("item");
         listaDetalle.remove(item);
@@ -464,7 +465,7 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
         RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
     }
-    
+
     public void onCellEdit(CellEditEvent event) {
         int index = event.getRowIndex();
         if (listaDetalle.get(index).getValorUnitario() < listaDetalle.get(index).getPrecioOriginal()) {
@@ -489,11 +490,11 @@ public class FacturaMB implements Serializable {
         calcularTotalUSD();
         RequestContext.getCurrentInstance().update("IdFormFactura:IdSubTotal");
     }
-    
+
     public void updateTabla() {
         RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
     }
-    
+
     private void calcularTotalDescuento() {
         totalDescuento = 0;
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
@@ -508,7 +509,7 @@ public class FacturaMB implements Serializable {
             subtotal += documentodetalle.getValorTotal();
         }
     }
-    
+
     private void calcularImpuesto() {
         float aux;
         for (CfgImpuesto impuesto : listaImpuestos) {
@@ -517,14 +518,14 @@ public class FacturaMB implements Serializable {
             impuesto.setTotalImpuesto(aux);
         }
     }
-    
+
     private void calcularTotalFactura() {
         totalFactura = subtotal - totalDescuento;
         for (CfgImpuesto impuesto : listaImpuestos) {
             totalFactura += impuesto.getTotalImpuesto();
         }
     }
-    
+
     private void calcularTotalUSD() {
         if (movimientoCajaMaster != null) {
             if (movimientoCajaMaster.getAbierta()) {
@@ -539,13 +540,13 @@ public class FacturaMB implements Serializable {
             }
         }
     }
-    
+
     public float Redondear(float pNumero, int pCantidadDecimales) {
         BigDecimal value = new BigDecimal(pNumero);
         value = value.setScale(pCantidadDecimales, RoundingMode.HALF_UP);
         return value.floatValue();
     }
-    
+
     private boolean validarCampos(CfgDocumento documento) {
         boolean ban = true;
         if (clienteSeleccionado == null) {
@@ -570,7 +571,7 @@ public class FacturaMB implements Serializable {
         }
         return ban;
     }
-    
+
     public void guardarFactura() {
         movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
         if (!movimientoCajaMaster.getAbierta()) {
@@ -598,7 +599,7 @@ public class FacturaMB implements Serializable {
         try {
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
-            documentosmaster.setCfgdocumento(documento);
+            documentosmaster.setCfgDocumento(documento);
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
             documentosmaster.setCfgempresasedeidSede(sedeActual);
             documentosmaster.setDescuento(totalDescuento);
@@ -656,16 +657,17 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
         }
     }
-    
+
     private void generarMovimientoCaja(FacDocumentosmaster documentosmaster) {
         List<FacDocuementopago> listaformapago = docuementopagoFacade.buscarByDocumentoMaster(documentosmaster);
         try {
             for (FacDocuementopago formapago : listaformapago) {
                 FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
+                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago()));
+                movcajadetalle.setFacMovcaja(movimientoCajaMaster);
                 movcajadetalle.setFacDocumentosmaster(documentosmaster);
+                movcajadetalle.setCfgFormapago(formapago.getCfgFormapago());
                 movcajadetalle.setFecha(new Date());
-                movcajadetalle.setFacmovcajaidMovimiento(movimientoCajaMaster);
-                movcajadetalle.setCfgformapagoidFormaPago(formapago.getCfgFormapago());
                 movcajadetalle.setValor(formapago.getValorPago());
                 movcajadetalleFacade.create(movcajadetalle);
             }
@@ -675,7 +677,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro registrar el pago. Cancele la factura " + documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
         }
     }
-    
+
     private void actualizarTablaConsolidado(FacDocumentodetalle documentodetalle) {
         try {
             InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, documentodetalle.getCfgProducto());
@@ -689,7 +691,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario para el producto " + documentodetalle.getCfgProducto().getNomProducto()));
         }
     }
-    
+
     private void crearMovimientoInventario(List<FacDocumentodetalle> listaDetalle, FacDocumentosmaster documentosmaster) {
         CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
         if (documento.getActDocumento() == 0) {
@@ -732,7 +734,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo el inventario en el inventario"));
         }
     }
-    
+
     public void facturacion() {
         if (cajaUsuario == null) {
             //se vuelve a buscar la caja del usario. Por si el usuario la creo en el transcurso de la sesion
@@ -761,7 +763,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay items de factura"));
         }
     }
-    
+
     public void impresion() {
         if (documentoActual != null) {
             RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
@@ -769,7 +771,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay una factura reciente"));
         }
     }
-    
+
     public void onRowEdit(RowEditEvent event) {
         CfgFormapago formapago = (CfgFormapago) event.getObject();
         float aux = totalFormaPago();
@@ -778,7 +780,7 @@ public class FacturaMB implements Serializable {
         }
         setEnableBtnPrint(totalFactura == aux);
     }
-    
+
     public void onRowCancel(RowEditEvent event) {
 //        FacesMessage msg = new FacesMessage("Edit Cancelled", ((CfgFormapago) event.getObject()).getNomFormaPago());
 //        FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -787,7 +789,7 @@ public class FacturaMB implements Serializable {
         float aux = totalFormaPago();
         setEnableBtnPrint(totalFactura == aux);
     }
-    
+
     private float totalFormaPago() {
         float aux = 0;
         for (CfgFormapago formapago : listaFormapagos) {
@@ -795,16 +797,16 @@ public class FacturaMB implements Serializable {
         }
         return aux;
     }
-    
+
     private boolean validarFormaPago(float aux) {
         return aux <= totalFactura;
     }
-    
+
     public void actualizarTablaFormaPago() {
         RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
         RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
     }
-    
+
     public void generarPDF() {
 //        guardarFactura();
         if (documentoActual != null) {
@@ -828,9 +830,9 @@ public class FacturaMB implements Serializable {
             }
 //            documentoActual = null;
         }
-        
+
     }
-    
+
     private void generarFactura(String ruta) throws IOException, JRException {
         FacDocumentosmaster documento
                 = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
@@ -884,13 +886,13 @@ public class FacturaMB implements Serializable {
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
-            parametros.put("resdian", documento.getCfgdocumento().getResDian());
+            parametros.put("resdian", documento.getCfgDocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();
         }
     }
-    
+
     private List<FacturaDetalleReporte> crearListadoDetalle(List<FacDocumentodetalle> detalles) {
         List<FacturaDetalleReporte> list = new ArrayList();
         for (FacDocumentodetalle detalle : detalles) {
@@ -905,7 +907,7 @@ public class FacturaMB implements Serializable {
         }
         return list;
     }
-    
+
     private List<FacturaPagoReporte> crearListadoPago(List<FacDocuementopago> pagos) {
         List<FacturaPagoReporte> list = new ArrayList();
         for (FacDocuementopago pago : pagos) {
@@ -916,7 +918,7 @@ public class FacturaMB implements Serializable {
         }
         return list;
     }
-    
+
     private List<FacturaImpuestoReporte> crearListadoImpuesto(List<FacDocumentoimpuesto> impuestos) {
         List<FacturaImpuestoReporte> list = new ArrayList();
         for (FacDocumentoimpuesto impuesto : impuestos) {
@@ -928,7 +930,7 @@ public class FacturaMB implements Serializable {
         }
         return list;
     }
-    
+
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
@@ -943,7 +945,7 @@ public class FacturaMB implements Serializable {
         setEnableBtnPrint(false);
         RequestContext.getCurrentInstance().update("IdFormFactura");
         RequestContext.getCurrentInstance().update("FormModalFactura");
-        
+
     }
 //------------------------------------    
 //    METODOS PARA CREAR CLIENTE
@@ -961,14 +963,14 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
     }
-    
+
     public void actualizarMunicipios() {
         listaMunicipios.clear();
         if (idDepartamento != null) {
             listaMunicipios = municipioFacade.buscarPorDepartamento(idDepartamento);
         }
     }
-    
+
     public void handleFileUpload(FileUploadEvent event) {
         file = event.getFile();
         if (file != null) {
@@ -976,7 +978,7 @@ public class FacturaMB implements Serializable {
             RequestContext.getCurrentInstance().execute("PF('dlgFoto').hide()");
         }
     }
-    
+
     public void cargarInformacionClienteModal() {
         if (getClienteSeleccionadoModal() != null) {
             setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
@@ -1010,7 +1012,7 @@ public class FacturaMB implements Serializable {
         }
         RequestContext.getCurrentInstance().update("FormModalCliente");
     }
-    
+
     private void limpiarFormularioModal() {
         setIdIdentificacion(0);
 //        setNumIdentificacion(null);
@@ -1031,7 +1033,7 @@ public class FacturaMB implements Serializable {
         setFechaNacimiento(null);
 //        opcion = "creacion";
     }
-    
+
     public void accion() {
         if (clienteSeleccionadoModal != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No es posible modificar al cliente."));
@@ -1039,7 +1041,7 @@ public class FacturaMB implements Serializable {
             crearCliente();
         }
     }
-    
+
     private boolean validarCamposFormulario() {
         if (sedeActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
@@ -1068,7 +1070,7 @@ public class FacturaMB implements Serializable {
         if (direccion.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Direccion vacia"));
             return false;
-            
+
         }
         if (telefono.trim().isEmpty()) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese un numero telefonico"));
@@ -1076,7 +1078,7 @@ public class FacturaMB implements Serializable {
         }
         return true;
     }
-    
+
     private void crearCliente() {
         if (!validarCamposFormulario()) {
             return;
@@ -1121,7 +1123,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no creado"));
         }
     }
-    
+
     public void cancelar() {
         clienteSeleccionadoModal = null;
 //        empresaSeleccionada = null;
@@ -1131,259 +1133,259 @@ public class FacturaMB implements Serializable {
         limpiarFormularioModal();
         RequestContext.getCurrentInstance().update("FormModalCliente");
     }
-    
+
     public List<FacDocumentodetalle> getListaDetalle() {
         return listaDetalle;
     }
-    
+
     public void setListaDetalle(List<FacDocumentodetalle> listaDetalle) {
         this.listaDetalle = listaDetalle;
     }
-    
+
     public CfgCliente getClienteSeleccionado() {
         return clienteSeleccionado;
     }
-    
+
     public void setClienteSeleccionado(CfgCliente clienteSeleccionado) {
         this.clienteSeleccionado = clienteSeleccionado;
     }
-    
+
     public LazyDataModel<CfgCliente> getListaClientes() {
         return listaClientes;
     }
-    
+
     public void setListaClientes(LazyDataModel<CfgCliente> listaClientes) {
         this.listaClientes = listaClientes;
     }
-    
+
     public String getIdentificacionCliente() {
         return identificacionCliente;
     }
-    
+
     public void setIdentificacionCliente(String identificacionCliente) {
         this.identificacionCliente = identificacionCliente;
     }
-    
+
     public String getNombreCliente() {
         return nombreCliente;
     }
-    
+
     public void setNombreCliente(String nombreCliente) {
         this.nombreCliente = nombreCliente;
     }
-    
+
     public LazyDataModel<CfgProducto> getListaProducto() {
         return listaProducto;
     }
-    
+
     public void setListaProducto(LazyDataModel<CfgProducto> listaProducto) {
         this.listaProducto = listaProducto;
     }
-    
+
     public CfgProducto getProductoSeleccionado() {
         return productoSeleccionado;
     }
-    
+
     public void setProductoSeleccionado(CfgProducto productoSeleccionado) {
         this.productoSeleccionado = productoSeleccionado;
     }
-    
+
     public float getSubtotal() {
         return subtotal;
     }
-    
+
     public void setSubtotal(float subtotal) {
         this.subtotal = subtotal;
     }
-    
+
     public float getTotalDescuento() {
         return totalDescuento;
     }
-    
+
     public void setTotalDescuento(float totalDescuento) {
         this.totalDescuento = totalDescuento;
     }
-    
+
     public List<CfgImpuesto> getListaImpuestos() {
         return listaImpuestos;
     }
-    
+
     public void setListaImpuestos(List<CfgImpuesto> listaImpuestos) {
         this.listaImpuestos = listaImpuestos;
     }
-    
+
     public float getTotalFactura() {
         return totalFactura;
     }
-    
+
     public void setTotalFactura(float totalFactura) {
         this.totalFactura = totalFactura;
     }
-    
+
     public List<CfgFormapago> getListaFormapagos() {
         return listaFormapagos;
     }
-    
+
     public void setListaFormapagos(List<CfgFormapago> listaFormapagos) {
         this.listaFormapagos = listaFormapagos;
     }
-    
+
     public int getTipoImpresion() {
         return tipoImpresion;
     }
-    
+
     public void setTipoImpresion(int tipoImpresion) {
         this.tipoImpresion = tipoImpresion;
     }
-    
+
     public boolean isEnableBtnPrint() {
         return enableBtnPrint;
     }
-    
+
     public void setEnableBtnPrint(boolean enableBtnPrint) {
         this.enableBtnPrint = enableBtnPrint;
     }
-    
+
     public float getTotalUSD() {
         return totalUSD;
     }
-    
+
     public String getObservacion() {
         return observacion;
     }
-    
+
     public void setObservacion(String observacion) {
         this.observacion = observacion;
     }
-    
+
     public String getIdDepartamento() {
         return idDepartamento;
     }
-    
+
     public void setIdDepartamento(String idDepartamento) {
         this.idDepartamento = idDepartamento;
     }
-    
+
     public String getIdMunicipio() {
         return idMunicipio;
     }
-    
+
     public void setIdMunicipio(String idMunicipio) {
         this.idMunicipio = idMunicipio;
     }
-    
+
     public int getIdIdentificacion() {
         return idIdentificacion;
     }
-    
+
     public void setIdIdentificacion(int idIdentificacion) {
         this.idIdentificacion = idIdentificacion;
     }
-    
+
     public String getNumIdentificacion() {
         return numIdentificacion;
     }
-    
+
     public void setNumIdentificacion(String numIdentificacion) {
         this.numIdentificacion = numIdentificacion;
     }
-    
+
     public int getIdTipoCliente() {
         return idTipoCliente;
     }
-    
+
     public void setIdTipoCliente(int idTipoCliente) {
         this.idTipoCliente = idTipoCliente;
     }
-    
+
     public String getPrimerNombre() {
         return primerNombre;
     }
-    
+
     public void setPrimerNombre(String primerNombre) {
         this.primerNombre = primerNombre;
     }
-    
+
     public String getSegundoNombre() {
         return segundoNombre;
     }
-    
+
     public void setSegundoNombre(String segundoNombre) {
         this.segundoNombre = segundoNombre;
     }
-    
+
     public String getPrimerApellido() {
         return primerApellido;
     }
-    
+
     public void setPrimerApellido(String primerApellido) {
         this.primerApellido = primerApellido;
     }
-    
+
     public String getSegundoApellido() {
         return segundoApellido;
     }
-    
+
     public void setSegundoApellido(String segundoApellido) {
         this.segundoApellido = segundoApellido;
     }
-    
+
     public UploadedFile getFile() {
         return file;
     }
-    
+
     public void setFile(UploadedFile file) {
         this.file = file;
     }
-    
+
     public String getDireccion() {
         return direccion;
     }
-    
+
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
-    
+
     public String getTelefono() {
         return telefono;
     }
-    
+
     public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
-    
+
     public String getMail() {
         return mail;
     }
-    
+
     public void setMail(String mail) {
         this.mail = mail;
     }
-    
+
     public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
-    
+
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
-    
+
     public String getTarjetaMembresia() {
         return tarjetaMembresia;
     }
-    
+
     public void setTarjetaMembresia(String tarjetaMembresia) {
         this.tarjetaMembresia = tarjetaMembresia;
     }
-    
+
     public float getCupoCredito() {
         return cupoCredito;
     }
-    
+
     public void setCupoCredito(float cupoCredito) {
         this.cupoCredito = cupoCredito;
     }
-    
+
     public StreamedContent getImage() {
         FacesContext context = FacesContext.getCurrentInstance();
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
@@ -1400,67 +1402,67 @@ public class FacturaMB implements Serializable {
             }
         }
     }
-    
+
     public void setImage(StreamedContent image) {
         this.image = image;
     }
-    
+
     public List<CfgMunicipio> getListaMunicipios() {
         return listaMunicipios;
     }
-    
+
     public void setListaMunicipios(List<CfgMunicipio> listaMunicipios) {
         this.listaMunicipios = listaMunicipios;
     }
-    
+
     public CfgCliente getClienteSeleccionadoModal() {
         return clienteSeleccionadoModal;
     }
-    
+
     public void setClienteSeleccionadoModal(CfgCliente clienteSeleccionadoModal) {
         this.clienteSeleccionadoModal = clienteSeleccionadoModal;
     }
-    
+
     public SegUsuario getVendedorSeleccionado() {
         return vendedorSeleccionado;
     }
-    
+
     public void setVendedorSeleccionado(SegUsuario vendedorSeleccionado) {
         this.vendedorSeleccionado = vendedorSeleccionado;
     }
-    
+
     public List<SegUsuario> getListaVendedor() {
         return listaVendedor;
     }
-    
+
     public void setListaVendedor(List<SegUsuario> listaVendedor) {
         this.listaVendedor = listaVendedor;
     }
-    
+
     public String getDocumentoVendedor() {
         return documentoVendedor;
     }
-    
+
     public void setDocumentoVendedor(String documentoVendedor) {
         this.documentoVendedor = documentoVendedor;
     }
-    
+
     public String getNombreVendedor() {
         return nombreVendedor;
     }
-    
+
     public void setNombreVendedor(String nombreVendedor) {
         this.nombreVendedor = nombreVendedor;
     }
-    
+
     public LazyDataModel<FacDocumentosmaster> getListadoCotizacion() {
         return listadoCotizacion;
     }
-    
+
     public FacDocumentosmaster getCotizacionSeleccionada() {
         return cotizacionSeleccionada;
     }
-    
+
     public void setCotizacionSeleccionada(FacDocumentosmaster cotizacionSeleccionada) {
         this.cotizacionSeleccionada = cotizacionSeleccionada;
     }

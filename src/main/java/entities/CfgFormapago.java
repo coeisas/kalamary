@@ -86,6 +86,8 @@ public class CfgFormapago implements Serializable {
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
+      @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
+    private List<FacMovcajadetalle> facMovcajadetalleList;  
     @Transient
     private float subtotal;//campo utilizado en factura, para guardar el monto a pagar por cada forma de pago
 
@@ -177,6 +179,15 @@ public class CfgFormapago implements Serializable {
 
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
+    }
+    
+    @XmlTransient
+    public List<FacMovcajadetalle> getFacMovcajadetalleList() {
+        return facMovcajadetalleList;
+    }
+
+    public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
+        this.facMovcajadetalleList = facMovcajadetalleList;
     }
     
     public float getSubtotal() {

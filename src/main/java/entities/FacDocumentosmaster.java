@@ -15,6 +15,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -23,8 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -46,7 +45,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
 public class FacDocumentosmaster implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
@@ -54,11 +52,9 @@ public class FacDocumentosmaster implements Serializable {
     @Column(name = "totalFactura", nullable = false)
     private float totalFactura;
     @Lob
-    @Size(max = 65535)
     @Column(name = "observaciones", length = 65535)
     private String observaciones;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
@@ -71,6 +67,8 @@ public class FacDocumentosmaster implements Serializable {
     private Float subtotal;
     @Column(name = "descuento", precision = 12)
     private Float descuento;
+    @OneToMany(mappedBy = "facDocumentosmaster")
+    private List<InvMovimiento> invMovimientoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocuementopago> facDocuementopagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
@@ -90,12 +88,19 @@ public class FacDocumentosmaster implements Serializable {
     @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja")
     @ManyToOne
     private FacCaja faccajaidCaja;
+    @OneToMany(mappedBy = "facDocumentosmaster")
+    private List<FacDocumentosmaster> facDocumentosmasterList;
+    @JoinColumns({
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc"),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento")})
+    @ManyToOne
+    private FacDocumentosmaster facDocumentosmaster;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
     @JoinColumn(name = "seg_usuario_idUsuario1", referencedColumnName = "idUsuario")
     @ManyToOne
-    private SegUsuario segusuarioidUsuario1;    
+    private SegUsuario segusuarioidUsuario1;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocumentodetalle> facDocumentodetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
@@ -183,6 +188,15 @@ public class FacDocumentosmaster implements Serializable {
     }
 
     @XmlTransient
+    public List<InvMovimiento> getInvMovimientoList() {
+        return invMovimientoList;
+    }
+
+    public void setInvMovimientoList(List<InvMovimiento> invMovimientoList) {
+        this.invMovimientoList = invMovimientoList;
+    }
+
+    @XmlTransient
     public List<FacDocuementopago> getFacDocuementopagoList() {
         return facDocuementopagoList;
     }
@@ -208,12 +222,12 @@ public class FacDocumentosmaster implements Serializable {
         this.cfgclienteidCliente = cfgclienteidCliente;
     }
 
-    public CfgDocumento getCfgdocumento() {
+    public CfgDocumento getCfgDocumento() {
         return cfgDocumento;
     }
 
-    public void setCfgdocumento(CfgDocumento cfgdocumento) {
-        this.cfgDocumento = cfgdocumento;
+    public void setCfgDocumento(CfgDocumento cfgDocumento) {
+        this.cfgDocumento = cfgDocumento;
     }
 
     public CfgEmpresasede getCfgempresasedeidSede() {
@@ -240,20 +254,37 @@ public class FacDocumentosmaster implements Serializable {
         this.faccajaidCaja = faccajaidCaja;
     }
 
+    @XmlTransient
+    public List<FacDocumentosmaster> getFacDocumentosmasterList() {
+        return facDocumentosmasterList;
+    }
+
+    public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
+        this.facDocumentosmasterList = facDocumentosmasterList;
+    }
+
+    public FacDocumentosmaster getFacDocumentosmaster() {
+        return facDocumentosmaster;
+    }
+
+    public void setFacDocumentosmaster(FacDocumentosmaster facDocumentosmaster) {
+        this.facDocumentosmaster = facDocumentosmaster;
+    }
+
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
     }
-    
+
+    public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
+        this.segusuarioidUsuario = segusuarioidUsuario;
+    }
+
     public SegUsuario getSegusuarioidUsuario1() {
         return segusuarioidUsuario1;
     }
 
     public void setSegusuarioidUsuario1(SegUsuario segusuarioidUsuario1) {
         this.segusuarioidUsuario1 = segusuarioidUsuario1;
-    }    
-
-    public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
-        this.segusuarioidUsuario = segusuarioidUsuario;
     }
 
     @XmlTransient

@@ -23,7 +23,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -52,15 +51,12 @@ public class FacMovcaja implements Serializable {
     @Column(name = "idMovimiento", nullable = false)
     private Integer idMovimiento;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "base", nullable = false)
     private float base;
     @Basic(optional = false)
     @Column(name = "trm", nullable = false)
     private float trm;
-    @Basic(optional = false)
-    @NotNull
-    @Column(name = "fecApertura", nullable = false)
+    @Column(name = "fecApertura")
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecApertura;
     @Column(name = "fecCierre")
@@ -75,7 +71,7 @@ public class FacMovcaja implements Serializable {
     private Date feccrea;
     @Basic(optional = false)
     @Column(name = "abierta", nullable = false)
-    private boolean abierta;    
+    private boolean abierta;
     @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja", nullable = false)
     @ManyToOne(optional = false)
     private FacCaja faccajaidCaja;
@@ -84,10 +80,9 @@ public class FacMovcaja implements Serializable {
     private SegUsuario segusuarioidUsuario;
     @JoinColumn(name = "seg_usuario_idUsuario1", referencedColumnName = "idUsuario")
     @ManyToOne
-    private SegUsuario segusuarioidUsuario1;    
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facmovcajaidMovimiento")
+    private SegUsuario segusuarioidUsuario1;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facMovcaja")
     private List<FacMovcajadetalle> facMovcajadetalleList;
-    
 
     public FacMovcaja() {
     }
@@ -96,11 +91,10 @@ public class FacMovcaja implements Serializable {
         this.idMovimiento = idMovimiento;
     }
 
-    public FacMovcaja(Integer idMovimiento, int idusuario, float base, float trm, Date fecApertura, Date feccrea, boolean abierta) {
+    public FacMovcaja(Integer idMovimiento, float base, float trm, Date feccrea, boolean abierta) {
         this.idMovimiento = idMovimiento;
         this.base = base;
         this.trm = trm;
-        this.fecApertura = fecApertura;
         this.feccrea = feccrea;
         this.abierta = abierta;
     }
@@ -168,7 +162,7 @@ public class FacMovcaja implements Serializable {
     public void setAbierta(boolean abierta) {
         this.abierta = abierta;
     }
-    
+
     public FacCaja getFaccajaidCaja() {
         return faccajaidCaja;
     }
@@ -176,7 +170,6 @@ public class FacMovcaja implements Serializable {
     public void setFaccajaidCaja(FacCaja faccajaidCaja) {
         this.faccajaidCaja = faccajaidCaja;
     }
-
 
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
@@ -193,7 +186,7 @@ public class FacMovcaja implements Serializable {
     public void setSegusuarioidUsuario1(SegUsuario segusuarioidUsuario1) {
         this.segusuarioidUsuario1 = segusuarioidUsuario1;
     }
-    
+
     @XmlTransient
     public List<FacMovcajadetalle> getFacMovcajadetalleList() {
         return facMovcajadetalleList;
@@ -202,7 +195,7 @@ public class FacMovcaja implements Serializable {
     public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
         this.facMovcajadetalleList = facMovcajadetalleList;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

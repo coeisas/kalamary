@@ -116,7 +116,7 @@ public class CerrarCajaMB implements Serializable {
         if (listaMovDetalle != null) {
             clearSubtotales();
             for (FacMovcajadetalle movcajadetalle : listaMovDetalle) {
-                CfgFormapago formapago = obtenerItemFormaPago(movcajadetalle.getCfgformapagoidFormaPago());
+                CfgFormapago formapago = obtenerItemFormaPago(movcajadetalle.getCfgFormapago());
                 formapago.setSubtotal(formapago.getSubtotal() + movcajadetalle.getValor());
             }
         }

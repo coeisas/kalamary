@@ -9,10 +9,8 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -21,7 +19,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -33,48 +30,58 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "FacMovcajadetalle.findAll", query = "SELECT f FROM FacMovcajadetalle f"),
+    @NamedQuery(name = "FacMovcajadetalle.findByFacmovcajaidMovimiento", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.facmovcajaidMovimiento = :facmovcajaidMovimiento"),
+    @NamedQuery(name = "FacMovcajadetalle.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
+    @NamedQuery(name = "FacMovcajadetalle.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento"),
+    @NamedQuery(name = "FacMovcajadetalle.findByCfgformapagoidFormaPago", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.cfgformapagoidFormaPago = :cfgformapagoidFormaPago"),
     @NamedQuery(name = "FacMovcajadetalle.findByValor", query = "SELECT f FROM FacMovcajadetalle f WHERE f.valor = :valor"),
-    @NamedQuery(name = "FacMovcajadetalle.findByFecha", query = "SELECT f FROM FacMovcajadetalle f WHERE f.fecha = :fecha"),
-    @NamedQuery(name = "FacMovcajadetalle.findByIdmovcajadetalle", query = "SELECT f FROM FacMovcajadetalle f WHERE f.idmovcajadetalle = :idmovcajadetalle")})
+    @NamedQuery(name = "FacMovcajadetalle.findByFecha", query = "SELECT f FROM FacMovcajadetalle f WHERE f.fecha = :fecha")})
 public class FacMovcajadetalle implements Serializable {
     private static final long serialVersionUID = 1L;
+    @EmbeddedId
+    protected FacMovcajadetallePK facMovcajadetallePK;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "valor", nullable = false)
     private float valor;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecha", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "idmovcajadetalle", nullable = false)
-    private Long idmovcajadetalle;
-    @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false)
+    @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private CfgFormapago cfgformapagoidFormaPago;
+    private CfgFormapago cfgFormapago;
     @JoinColumns({
-        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false),
-        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false)})
+        @JoinColumn(name = "fac_documentosmaster_cfg_documento_idDoc", referencedColumnName = "cfg_documento_idDoc", nullable = false, insertable = false, updatable = false),
+        @JoinColumn(name = "fac_documentosmaster_numDocumento", referencedColumnName = "numDocumento", nullable = false, insertable = false, updatable = false)})
     @ManyToOne(optional = false)
     private FacDocumentosmaster facDocumentosmaster;
-    @JoinColumn(name = "fac_movcaja_idMovimiento", referencedColumnName = "idMovimiento", nullable = false)
+    @JoinColumn(name = "fac_movcaja_idMovimiento", referencedColumnName = "idMovimiento", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
-    private FacMovcaja facmovcajaidMovimiento;
+    private FacMovcaja facMovcaja;
 
     public FacMovcajadetalle() {
     }
 
-    public FacMovcajadetalle(Long idmovcajadetalle) {
-        this.idmovcajadetalle = idmovcajadetalle;
+    public FacMovcajadetalle(FacMovcajadetallePK facMovcajadetallePK) {
+        this.facMovcajadetallePK = facMovcajadetallePK;
     }
 
-    public FacMovcajadetalle(Long idmovcajadetalle, float valor, Date fecha, int numRecibocaja) {
-        this.idmovcajadetalle = idmovcajadetalle;
+    public FacMovcajadetalle(FacMovcajadetallePK facMovcajadetallePK, float valor, Date fecha) {
+        this.facMovcajadetallePK = facMovcajadetallePK;
         this.valor = valor;
         this.fecha = fecha;
+    }
+
+    public FacMovcajadetalle(int facmovcajaidMovimiento, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento, int cfgformapagoidFormaPago) {
+        this.facMovcajadetallePK = new FacMovcajadetallePK(facmovcajaidMovimiento, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento, cfgformapagoidFormaPago);
+    }
+
+    public FacMovcajadetallePK getFacMovcajadetallePK() {
+        return facMovcajadetallePK;
+    }
+
+    public void setFacMovcajadetallePK(FacMovcajadetallePK facMovcajadetallePK) {
+        this.facMovcajadetallePK = facMovcajadetallePK;
     }
 
     public float getValor() {
@@ -93,20 +100,12 @@ public class FacMovcajadetalle implements Serializable {
         this.fecha = fecha;
     }
 
-    public Long getIdmovcajadetalle() {
-        return idmovcajadetalle;
+    public CfgFormapago getCfgFormapago() {
+        return cfgFormapago;
     }
 
-    public void setIdmovcajadetalle(Long idmovcajadetalle) {
-        this.idmovcajadetalle = idmovcajadetalle;
-    }
-
-    public CfgFormapago getCfgformapagoidFormaPago() {
-        return cfgformapagoidFormaPago;
-    }
-
-    public void setCfgformapagoidFormaPago(CfgFormapago cfgformapagoidFormaPago) {
-        this.cfgformapagoidFormaPago = cfgformapagoidFormaPago;
+    public void setCfgFormapago(CfgFormapago cfgFormapago) {
+        this.cfgFormapago = cfgFormapago;
     }
 
     public FacDocumentosmaster getFacDocumentosmaster() {
@@ -117,18 +116,18 @@ public class FacMovcajadetalle implements Serializable {
         this.facDocumentosmaster = facDocumentosmaster;
     }
 
-    public FacMovcaja getFacmovcajaidMovimiento() {
-        return facmovcajaidMovimiento;
+    public FacMovcaja getFacMovcaja() {
+        return facMovcaja;
     }
 
-    public void setFacmovcajaidMovimiento(FacMovcaja facmovcajaidMovimiento) {
-        this.facmovcajaidMovimiento = facmovcajaidMovimiento;
+    public void setFacMovcaja(FacMovcaja facMovcaja) {
+        this.facMovcaja = facMovcaja;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (idmovcajadetalle != null ? idmovcajadetalle.hashCode() : 0);
+        hash += (facMovcajadetallePK != null ? facMovcajadetallePK.hashCode() : 0);
         return hash;
     }
 
@@ -139,7 +138,7 @@ public class FacMovcajadetalle implements Serializable {
             return false;
         }
         FacMovcajadetalle other = (FacMovcajadetalle) object;
-        if ((this.idmovcajadetalle == null && other.idmovcajadetalle != null) || (this.idmovcajadetalle != null && !this.idmovcajadetalle.equals(other.idmovcajadetalle))) {
+        if ((this.facMovcajadetallePK == null && other.facMovcajadetallePK != null) || (this.facMovcajadetallePK != null && !this.facMovcajadetallePK.equals(other.facMovcajadetallePK))) {
             return false;
         }
         return true;
@@ -147,7 +146,7 @@ public class FacMovcajadetalle implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.FacMovcajadetalle[ idmovcajadetalle=" + idmovcajadetalle + " ]";
+        return "entities.FacMovcajadetalle[ facMovcajadetallePK=" + facMovcajadetallePK + " ]";
     }
     
 }

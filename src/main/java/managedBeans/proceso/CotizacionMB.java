@@ -506,7 +506,7 @@ public class CotizacionMB implements Serializable {
         try {
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
-            documentosmaster.setCfgdocumento(documento);
+            documentosmaster.setCfgDocumento(documento);
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
             documentosmaster.setCfgempresasedeidSede(sedeActual);
             documentosmaster.setDescuento(totalDescuento);
@@ -632,7 +632,7 @@ public class CotizacionMB implements Serializable {
             parametros.put("SUBREPORT_DIR", rutaReportes);
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
-            parametros.put("resdian", documento.getCfgdocumento().getResDian());
+            parametros.put("resdian", documento.getCfgDocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();

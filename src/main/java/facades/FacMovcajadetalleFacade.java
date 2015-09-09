@@ -33,7 +33,7 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
     
     public List<FacMovcajadetalle> buscarMovDetallePorMovCaja(FacMovcaja movcaja){
         try {
-            Query query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facmovcajaidMovimiento = ?1");
+            Query query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja = ?1");
             query.setParameter(1, movcaja);
             return query.getResultList();
         } catch (Exception e) {
