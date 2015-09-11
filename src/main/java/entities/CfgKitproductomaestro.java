@@ -24,8 +24,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -48,7 +46,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgKitproductomaestro.findByCodKit", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.codKit = :codKit"),
     @NamedQuery(name = "CfgKitproductomaestro.findByPrecio", query = "SELECT c FROM CfgKitproductomaestro c WHERE c.precio = :precio")})
 public class CfgKitproductomaestro implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,39 +53,32 @@ public class CfgKitproductomaestro implements Serializable {
     @Column(name = "idKit", nullable = false)
     private Integer idKit;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
     @Column(name = "nomKit", nullable = false, length = 100)
     private String nomKit;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "idUnidad", nullable = false)
     private int idUnidad;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "costo", precision = 12)
+    private Float costo;
     @Basic(optional = false)
-    @NotNull
-    @Column(name = "costo")
-    private float costo;
-    @Basic(optional = false)
-    @NotNull
     @Column(name = "utilidad", nullable = false)
     private float utilidad;
     @Lob
     @Column(name = "imgkit")
     private byte[] imgkit;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "activo", nullable = false)
     private boolean activo;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
     @Basic(optional = false)
     @Column(name = "codKit", nullable = false, length = 10)
     private String codKit;
-    @Column(name = "precio")
-    private float precio;
+    @Column(name = "precio", precision = 12)
+    private Float precio;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgKitproductomaestro")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -98,7 +88,7 @@ public class CfgKitproductomaestro implements Serializable {
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
     @OneToMany(mappedBy = "cfgkitproductomaestroidKit")
-    private List<FacDocumentosmaster> facDocumentosmasterList;
+    private List<CfgProducto> cfgProductoList;
 
     public CfgKitproductomaestro() {
     }
@@ -107,14 +97,14 @@ public class CfgKitproductomaestro implements Serializable {
         this.idKit = idKit;
     }
 
-    public CfgKitproductomaestro(Integer idKit, String nomKit, int idUnidad, float costo, float utilidad, boolean activo, Date fecCrea) {
+    public CfgKitproductomaestro(Integer idKit, String nomKit, int idUnidad, float utilidad, boolean activo, Date fecCrea, String codKit) {
         this.idKit = idKit;
         this.nomKit = nomKit;
         this.idUnidad = idUnidad;
-        this.costo = costo;
         this.utilidad = utilidad;
         this.activo = activo;
         this.fecCrea = fecCrea;
+        this.codKit = codKit;
     }
 
     public Integer getIdKit() {
@@ -141,11 +131,11 @@ public class CfgKitproductomaestro implements Serializable {
         this.idUnidad = idUnidad;
     }
 
-    public float getCosto() {
+    public Float getCosto() {
         return costo;
     }
 
-    public void setCosto(float costo) {
+    public void setCosto(Float costo) {
         this.costo = costo;
     }
 
@@ -180,7 +170,7 @@ public class CfgKitproductomaestro implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
-    
+
     public String getCodKit() {
         return codKit;
     }
@@ -189,14 +179,14 @@ public class CfgKitproductomaestro implements Serializable {
         this.codKit = codKit;
     }
 
-    public float getPrecio() {
+    public Float getPrecio() {
         return precio;
     }
 
-    public void setPrecio(float precio) {
+    public void setPrecio(Float precio) {
         this.precio = precio;
     }
-    
+
     @XmlTransient
     public List<CfgKitproductodetalle> getCfgKitproductodetalleList() {
         return cfgKitproductodetalleList;
@@ -223,12 +213,12 @@ public class CfgKitproductomaestro implements Serializable {
     }
 
     @XmlTransient
-    public List<FacDocumentosmaster> getFacDocumentosmasterList() {
-        return facDocumentosmasterList;
+    public List<CfgProducto> getCfgProductoList() {
+        return cfgProductoList;
     }
 
-    public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
-        this.facDocumentosmasterList = facDocumentosmasterList;
+    public void setCfgProductoList(List<CfgProducto> cfgProductoList) {
+        this.cfgProductoList = cfgProductoList;
     }
 
     @Override

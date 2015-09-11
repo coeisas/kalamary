@@ -301,6 +301,7 @@ public class ProductoMB implements Serializable {
             producto.setPrecio(getPrecio());
             producto.setEsServicio(esServicio);
             producto.setActivo(activo);
+            producto.setEsKit(false);
             producto.setFecCrea(new Date());
             producto.setCfgempresaidEmpresa(empresaSeleccionada);
             producto.setSegusuarioidUsuario(usuarioActual);

@@ -114,7 +114,7 @@ public class MovimientoInventarioMB implements Serializable {
         listaItemsInventarioMovimiento = new ArrayList();
         listaMovInventarioMaestro = new ArrayList();
         if (empresaActual != null) {
-            listaMovInventarioMaestro = movInventarioMaestroFacade.buscarByEmpresa(empresaActual);
+            listaMovInventarioMaestro = movInventarioMaestroFacade.findAll();
             listaFormaPago = pagoproveedorFacade.buscarFormasPagoByEmpresa(empresaActual);
         }
     }
@@ -384,6 +384,10 @@ public class MovimientoInventarioMB implements Serializable {
             documento.setActDocumento(documento.getActDocumento() + 1);
         }
         if (documento.getFinDocumento() < documento.getActDocumento()) {
+            if (!documento.getFinalizado()) {//si el documento se finaliza si aun no lo esta
+                documento.setFinalizado(true);
+                documentoFacade.edit(documento);
+            }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de creacion de este tipo de movimiento. Revice la configuracion de documentos"));
             return;
         }
@@ -407,6 +411,9 @@ public class MovimientoInventarioMB implements Serializable {
             invMovimientoMaestro.setSubtotal(subtotal);
             invMovimientoMaestro.setTotal(totalMovimiento);
             inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
+            if (documento.getActDocumento() >= documento.getFinDocumento()) {//dependiendo de la situacion se finaliza el documento aplicado al movimiento de salida
+                documento.setFinalizado(true);
+            }
             documentoFacade.edit(documento);
 
 //            CREACION DEL DETALLE MOVIMIENTO
@@ -416,6 +423,10 @@ public class MovimientoInventarioMB implements Serializable {
                 actualizarTablaProducto(detalleMovimiento);//actualiza la informacion del producto precio
                 inventarioMovimientoDetalleFacade.create(detalleMovimiento);
             }
+            
+//            SE INCLUYE EL DETALLE DEL MOVIMIENTO AL MAESTRO
+            invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
+            inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
             cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Movimiento guardado"));
         } catch (Exception e) {

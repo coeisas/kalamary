@@ -6,7 +6,6 @@
 package entities;
 
 import com.google.common.base.Strings;
-import facades.FacDocuementopagoFacade;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +26,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-import javax.ejb.EJB;
 
 /**
  *
@@ -45,9 +43,9 @@ import javax.ejb.EJB;
     @NamedQuery(name = "FacDocumentosmaster.findByEstado", query = "SELECT f FROM FacDocumentosmaster f WHERE f.estado = :estado"),
     @NamedQuery(name = "FacDocumentosmaster.findByTotalFacturaUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFacturaUSD = :totalFacturaUSD"),
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
-    @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento")})
+    @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento"),
+    @NamedQuery(name = "FacDocumentosmaster.findByUtilidad", query = "SELECT f FROM FacDocumentosmaster f WHERE f.utilidad = :utilidad")})
 public class FacDocumentosmaster implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
@@ -70,6 +68,8 @@ public class FacDocumentosmaster implements Serializable {
     private Float subtotal;
     @Column(name = "descuento", precision = 12)
     private Float descuento;
+    @Column(name = "utilidad", precision = 12)
+    private Float utilidad;
     @OneToMany(mappedBy = "facDocumentosmaster")
     private List<InvMovimiento> invMovimientoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
@@ -85,9 +85,6 @@ public class FacDocumentosmaster implements Serializable {
     @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresasede cfgempresasedeidSede;
-    @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit")
-    @ManyToOne
-    private CfgKitproductomaestro cfgkitproductomaestroidKit;
     @JoinColumn(name = "fac_caja_idCaja", referencedColumnName = "idCaja")
     @ManyToOne
     private FacCaja faccajaidCaja;
@@ -189,6 +186,14 @@ public class FacDocumentosmaster implements Serializable {
     public void setDescuento(Float descuento) {
         this.descuento = descuento;
     }
+    
+    public Float getUtilidad() {
+        return utilidad;
+    }
+
+    public void setUtilidad(Float utilidad) {
+        this.utilidad = utilidad;
+    }    
 
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
@@ -239,14 +244,6 @@ public class FacDocumentosmaster implements Serializable {
 
     public void setCfgempresasedeidSede(CfgEmpresasede cfgempresasedeidSede) {
         this.cfgempresasedeidSede = cfgempresasedeidSede;
-    }
-
-    public CfgKitproductomaestro getCfgkitproductomaestroidKit() {
-        return cfgkitproductomaestroidKit;
-    }
-
-    public void setCfgkitproductomaestroidKit(CfgKitproductomaestro cfgkitproductomaestroidKit) {
-        this.cfgkitproductomaestroidKit = cfgkitproductomaestroidKit;
     }
 
     public FacCaja getFaccajaidCaja() {

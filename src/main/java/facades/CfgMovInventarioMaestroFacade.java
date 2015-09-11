@@ -19,6 +19,7 @@ import javax.persistence.Query;
  */
 @Stateless
 public class CfgMovInventarioMaestroFacade extends AbstractFacade<CfgMovInventarioMaestro> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -30,24 +31,13 @@ public class CfgMovInventarioMaestroFacade extends AbstractFacade<CfgMovInventar
     public CfgMovInventarioMaestroFacade() {
         super(CfgMovInventarioMaestro.class);
     }
-    
-    public List<CfgMovInventarioMaestro> buscarByEmpresa(CfgEmpresa empresa){
-        try {
-            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.cfgempresaidEmpresa = ?1");
-            query.setParameter(1, empresa);
-            return query.getResultList();
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
-    public CfgMovInventarioMaestro buscarMovimientoSalidaByEmpresa(CfgEmpresa empresa){
+    public CfgMovInventarioMaestro buscarMovimientoSalida() {
         try {
-            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.cfgempresaidEmpresa = ?1 AND m.codMovInvetario LIKE '2'");
-            query.setParameter(1, empresa);
+            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.codMovInvetario LIKE '2'");
             return (CfgMovInventarioMaestro) query.getSingleResult();
         } catch (Exception e) {
             return null;
         }
-    }    
+    }
 }

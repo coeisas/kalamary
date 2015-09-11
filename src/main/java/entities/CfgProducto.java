@@ -51,7 +51,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgProducto.findByUtilidad", query = "SELECT c FROM CfgProducto c WHERE c.utilidad = :utilidad"),
     @NamedQuery(name = "CfgProducto.findByPrecio", query = "SELECT c FROM CfgProducto c WHERE c.precio = :precio"),
     @NamedQuery(name = "CfgProducto.findByActivo", query = "SELECT c FROM CfgProducto c WHERE c.activo = :activo"),
-    @NamedQuery(name = "CfgProducto.findByFecCrea", query = "SELECT c FROM CfgProducto c WHERE c.fecCrea = :fecCrea")})
+    @NamedQuery(name = "CfgProducto.findByFecCrea", query = "SELECT c FROM CfgProducto c WHERE c.fecCrea = :fecCrea"),
+    @NamedQuery(name = "CfgProducto.findByEsServicio", query = "SELECT c FROM CfgProducto c WHERE c.esServicio = :esServicio"),
+    @NamedQuery(name = "CfgProducto.findByEsKit", query = "SELECT c FROM CfgProducto c WHERE c.esKit = :esKit")})
 public class CfgProducto implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -59,13 +61,10 @@ public class CfgProducto implements Serializable {
     @Basic(optional = false)
     @Column(name = "idProducto", nullable = false)
     private Integer idProducto;
-    @Size(max = 45)
     @Column(name = "codProducto", length = 45)
     private String codProducto;
-    @Size(max = 45)
     @Column(name = "codBarProducto", length = 45)
     private String codBarProducto;
-    @Size(max = 400)
     @Column(name = "nomProducto", length = 400)
     private String nomProducto;
     @Column(name = "idUnidad")
@@ -104,15 +103,21 @@ public class CfgProducto implements Serializable {
     @Basic(optional = false)
     @Column(name = "esServicio", nullable = false)
     private boolean esServicio;
+    @Basic(optional = false)
+    @Column(name = "esKit", nullable = false)
+    private boolean esKit;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
-    private List<InvMovimientoDetalle> invMovimientoDetalleList;    
+    private List<InvMovimientoDetalle> invMovimientoDetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
-    private List<InvConsolidado> invConsolidadoList;    
+    private List<InvConsolidado> invConsolidadoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
+    @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit")
+    @ManyToOne
+    private CfgKitproductomaestro cfgkitproductomaestroidKit;
     @JoinColumn(name = "cfg_marcaproducto_idMarca", referencedColumnName = "idMarca", nullable = false)
     @ManyToOne(optional = false)
     private CfgMarcaproducto cfgmarcaproductoidMarca;
@@ -127,6 +132,12 @@ public class CfgProducto implements Serializable {
 
     public CfgProducto(Integer idProducto) {
         this.idProducto = idProducto;
+    }
+
+    public CfgProducto(Integer idProducto, boolean esServicio, boolean esKit) {
+        this.idProducto = idProducto;
+        this.esServicio = esServicio;
+        this.esKit = esKit;
     }
 
     public Integer getIdProducto() {
@@ -256,7 +267,7 @@ public class CfgProducto implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
-    
+
     public String getColor() {
         return color;
     }
@@ -272,13 +283,21 @@ public class CfgProducto implements Serializable {
     public void setTalla(String talla) {
         this.talla = talla;
     }
-    
+
     public boolean getEsServicio() {
         return esServicio;
     }
 
     public void setEsServicio(boolean esServicio) {
         this.esServicio = esServicio;
+    }
+
+    public boolean getEsKit() {
+        return esKit;
+    }
+
+    public void setEsKit(boolean esKit) {
+        this.esKit = esKit;
     }
 
     @XmlTransient
@@ -298,7 +317,7 @@ public class CfgProducto implements Serializable {
     public void setInvConsolidadoList(List<InvConsolidado> invConsolidadoList) {
         this.invConsolidadoList = invConsolidadoList;
     }
-    
+
     @XmlTransient
     public List<CfgKitproductodetalle> getCfgKitproductodetalleList() {
         return cfgKitproductodetalleList;
@@ -314,6 +333,14 @@ public class CfgProducto implements Serializable {
 
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
+    }
+
+    public CfgKitproductomaestro getCfgkitproductomaestroidKit() {
+        return cfgkitproductomaestroidKit;
+    }
+
+    public void setCfgkitproductomaestroidKit(CfgKitproductomaestro cfgkitproductomaestroidKit) {
+        this.cfgkitproductomaestroidKit = cfgkitproductomaestroidKit;
     }
 
     public CfgMarcaproducto getCfgmarcaproductoidMarca() {

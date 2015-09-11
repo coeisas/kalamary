@@ -321,21 +321,26 @@ public class CotizacionMB implements Serializable {
             totalDescuento = 0;
         }
         if (productoSeleccionado != null) {
-            InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
-            if (consolidado == null) {//el producto no esta en el inventario
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
-                return;
-            }
-            if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de este producto"));
-                return;
+            InvConsolidado consolidado = null;
+            if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
+                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
+                if (consolidado == null) {//el producto no esta en el inventario
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
+                    return;
+                }
+                if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de este producto"));
+                    return;
+                }
             }
             FacDocumentodetalle facdetalle = obtenerItemEnLista(productoSeleccionado);
             if (facdetalle == null) {
                 facdetalle = new FacDocumentodetalle();
                 facdetalle.setCfgProducto(productoSeleccionado);
-                //se determina como cantidad posible el total de las existencias en el inventario
-                facdetalle.setCantidadPosible(consolidado.getExistencia());
+                if (consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
+                    //se determina como cantidad posible el total de las existencias en el inventario
+                    facdetalle.setCantidadPosible(consolidado.getExistencia());
+                }
                 //el valor del documento master no es el definitivo
                 facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1, 1));
                 facdetalle.setCantidad(1);
@@ -397,11 +402,13 @@ public class CotizacionMB implements Serializable {
             listaDetalle.get(index).setValorUnitario(listaDetalle.get(index).getPrecioOriginal());
         }
         subtotal -= listaDetalle.get(index).getValorTotal();
-        //validacion donde se impide que la cantidad sea mayor a las existencias
-        if (listaDetalle.get(index).getCantidad() > listaDetalle.get(index).getCantidadPosible()) {
-            listaDetalle.get(index).setCantidad(listaDetalle.get(index).getCantidadPosible());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "Hay unicamente " + listaDetalle.get(index).getCantidadPosible() + " unidades disponibles"));
-            RequestContext.getCurrentInstance().update("msg");
+        if (!listaDetalle.get(index).getCfgProducto().getEsServicio()) {//si el producto seleccionado no es un servicio. Se valida la cantidad maxima permitida a ingresar
+            //validacion donde se impide que la cantidad sea mayor a las existencias
+            if (listaDetalle.get(index).getCantidad() > listaDetalle.get(index).getCantidadPosible()) {
+                listaDetalle.get(index).setCantidad(listaDetalle.get(index).getCantidadPosible());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "Hay unicamente " + listaDetalle.get(index).getCantidadPosible() + " unidades disponibles"));
+                RequestContext.getCurrentInstance().update("msg");
+            }
         }
         listaDetalle.get(index).setValorTotal(listaDetalle.get(index).getCantidad() * listaDetalle.get(index).getValorUnitario());
         float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
@@ -615,7 +622,7 @@ public class CotizacionMB implements Serializable {
             parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
             parametros.put("tipoDoc", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura());
-            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());           
+            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
             parametros.put("fecha", documento.getFecCrea());
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(documento.getFecCrea());

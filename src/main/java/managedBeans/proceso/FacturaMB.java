@@ -117,6 +117,7 @@ public class FacturaMB implements Serializable {
     private float totalDescuento;
     private float totalFactura;
     private float totalUSD;
+    private float utilidad;
     private String observacion;
     private SegUsuario vendedorSeleccionado;
     private LazyDataModel<CfgProducto> listaProducto;
@@ -421,21 +422,26 @@ public class FacturaMB implements Serializable {
             totalDescuento = 0;
         }
         if (productoSeleccionado != null) {
-            InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
-            if (consolidado == null) {//el producto no esta en el inventario
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
-                return;
-            }
-            if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de este producto"));
-                return;
+            InvConsolidado consolidado = null;
+            if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
+                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
+                if (consolidado == null) {//el producto no esta en el inventario
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
+                    return;
+                }
+                if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de este producto"));
+                    return;
+                }
             }
             FacDocumentodetalle facdetalle = obtenerItemEnLista(productoSeleccionado);
             if (facdetalle == null) {
                 facdetalle = new FacDocumentodetalle();
                 facdetalle.setCfgProducto(productoSeleccionado);
-                //se determina como cantidad posible el total de las existencias en el inventario
-                facdetalle.setCantidadPosible(consolidado.getExistencia());
+                if (consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
+                    //se determina como cantidad posible el total de las existencias en el inventario
+                    facdetalle.setCantidadPosible(consolidado.getExistencia());
+                }
                 //el valor del documento master no es el definitivo
                 facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1, 1));
                 facdetalle.setCantidad(1);
@@ -497,11 +503,13 @@ public class FacturaMB implements Serializable {
             listaDetalle.get(index).setValorUnitario(listaDetalle.get(index).getPrecioOriginal());
         }
         subtotal -= listaDetalle.get(index).getValorTotal();
-        //validacion donde se impide que la cantidad sea mayor a las existencias
-        if (listaDetalle.get(index).getCantidad() > listaDetalle.get(index).getCantidadPosible()) {
-            listaDetalle.get(index).setCantidad(listaDetalle.get(index).getCantidadPosible());
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "Hay unicamente " + listaDetalle.get(index).getCantidadPosible() + " unidades disponibles"));
-            RequestContext.getCurrentInstance().update("msg");
+        if (!listaDetalle.get(index).getCfgProducto().getEsServicio()) {//si el producto seleccionado no es un servicio. Se valida la cantidad maxima permitida a ingresar
+            //validacion donde se impide que la cantidad sea mayor a las existencias
+            if (listaDetalle.get(index).getCantidad() > listaDetalle.get(index).getCantidadPosible()) {
+                listaDetalle.get(index).setCantidad(listaDetalle.get(index).getCantidadPosible());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "Hay unicamente " + listaDetalle.get(index).getCantidadPosible() + " unidades disponibles"));
+                RequestContext.getCurrentInstance().update("msg");
+            }
         }
         listaDetalle.get(index).setValorTotal(listaDetalle.get(index).getCantidad() * listaDetalle.get(index).getValorUnitario());
         float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
@@ -541,6 +549,16 @@ public class FacturaMB implements Serializable {
             aux = impuesto.getPorcentaje() * (subtotal - totalDescuento) / (float) 100;
             aux = Redondear(aux, 0);
             impuesto.setTotalImpuesto(aux);
+        }
+    }
+
+    private void calcularTotalUtilidad() {
+        utilidad = 0;
+        for (FacDocumentodetalle documentodetalle : listaDetalle) {
+            float costoProductoOriginal = documentodetalle.getCfgProducto().getCosto() != null ? documentodetalle.getCfgProducto().getCosto() : 0;
+            costoProductoOriginal = Redondear(costoProductoOriginal, 0);
+            float utilidadProducto = documentodetalle.getCantidad() * (documentodetalle.getValorUnitario() - costoProductoOriginal);
+            utilidad += utilidadProducto;
         }
     }
 
@@ -646,6 +664,8 @@ public class FacturaMB implements Serializable {
             documentosmaster.setTotalFacturaUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setFaccajaidCaja(cajaUsuario);
+            calcularTotalUtilidad();
+            documentosmaster.setUtilidad(utilidad);
             documentosmaster.setEstado("PENDIENTE");
             documentosmasterFacade.create(documentosmaster);
             if (documento.getActDocumento() == documento.getFinDocumento()) {
@@ -653,7 +673,7 @@ public class FacturaMB implements Serializable {
                 documento.setActivo(false);
             }
             documentoFacade.edit(documento);
-            
+
 //            MODIFICANDO EL DETALLE 
             for (FacDocumentodetalle documentodetalle : listaDetalle) {
                 documentodetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(documentodetalle.getCfgProducto().getIdProducto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
@@ -673,7 +693,9 @@ public class FacturaMB implements Serializable {
                     documentodetalle.setValorDescuento(valorDescuento);
                 }
                 documentodetalleFacade.create(documentodetalle);
-                actualizarTablaConsolidado(documentodetalle);
+                if (!documentodetalle.getCfgProducto().getEsServicio()) {//si el producto no es un servicio se descontara del inventario
+                    actualizarTablaConsolidado(documentodetalle);
+                }
             }
             if (tipoFactura == 2) {//si el tipo de factura es especial. Se actualiza el subtotal y el totaldescuento en el documentomaster
                 calcularSubtotal();
@@ -681,7 +703,7 @@ public class FacturaMB implements Serializable {
                 documentosmaster.setDescuento(totalDescuento);
                 documentosmaster.setSubtotal(subtotal);
             }
-            
+
             //GUARDANDO LOS IMPUESTOS APLICADOS A LA FACTURA
             List<FacDocumentoimpuesto> listaDocumentoImpuesto = new ArrayList();
             if (tipoFactura == 1) {//para la factura normal. los impuestos estan discriminados
@@ -696,7 +718,7 @@ public class FacturaMB implements Serializable {
                     listaDocumentoImpuesto.add(documentoimpuesto);
                 }
             }
-            
+
             //GUARDANDO LAS FORMAS DE PAGOS DE LA FACTURA
             List<FacDocuementopago> listaDocumentoPago = new ArrayList();
             for (CfgFormapago formapago : listaFormapagos) {
@@ -710,7 +732,7 @@ public class FacturaMB implements Serializable {
                     listaDocumentoPago.add(docuementopago);
                 }
             }
-            
+
 //            ASOCIANDO LAS LISTAS: DETALLE, IMPUESTOS Y PAGOS AL DOCUMENTOMASTER
             documentosmaster.setFacDocumentodetalleList(listaDetalle);
             if (!listaDocumentoImpuesto.isEmpty()) {
@@ -720,13 +742,13 @@ public class FacturaMB implements Serializable {
                 documentosmaster.setFacDocuementopagoList(listaDocumentoPago);
             }
             documentosmasterFacade.edit(documentosmaster);
-            
+
 //            SI LA FACTURA PROVIENE DE UNA COTIZACION. SE CAMBIARA EL ESTADO DE LA COTIZACION A FACTURADA
             if (cotizacionSeleccionada != null) {
                 cotizacionSeleccionada.setEstado("FACTURADA");
                 documentosmasterFacade.edit(cotizacionSeleccionada);
             }
-            
+
             documentoActual = documentosmaster;
             crearMovimientoInventario(listaDetalle, documentosmaster);
             generarMovimientoCaja(documentosmaster);
@@ -773,13 +795,14 @@ public class FacturaMB implements Serializable {
     }
 
     private void crearMovimientoInventario(List<FacDocumentodetalle> listaDetalle, FacDocumentosmaster documentosmaster) {
+//        BUSCA EL DOCUMENTO APLICADO AL MOVIMIENTO DE INVENTARIO DE SALIDA
         CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
         if (documento.getActDocumento() == 0) {
             documento.setActDocumento(documento.getIniDocumento());
         } else {
             documento.setActDocumento(documento.getActDocumento() + 1);
         }
-        CfgMovInventarioMaestro movInventarioMaestro = movInventarioMaestroFacade.buscarMovimientoSalidaByEmpresa(empresaActual);
+        CfgMovInventarioMaestro movInventarioMaestro = movInventarioMaestroFacade.buscarMovimientoSalida();
         CfgMovInventarioDetalle movInventarioDetalle = movInventarioDetalleFacade.buscarSalidaVentaByMaestro(movInventarioMaestro);
         try {
 //            CREACION DEL MAESTRO MOVIMIENTO 
@@ -796,20 +819,30 @@ public class FacturaMB implements Serializable {
             invMovimientoMaestro.setSubtotal(subtotal);
             invMovimientoMaestro.setTotal(totalFactura);
             inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
+            if (documento.getActDocumento() >= documento.getFinDocumento()) {//dependiendo de la situacion se finaliza el documento aplicado al movimiento de salida
+                documento.setFinalizado(true);
+            }
             documentoFacade.edit(documento);
-
+            List<InvMovimientoDetalle> listaItemsInventarioMovimiento = new ArrayList();
 //            CREACION DEL DETALLE MOVIMIENTO
             for (FacDocumentodetalle detalleFactura : listaDetalle) {
-                InvMovimientoDetalle detalle = new InvMovimientoDetalle();
-                detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc(), detalleFactura.getCfgProducto().getIdProducto()));
-                detalle.setInvMovimiento(invMovimientoMaestro);
-                detalle.setCantidad(detalleFactura.getCantidad());
-                detalle.setCfgProducto(detalleFactura.getCfgProducto());
-                detalle.setCostoAdquisicion(detalleFactura.getValorUnitario());
-                detalle.setDescuento(detalleFactura.getDescuento());
-                detalle.setCostoFinal(detalleFactura.getValorTotal());
-                inventarioMovimientoDetalleFacade.create(detalle);
+                if (!detalleFactura.getCfgProducto().getEsServicio()) {//si el producto no es un servicio se incluye en el detalle del movimiento de salida
+                    InvMovimientoDetalle detalle = new InvMovimientoDetalle();
+                    detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc(), detalleFactura.getCfgProducto().getIdProducto()));
+                    detalle.setInvMovimiento(invMovimientoMaestro);
+                    detalle.setCantidad(detalleFactura.getCantidad());
+                    detalle.setCfgProducto(detalleFactura.getCfgProducto());
+                    detalle.setCostoAdquisicion(detalleFactura.getValorUnitario());
+                    detalle.setDescuento(detalleFactura.getDescuento());
+                    detalle.setCostoFinal(detalleFactura.getValorTotal());
+                    inventarioMovimientoDetalleFacade.create(detalle);
+                    listaItemsInventarioMovimiento.add(detalle);
+                }
             }
+
+//            SE INCLUYE EL DETALLE DEL MOVIMIENTO AL MAESTRO
+            invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
+            inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo el inventario en el inventario"));
         }

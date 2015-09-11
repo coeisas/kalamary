@@ -20,8 +20,11 @@
                 </p:inputText>
                 <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
                 <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
-                <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{cotizacionMB.nombreCliente}"/>
-                <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{cotizacionMB.nombreCliente}"/>   
+           </div>
+            <div style="clear: left"/>
+            <br/>
+            <div>
                 <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
                 <p:inputText id="IdDocumentoVendedor" value="#{cotizacionMB.documentoVendedor}" class="campoFormulario">
                     <p:ajax event="blur" listener="#{cotizacionMB.buscarVendedor}" update="@none"/>

@@ -98,8 +98,6 @@ public class CfgEmpresa implements Serializable {
     private List<CfgFormapago> cfgFormapagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
     private List<CfgKitproductomaestro> cfgKitproductomaestroList;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
-    private List<CfgMovInventarioMaestro> cfgMovInventarioMaestroList;
     @JoinColumns({
         @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio", nullable = false),
         @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
@@ -120,7 +118,7 @@ public class CfgEmpresa implements Serializable {
     private List<CfgProducto> cfgProductoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
     private List<CfgCategoriaproducto> cfgCategoriaproductoList;
-    
+
     public CfgEmpresa() {
     }
 
@@ -296,15 +294,6 @@ public class CfgEmpresa implements Serializable {
 
     public void setCfgKitproductomaestroList(List<CfgKitproductomaestro> cfgKitproductomaestroList) {
         this.cfgKitproductomaestroList = cfgKitproductomaestroList;
-    }
-
-    @XmlTransient
-    public List<CfgMovInventarioMaestro> getCfgMovInventarioMaestroList() {
-        return cfgMovInventarioMaestroList;
-    }
-
-    public void setCfgMovInventarioMaestroList(List<CfgMovInventarioMaestro> cfgMovInventarioMaestroList) {
-        this.cfgMovInventarioMaestroList = cfgMovInventarioMaestroList;
     }
 
     public CfgMunicipio getCfgMunicipio() {

@@ -23,6 +23,16 @@
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>
             <p:remoteCommand name="determinarValorFormaPago" actionListener="#{facturaMB.determinarValorFormaPago}"/>
             <div>
+                <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
+                <p:selectOneMenu class="campoFormulario" value="#{facturaMB.tipoFactura}">
+                    <p:ajax event="change" listener="#{facturaMB.validarTipoFacturacion}" update="@none"/>
+                    <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                    <f:selectItems value="#{facturaMB.listaTipoFactura}"/>
+                </p:selectOneMenu>
+            </div>
+            <div style="clear: left"/>
+            <br/>
+            <div>
                 <p:outputLabel value="Cliente:" class="labelFormularioObligatorio"/>
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
                     <p:ajax event="blur" listener="#{facturaMB.buscarCliente}" update="@none"/> 
@@ -31,24 +41,18 @@
                 <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
                 <p:commandButton icon="ui-icon-script" title="Cargar Cotizacion" class="campoFormulario" actionListener="#{facturaMB.cargarCotizaciones}"/>
                 <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
-                <div style="float: left;margin-left: 20px;height: 1.5em"/>
+            </div>
+            <div style="clear: left"/>
+            <br/>
+            <div>
                 <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
                 <p:inputText id="IdDocumentoVendedor" value="#{facturaMB.documentoVendedor}" class="campoFormulario">
                     <p:ajax event="blur" listener="#{facturaMB.buscarVendedor}" update="@none"/>
                 </p:inputText>
                 <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
-                <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>
+                <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>                
             </div>
-            <div style="clear: left"/>
-            <br/>
-            <div>
-                <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
-                <p:selectOneMenu class="campoFormulario" value="#{facturaMB.tipoFactura}">
-                    <p:ajax event="change" listener="#{facturaMB.validarTipoFacturacion}" update="@none"/>
-                    <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
-                    <f:selectItems value="#{facturaMB.listaTipoFactura}"/>
-                </p:selectOneMenu>
-            </div>
+
             <div style="clear: left"/>
             <div>
                 <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{facturaMB.cargarModalProductos}"/>
