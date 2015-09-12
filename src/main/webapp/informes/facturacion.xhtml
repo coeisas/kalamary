@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="../templates/layout.xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="title">Informe Facturacion</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormInformeFactura">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Informe Factura</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Inicial:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeFacturaMB.fechaIncial}"/>
+                        <div style="float: left;margin-left: 25px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeFacturaMB.fechaFinal}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Cliente:"/>
+                        <p:inputText id="IdCliente" class="campoFormulario" value="#{informeFacturaMB.identificacionCliente}">
+                            <p:ajax event="blur" listener="#{informeFacturaMB.buscarCliente}" update="@none"/>
+                        </p:inputText>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{informeFacturaMB.cargarClientes}"/>
+                        <p:outputLabel id="IdNombreCliente" class="labelFormularioInformativa" value="#{informeFacturaMB.nombreCliente}"/>
+                        <p:watermark for="IdCliente" value="Identificacion"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Vendedor:"/>
+                        <p:inputText id="IdVendedor" class="campoFormulario" value="#{informeFacturaMB.identificacionVendedor}">
+                            <p:ajax event="blur" listener="#{informeFacturaMB.buscarVendedor}" update="@none"/>
+                        </p:inputText>
+                        <p:commandButton  class="campoFormulario" icon="ui-icon-search" title="Buscar Vendedor" actionListener="#{informeFacturaMB.cargarListaVendedores}"/>
+                        <p:outputLabel id="IdNombreVendedor" class="labelFormularioInformativa" value="#{informeFacturaMB.nombreVendedor}"/>
+                        <p:watermark for="IdVendedor" value="Identificacion"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" actionListener="#{informeFacturaMB.generarReporte}" ajax="false" onclick="this.form.target = '_blank'"/>&nbsp;<p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeFacturaMB.limpiar}" />
+                    </p:column>
+
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{listadoFacturaMB.listadoClientes}" var="cliente" emptyMessage="No se encontraron clientes" selectionMode="single" selection="#{informeFacturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" lazy="true" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{informeFacturaMB.cargarInformacionCliente}"/>
+            </h:form>                                
+        </p:dialog>
+        
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%">
+            <h:form id="FormModalVendedor">
+                <p:dataTable value="#{informeFacturaMB.listaVendedores}" var="vendedor" selection="#{informeFacturaMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single">
+                    <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
+                    <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{informeFacturaMB.cargarInformacionVendedor}"/>
+            </h:form>
+        </p:dialog>        
+    </ui:define>
+</ui:composition>
+
