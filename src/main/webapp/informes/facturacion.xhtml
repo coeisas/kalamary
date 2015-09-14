@@ -58,7 +58,7 @@
 
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
             <h:form id="FormBuscarCliente">
-                <p:dataTable value="#{listadoFacturaMB.listadoClientes}" var="cliente" emptyMessage="No se encontraron clientes" selectionMode="single" selection="#{informeFacturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" lazy="true" paginator="true" paginatorPosition="bottom">
+                <p:dataTable value="#{informeFacturaMB.listaClientes}" var="cliente" emptyMessage="No se encontraron clientes" selectionMode="single" selection="#{informeFacturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" lazy="true" paginator="true" paginatorPosition="bottom">
                     <p:column headerText="Identificacion">
                         <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
                     </p:column>

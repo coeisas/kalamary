@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" columnCount="3" printOrder="Horizontal" pageWidth="612" pageHeight="792" columnWidth="190" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8e8d1562-f14d-4f49-a719-1075e707cebf">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="logo" class="java.io.InputStream"/>
+	<field name="sede" class="java.lang.String"/>
+	<field name="caja" class="java.lang.String"/>
+	<field name="fecha" class="java.util.Date"/>
+	<field name="formaPago" class="java.lang.String"/>
+	<field name="valor" class="java.lang.Float"/>
+	<group name="caja">
+		<groupExpression><![CDATA[$F{caja}]]></groupExpression>
+		<groupHeader>
+			<band height="25">
+				<textField>
+					<reportElement x="0" y="0" width="572" height="25" uuid="9d3606a0-d339-4c16-9bbd-d82323ad6e53"/>
+					<textElement verticalAlignment="Middle">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{caja}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="0" y="24" width="572" height="1" uuid="53acc633-915f-4477-8705-3fa522d1d271"/>
+				</line>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="fecha">
+		<groupExpression><![CDATA[$F{fecha}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField pattern="MMMMM dd, yyyy">
+					<reportElement x="0" y="0" width="572" height="20" uuid="3026c2d7-aaae-40ed-8492-1de12211d159"/>
+					<textElement verticalAlignment="Middle"/>
+					<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="572" height="50" uuid="67b49ec4-c720-4eac-979b-74b920c7c73d"/>
+			</rectangle>
+			<image>
+				<reportElement x="10" y="1" width="98" height="48" uuid="6abe1232-861c-48e1-b4f5-3496b2b7dc94"/>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="0" y="0" width="572" height="50" uuid="a6fa98de-37ae-4a31-8f6c-876b9b172d37"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INFORME MOVIMIENTO DE CAJA]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="16" uuid="c2a92674-5854-4e44-8d45-f52f44811a16"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{formaPago}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="100" y="0" width="88" height="16" uuid="895f8b87-5967-4427-be78-1155ec851ccf"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{valor}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

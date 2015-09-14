@@ -143,7 +143,7 @@ public class CajaMB implements Serializable {
             caja.setCfgempresasedeidSede(getSedeActual());
             caja.setCodigoCaja(codigoCaja.toUpperCase());
             caja.setNomCaja(nombreCaja.toUpperCase());
-            caja.setCerrada(true);
+            caja.setActiva(true);
             caja.setFeccrea(new Date());
             caja.setUsrcrea(usuarioActual.getIdUsuario());
             caja.setBase(baseCaja);

@@ -4,14 +4,62 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
                 template="../templates/layout.xhtml">
     <ui:define name="title">Informe Clientes</ui:define>
     <ui:define name="content">
-        TODO: INFORME CLIENTES
         <p:growl autoUpdate="true" showDetail="true"/>
-        <h:form>
-            
+        <h:form id="IdFormInformeCliente">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="2">Informe Cliente</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column colspan="2">
+                        <p:outputLabel class="labelFormulario" value="Cliente:"/>
+                        <p:inputText id="IdCliente" class="campoFormulario" value="#{informeClienteMB.identificacion}">
+                            <p:ajax event="blur" listener="#{informeClienteMB.buscarCliente}" update="@none"/>
+                        </p:inputText>
+                        <p:watermark for="IdCliente" value="Identificacion"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{informeClienteMB.cargarClientes}"/>
+                        <p:outputLabel id="IdNombreCliente" class="labelFormularioInformativa" value="#{informeClienteMB.nombreCliente}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Incial:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaInicial}"/>     
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaFinal}"/>     
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center" colspan="2">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" onclick="this.form.target = '_blank'" actionListener="#{informeClienteMB.generarReporte}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeClienteMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
         </h:form>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{informeClienteMB.listaClientes}" var="cliente" emptyMessage="No se encontraron clientes" selectionMode="single" selection="#{informeClienteMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" lazy="true" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{informeClienteMB.cargarInformacionCliente}"/>
+            </h:form>                                
+        </p:dialog>
     </ui:define>
 </ui:composition>
 

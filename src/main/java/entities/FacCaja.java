@@ -23,8 +23,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -45,7 +43,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacCaja.findByActiva", query = "SELECT f FROM FacCaja f WHERE f.activa = :activa"),
     @NamedQuery(name = "FacCaja.findByBase", query = "SELECT f FROM FacCaja f WHERE f.base = :base")})
 public class FacCaja implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,22 +50,16 @@ public class FacCaja implements Serializable {
     @Column(name = "idCaja", nullable = false)
     private Integer idCaja;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
     @Column(name = "nomCaja", nullable = false, length = 100)
     private String nomCaja;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "feccrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date feccrea;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "usrcrea", nullable = false)
     private int usrcrea;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "codigoCaja", nullable = false, length = 5)
     private String codigoCaja;
     @Column(name = "activa")
@@ -85,6 +76,8 @@ public class FacCaja implements Serializable {
     private List<FacMovcaja> facMovcajaList;
     @OneToMany(mappedBy = "faccajaidCaja")
     private List<FacDocumentosmaster> facDocumentosmasterList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facCaja")
+    private List<ConsolidadoMovcaja> consolidadoMovcajaList;
 
     public FacCaja() {
     }
@@ -93,7 +86,7 @@ public class FacCaja implements Serializable {
         this.idCaja = idCaja;
     }
 
-    public FacCaja(Integer idCaja, String nomCaja, float base, Date feccrea, int usrcrea, String codigoCaja) {
+    public FacCaja(Integer idCaja, String nomCaja, Date feccrea, int usrcrea, String codigoCaja) {
         this.idCaja = idCaja;
         this.nomCaja = nomCaja;
         this.feccrea = feccrea;
@@ -145,16 +138,16 @@ public class FacCaja implements Serializable {
         return activa;
     }
 
+    public void setActiva(Boolean activa) {
+        this.activa = activa;
+    }
+
     public Float getBase() {
         return base;
     }
 
     public void setBase(Float base) {
         this.base = base;
-    }
-
-    public void setCerrada(Boolean activa) {
-        this.activa = activa;
     }
 
     public CfgEmpresasede getCfgempresasedeidSede() {
@@ -182,7 +175,7 @@ public class FacCaja implements Serializable {
     public void setFacMovcajaList(List<FacMovcaja> facMovcajaList) {
         this.facMovcajaList = facMovcajaList;
     }
-    
+
     @XmlTransient
     public List<FacDocumentosmaster> getFacDocumentosmasterList() {
         return facDocumentosmasterList;
@@ -190,7 +183,16 @@ public class FacCaja implements Serializable {
 
     public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
         this.facDocumentosmasterList = facDocumentosmasterList;
-    }    
+    }
+
+    @XmlTransient
+    public List<ConsolidadoMovcaja> getConsolidadoMovcajaList() {
+        return consolidadoMovcajaList;
+    }
+
+    public void setConsolidadoMovcajaList(List<ConsolidadoMovcaja> consolidadoMovcajaList) {
+        this.consolidadoMovcajaList = consolidadoMovcajaList;
+    }  
 
     @Override
     public int hashCode() {

@@ -5,6 +5,7 @@
  */
 package facades;
 
+import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.FacCaja;
 import java.util.List;
@@ -31,6 +32,16 @@ public class FacCajaFacade extends AbstractFacade<FacCaja> {
     public FacCajaFacade() {
         super(FacCaja.class);
     }
+    
+    public List<FacCaja> buscarCajasPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT c FROM FacCaja c WHERE c.cfgempresasedeidSede.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 
     public List<FacCaja> buscarCajasPorSede(CfgEmpresasede sede) {
         try {

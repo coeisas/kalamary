@@ -22,8 +22,6 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -44,7 +42,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgEmpresasede.findByTel1", query = "SELECT c FROM CfgEmpresasede c WHERE c.tel1 = :tel1"),
     @NamedQuery(name = "CfgEmpresasede.findByTel2", query = "SELECT c FROM CfgEmpresasede c WHERE c.tel2 = :tel2")})
 public class CfgEmpresasede implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,17 +49,13 @@ public class CfgEmpresasede implements Serializable {
     @Column(name = "idSede", nullable = false)
     private Integer idSede;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "cod_Sede", nullable = false, length = 5)
     private String codSede;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
     @Column(name = "nomSede", nullable = false, length = 100)
     private String nomSede;
     @Column(name = "activo")
-    private boolean activo;
+    private Boolean activo;
     @Lob
     @Column(name = "logo")
     private byte[] logo;
@@ -84,7 +77,7 @@ public class CfgEmpresasede implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresasedeidSede")
     private List<InvMovimiento> invMovimientoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
-    private List<InvConsolidado> invConsolidadoList;    
+    private List<InvConsolidado> invConsolidadoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresasedeidSede")
     private List<FacCaja> facCajaList;
     @OneToMany(mappedBy = "cfgempresasedeidSede")
@@ -101,6 +94,10 @@ public class CfgEmpresasede implements Serializable {
         @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
     @ManyToOne(optional = false)
     private CfgMunicipio cfgMunicipio;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresasedeidSede")
+    private List<FacDocumentosmaster> facDocumentosmasterList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
+    private List<ConsolidadoMovcaja> consolidadoMovcajaList;
 
     public CfgEmpresasede() {
     }
@@ -139,14 +136,14 @@ public class CfgEmpresasede implements Serializable {
         this.nomSede = nomSede;
     }
 
-    public boolean getActivo() {
+    public Boolean getActivo() {
         return activo;
     }
 
-    public void setActivo(boolean activo) {
+    public void setActivo(Boolean activo) {
         this.activo = activo;
     }
-    
+
     public byte[] getLogo() {
         return logo;
     }
@@ -194,7 +191,7 @@ public class CfgEmpresasede implements Serializable {
     public void setTel2(String tel2) {
         this.tel2 = tel2;
     }
-    
+
     public String getMail() {
         return mail;
     }
@@ -202,7 +199,7 @@ public class CfgEmpresasede implements Serializable {
     public void setMail(String mail) {
         this.mail = mail;
     }
-    
+
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
         return invMovimientoList;
@@ -220,7 +217,7 @@ public class CfgEmpresasede implements Serializable {
     public void setInvConsolidadoList(List<InvConsolidado> invConsolidadoList) {
         this.invConsolidadoList = invConsolidadoList;
     }
-    
+
     @XmlTransient
     public List<FacCaja> getFacCajaList() {
         return facCajaList;
@@ -271,6 +268,24 @@ public class CfgEmpresasede implements Serializable {
 
     public void setCfgMunicipio(CfgMunicipio cfgMunicipio) {
         this.cfgMunicipio = cfgMunicipio;
+    }
+
+    @XmlTransient
+    public List<FacDocumentosmaster> getFacDocumentosmasterList() {
+        return facDocumentosmasterList;
+    }
+
+    public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
+        this.facDocumentosmasterList = facDocumentosmasterList;
+    }
+
+    @XmlTransient
+    public List<ConsolidadoMovcaja> getConsolidadoMovcajaList() {
+        return consolidadoMovcajaList;
+    }
+
+    public void setConsolidadoMovcajaList(List<ConsolidadoMovcaja> consolidadoMovcajaList) {
+        this.consolidadoMovcajaList = consolidadoMovcajaList;
     }
 
     @Override

@@ -4,13 +4,43 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
                 template="../templates/layout.xhtml">
     <ui:define name="title">Informe Caja</ui:define>
     <ui:define name="content">
-        TODO: INFORME MOVIMIENTO CAJA
+        #{informeMovimientoCajaMB.cargarCajas()}
         <p:growl autoUpdate="true" showDetail="true"/>
-        <h:form>
-            
+        <h:form id="IdFormInformeMovCaja">
+            <p:panelGrid style="margin: 0 auto">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="3">Informe Movimiento Caja</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Caja:"/>
+                        <p:selectOneMenu class="campoFormulario" value="#{informeMovimientoCajaMB.idCaja}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{informeMovimientoCajaMB.listaCajas}" var="caja" itemLabel="#{caja.nomCaja}" itemValue="#{caja.idCaja}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Inicial:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeMovimientoCajaMB.fechaInicial}"/>                        
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeMovimientoCajaMB.fechaFinal}"/>                        
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column colspan="3" style="text-align: center">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" onclick="this.form.target = '_blank'" ajax="false" actionListener="#{informeMovimientoCajaMB.generarReporte}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeClienteMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>            
         </h:form>
     </ui:define>
 </ui:composition>

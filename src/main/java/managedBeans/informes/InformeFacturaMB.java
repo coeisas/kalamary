@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -164,6 +165,10 @@ public class InformeFacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la sede"));
             return false;
         }
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion del usuario"));
+            return false;
+        }
         ///se debe ingresar al menos un parametro de busqueda
         if (fechaFinal == null && fechaIncial == null && clienteSeleccionado == null && vendedorSeleccionado == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ingrese al menos un parametro"));
@@ -180,7 +185,15 @@ public class InformeFacturaMB implements Serializable {
         if (!validar()) {
             return;
         }
-        List<FacDocumentosmaster> listaFacturas = documentosmasterFacade.buscarFacturasToReporte(sedeActual, clienteSeleccionado, vendedorSeleccionado, fechaIncial, fechaFinal);
+        //como la fecha de facturacion contiene la hora es necesario aumentar un dia la fecha final ya que la fecha capurada tiene la hora 0
+        Date aux = fechaFinal;
+        if (fechaFinal != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(fechaFinal);
+            calendar.add(Calendar.DATE, 1);
+            aux = calendar.getTime();
+        }
+        List<FacDocumentosmaster> listaFacturas = documentosmasterFacade.buscarFacturasToReporte(sedeActual, clienteSeleccionado, vendedorSeleccionado, fechaIncial, aux);
         List<InformeFactura> lista = generarListado(listaFacturas);
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(lista);
         FacesContext facesContext = FacesContext.getCurrentInstance();

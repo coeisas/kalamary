@@ -13,6 +13,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -104,6 +105,30 @@ public class CfgClienteFacade extends AbstractFacade<CfgCliente> {
             return query.getResultList();
         } catch (Exception e) {
             return new ArrayList();
+        }
+    }
+
+    public List<CfgCliente> busquedaParaInforme(CfgEmpresa empresa, Date fechaInicial, Date fechaFinal) {
+        try {
+            String consulta = "SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1";
+//            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1 AND c.fecNacimiento  >= ?2 AND c.fecNacimiento <= ?3");
+            if (fechaInicial != null) {
+                consulta = consulta.concat(" AND c.fecNacimiento  >= ?2");
+            }
+            if (fechaFinal != null) {
+                consulta = consulta.concat(" AND c.fecNacimiento <= ?3");
+            }
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, empresa);
+            if (fechaInicial != null) {
+                query.setParameter(2, fechaInicial);
+            }
+            if (fechaFinal != null) {
+                query.setParameter(3, fechaFinal);
+            }
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
         }
     }
 }

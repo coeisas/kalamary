@@ -215,6 +215,7 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
         }
     }
 //documentos de cotizacion
+
     public List<FacDocumentosmaster> buscarCotizacionesBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int offset, int limit) {
         try {
             String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '5' AND d.estado LIKE 'PENDIENTE'";
@@ -234,6 +235,7 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
         }
     }
 //total documentos de cotizacion
+
     public int totalCotizacionesBySede(CfgEmpresasede sede, CfgCliente cliente) {
         try {
             String consulta = "SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '5' AND d.estado LIKE 'PENDIENTE'";
@@ -252,10 +254,10 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
         }
     }
 
-    //recupera las facturas normales y las especiales
+    //recupera las facturas normales y las especiales que estan canceladas (PAGADAS)
     public List<FacDocumentosmaster> buscarFacturasToReporte(CfgEmpresasede sede, CfgCliente cliente, SegUsuario vendedor, Date fechaIni, Date fechafin) {
         try {
-            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND (d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1' OR d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '6')";
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND (d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1' OR d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '6') AND d.estado LIKE 'CANCELADA'";
             if (cliente != null) {
                 consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
             }

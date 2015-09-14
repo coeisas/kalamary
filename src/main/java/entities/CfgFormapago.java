@@ -24,8 +24,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -53,41 +51,33 @@ public class CfgFormapago implements Serializable {
     @Column(name = "idFormaPago", nullable = false)
     private Integer idFormaPago;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "nomFormaPago", nullable = false, length = 50)
     private String nomFormaPago;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 2)
-    @Column(name = "Abreviatura", nullable = false, length = 2)
+    @Column(name = "Abreviatura", nullable = false, length = 3)
     private String abreviatura;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 1)
     @Column(name = "aplicaA", nullable = false, length = 1)
     private String aplicaA;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "usrCrea", nullable = false)
     private int usrCrea;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 5)
     @Column(name = "codFormaPago", nullable = false, length = 5)
     private String codFormaPago;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
-    private List<FacDocuementopago> facDocuementopagoList;    
+    private List<FacDocuementopago> facDocuementopagoList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
-      @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
-    private List<FacMovcajadetalle> facMovcajadetalleList;  
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
+    private List<ConsolidadoMovcaja> consolidadoMovcajaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgFormapago")
+    private List<FacMovcajadetalle> facMovcajadetalleList;
     @Transient
     private float subtotal;//campo utilizado en factura, para guardar el monto a pagar por cada forma de pago
 
@@ -163,7 +153,7 @@ public class CfgFormapago implements Serializable {
     public void setCodFormaPago(String codFormaPago) {
         this.codFormaPago = codFormaPago;
     }
-    
+
     @XmlTransient
     public List<FacDocuementopago> getFacDocuementopagoList() {
         return facDocuementopagoList;
@@ -172,7 +162,7 @@ public class CfgFormapago implements Serializable {
     public void setFacDocuementopagoList(List<FacDocuementopago> facDocuementopagoList) {
         this.facDocuementopagoList = facDocuementopagoList;
     }
-    
+
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }
@@ -180,7 +170,16 @@ public class CfgFormapago implements Serializable {
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
-    
+
+    @XmlTransient
+    public List<ConsolidadoMovcaja> getConsolidadoMovcajaList() {
+        return consolidadoMovcajaList;
+    }
+
+    public void setConsolidadoMovcajaList(List<ConsolidadoMovcaja> consolidadoMovcajaList) {
+        this.consolidadoMovcajaList = consolidadoMovcajaList;
+    }
+
     @XmlTransient
     public List<FacMovcajadetalle> getFacMovcajadetalleList() {
         return facMovcajadetalleList;
@@ -189,7 +188,7 @@ public class CfgFormapago implements Serializable {
     public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
         this.facMovcajadetalleList = facMovcajadetalleList;
     }
-    
+
     public float getSubtotal() {
         return subtotal;
     }
@@ -197,7 +196,7 @@ public class CfgFormapago implements Serializable {
     public void setSubtotal(float subtotal) {
         this.subtotal = subtotal;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -222,5 +221,5 @@ public class CfgFormapago implements Serializable {
     public String toString() {
         return "entities.CfgFormapago[ idFormaPago=" + idFormaPago + " ]";
     }
-   
+
 }
