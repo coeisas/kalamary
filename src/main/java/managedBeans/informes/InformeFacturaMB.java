@@ -86,6 +86,7 @@ public class InformeFacturaMB implements Serializable {
         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         empresaSeleccionada = sesionMB.getEmpresaActual();
         sedeActual = sesionMB.getSedeActual();
+        usuarioActual = sesionMB.getUsuarioActual();
         fechaIncial = new Date();
         fechaFinal = new Date();
     }

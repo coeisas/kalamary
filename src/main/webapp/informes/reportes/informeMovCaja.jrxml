@@ -53,9 +53,9 @@
 			<staticText>
 				<reportElement x="0" y="0" width="572" height="50" uuid="a6fa98de-37ae-4a31-8f6c-876b9b172d37"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="16" isBold="true"/>
+					<font size="20" isBold="true"/>
 				</textElement>
-				<text><![CDATA[INFORME MOVIMIENTO DE CAJA]]></text>
+				<text><![CDATA[INFORME MOVIMIENTO CAJA]]></text>
 			</staticText>
 		</band>
 	</title>
