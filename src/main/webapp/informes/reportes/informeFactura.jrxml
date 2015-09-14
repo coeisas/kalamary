@@ -94,12 +94,13 @@
 	</columnHeader>
 	<detail>
 		<band height="23" splitType="Stretch">
-			<textField pattern="dd/MM/yyyy h.mm a">
+			<textField isStretchWithOverflow="true" pattern="">
 				<reportElement x="0" y="0" width="70" height="20" uuid="736fcd6f-e689-410c-9a0c-d7f8a3e154d3"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+				<patternExpression><![CDATA["dd/MM/yyyy HH:mm"]]></patternExpression>
 			</textField>
 			<textField>
 				<reportElement x="75" y="0" width="75" height="20" uuid="a0cae196-8d34-4ed2-b057-ff42e7642db5"/>

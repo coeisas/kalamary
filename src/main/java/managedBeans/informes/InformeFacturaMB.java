@@ -243,7 +243,7 @@ public class InformeFacturaMB implements Serializable {
             aux = factura.getUtilidad() != null ? factura.getUtilidad() : 0;
             elemento.setUtilidad(aux);
             elemento.setTipoPago(factura.formasPagoString());
-            elemento.setVendedor(factura.getSegusuarioidUsuario1().nombreCompleto());
+            elemento.setVendedor(factura.getSegusuarioidUsuario1().getUsuario());
             lista.add(elemento);
         }
         return lista;
