@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package managedBeans.proceso;
+package managedBeans.facturacion;
 
 import entities.CfgCliente;
 import entities.CfgDocumento;
@@ -132,6 +132,8 @@ public class FacturaMB implements Serializable {
     private String documentoVendedor;
     private String nombreVendedor;
 
+    private String display;//style para ocultar o no la informacion adicional de separados y credito
+
     private List<SelectItem> listaTipoFactura;//los tipos de factura son: normal y remision.
     private int tipoFactura;
 
@@ -247,6 +249,9 @@ public class FacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(2, "ESPECIAL");
             listaTipoFactura.add(aux);
+            aux = new SelectItem(3, "SEPARADO");
+            listaTipoFactura.add(aux);
+            tipoFactura = 1;
         }
         if (usuarioActual != null) {
             cajaUsuario = usuarioActual.getFaccajaidCaja();
@@ -306,11 +311,15 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la sede"));
             return;
         }
+        display = "none";
         CfgDocumento documento = null;
         if (tipoFactura == 1) {//se valida la existencia del documento aplicado a facturacion
             documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
         } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
             documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+        } else if (tipoFactura == 3) {//se valida la existencia del documento aplicado a remision especial
+            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
+            display = documento != null ? "block" : "none";
         }
         if (tipoFactura != 0 && documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplique al tipo de factura seleccionada"));
@@ -630,6 +639,8 @@ public class FacturaMB implements Serializable {
             documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
         } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
             documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+        } else if (tipoFactura == 3) {//se valida la existencia del documento aplicado a separado
+            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
         }
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
@@ -649,7 +660,7 @@ public class FacturaMB implements Serializable {
             return;
         }
         try {
-//            CREANDO EL DOCUEMENTO MASTER DE LA FACTURA ESPECIAL O NORMAL
+//            CREANDO EL DOCUEMENTO MASTER DE FACTURA ESPECIAL, NORMAL, SEPARADO
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
             documentosmaster.setCfgDocumento(documento);
@@ -693,7 +704,7 @@ public class FacturaMB implements Serializable {
                     documentodetalle.setValorDescuento(valorDescuento);
                 }
                 documentodetalleFacade.create(documentodetalle);
-                if (!documentodetalle.getCfgProducto().getEsServicio()) {//si el producto no es un servicio se descontara del inventario
+                if (!documentodetalle.getCfgProducto().getEsServicio() && tipoFactura != 3) {//si el producto no es un servicio y el tipo de factura no es un separado, se descontara del inventario
                     actualizarTablaConsolidado(documentodetalle);
                 }
             }
@@ -943,10 +954,10 @@ public class FacturaMB implements Serializable {
             String ruta = null;
             switch (tipoImpresion) {
                 case 1:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaTicket.jasper");
+                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaTicket.jasper");
                     break;
                 case 2:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaCarta.jasper");
+                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaCarta.jasper");
                     break;
             }
 //            setTipoImpresion(2);
@@ -990,7 +1001,7 @@ public class FacturaMB implements Serializable {
         try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
             httpServletResponse.setContentType("application/pdf");
             ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
-            String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
+            String rutaReportes = servletContext.getRealPath("/facturacion/reportes/");//ubicacion para los subreportes
             Map<String, Object> parametros = new HashMap<>();
             if (bites != null) {
                 InputStream logo = new ByteArrayInputStream(bites);
@@ -1070,7 +1081,8 @@ public class FacturaMB implements Serializable {
         setTotalDescuento(0);
         setTotalFactura(0);
         totalUSD = 0;
-        tipoFactura = 0;
+        tipoFactura = 1;
+        display = "none";
         cotizacionSeleccionada = null;
         setEnableBtnPrint(false);
         RequestContext.getCurrentInstance().update("IdFormFactura");
@@ -1607,5 +1619,9 @@ public class FacturaMB implements Serializable {
 
     public void setTipoFactura(int tipoFactura) {
         this.tipoFactura = tipoFactura;
+    }
+
+    public String getDisplay() {
+        return display;
     }
 }

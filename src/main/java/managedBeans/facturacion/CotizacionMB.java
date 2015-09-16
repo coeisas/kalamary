@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package managedBeans.proceso;
+package managedBeans.facturacion;
 
 import entities.CfgCliente;
 import entities.CfgDocumento;
@@ -566,7 +566,7 @@ public class CotizacionMB implements Serializable {
     public void generarPDF() {
         if (documentoActual != null) {
             ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-            String ruta = servletContext.getRealPath("/procesos/reportes/cotizacion.jasper");
+            String ruta = servletContext.getRealPath("/facturacion/reportes/cotizacion.jasper");
             try {
                 generarCotizacion(ruta);
             } catch (IOException ex) {
@@ -605,7 +605,7 @@ public class CotizacionMB implements Serializable {
         try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
             httpServletResponse.setContentType("application/pdf");
             ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
-            String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
+            String rutaReportes = servletContext.getRealPath("/facturacion/reportes/");//ubicacion para los subreportes
             Map<String, Object> parametros = new HashMap<>();
             if (bites != null) {
                 InputStream logo = new ByteArrayInputStream(bites);

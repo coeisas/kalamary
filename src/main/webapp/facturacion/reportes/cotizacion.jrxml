@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="528" leftMargin="42" rightMargin="42" topMargin="42" bottomMargin="42" uuid="e2decc6e-399c-48df-9711-03c573432f26">
 	<property name="ireport.zoom" value="1.5421731577181266"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="96"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -10,7 +10,7 @@
 	</style>
 	<parameter name="empresa" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
-		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/facturacion/reportes/"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="cliente" class="java.lang.String"/>

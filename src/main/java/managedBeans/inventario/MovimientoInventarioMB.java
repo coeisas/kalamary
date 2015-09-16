@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package managedBeans.proceso;
+package managedBeans.inventario;
 
 import entities.CfgDocumento;
 import entities.CfgEmpresa;

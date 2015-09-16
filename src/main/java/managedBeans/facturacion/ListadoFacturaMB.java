@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package managedBeans.proceso;
+package managedBeans.facturacion;
 
 import entities.CfgCliente;
 import entities.CfgDocumento;
@@ -239,10 +239,10 @@ public class ListadoFacturaMB implements Serializable {
             String ruta = null;
             switch (tipoImpresion) {
                 case 1:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaTicket.jasper");
+                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaTicket.jasper");
                     break;
                 case 2:
-                    ruta = servletContext.getRealPath("/procesos/reportes/facturaCarta.jasper");
+                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaCarta.jasper");
                     break;
             }
 //            setTipoImpresion(2);
@@ -286,7 +286,7 @@ public class ListadoFacturaMB implements Serializable {
         try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
             httpServletResponse.setContentType("application/pdf");
             ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
-            String rutaReportes = servletContext.getRealPath("/procesos/reportes/");//ubicacion para los subreportes
+            String rutaReportes = servletContext.getRealPath("/facturacion/reportes/");//ubicacion para los subreportes
             Map<String, Object> parametros = new HashMap<>();
             if (bites != null) {
                 InputStream logo = new ByteArrayInputStream(bites);

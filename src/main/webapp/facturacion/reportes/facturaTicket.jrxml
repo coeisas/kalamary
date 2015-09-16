@@ -4,7 +4,7 @@
 	<property name="ireport.x" value="690"/>
 	<property name="ireport.y" value="288"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
-		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/facturacion/reportes/"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="empresa" class="java.lang.String"/>
 	<parameter name="nit" class="java.lang.String"/>

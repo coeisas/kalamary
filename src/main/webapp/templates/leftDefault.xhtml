@@ -7,17 +7,17 @@
     <h:form id="IdFormMenu">
         <p:slideMenu style="width: 95%" backLabel="Regresar">
             <p:submenu label="Facturacion">
-                <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/procesos/factura.xhtml"/>
-                <p:menuitem icon="ui-icon-script" value="Listado de Facturas" outcome="/procesos/listadoFacturas.xhtml"/>
+                <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/facturacion/factura.xhtml"/>
+                <p:menuitem icon="ui-icon-script" value="Listado de Facturas" outcome="/facturacion/listadoFacturas.xhtml"/>
                 <p:menuitem icon="ui-icon-search" value="Consultar Precios" outcome="/procesos/main.xhtml" />
-                <p:menuitem icon="ui-icon-script" value="Cotizacion" outcome="/procesos/cotizacion.xhtml"/>
+                <p:menuitem icon="ui-icon-script" value="Cotizacion" outcome="/facturacion/cotizacion.xhtml"/>
             </p:submenu>        
             <p:submenu label="Inventario" expanded="false">
-                <p:menuitem icon="ui-icon-refresh" value="Movimiento Inventario" outcome="/procesos/movimientoInventario.xhtml"/>
+                <p:menuitem icon="ui-icon-refresh" value="Movimiento Inventario" outcome="/inventario/movimientoInventario.xhtml"/>
             </p:submenu>
             <p:submenu label="Movimiento Caja" expanded="false" >
-                <p:menuitem icon="ui-icon-unlocked" value="Abrir Caja" outcome="/procesos/abrirCaja.xhtml"/>
-                <p:menuitem icon="ui-icon-locked" value="Cerrar Caja" outcome="/procesos/cerrarCaja.xhtml"/>                       
+                <p:menuitem icon="ui-icon-unlocked" value="Abrir Caja" outcome="/movimientoCaja/abrirCaja.xhtml"/>
+                <p:menuitem icon="ui-icon-locked" value="Cerrar Caja" outcome="/movimientoCaja/cerrarCaja.xhtml"/>                       
             </p:submenu>
             <p:submenu label="Configuracion">
                 <p:submenu label="General" expanded="false">

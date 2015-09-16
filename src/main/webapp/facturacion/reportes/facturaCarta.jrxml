@@ -10,7 +10,7 @@
 	</style>
 	<parameter name="empresa" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
-		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/procesos/reportes/"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/facturacion/reportes/"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="cliente" class="java.lang.String"/>

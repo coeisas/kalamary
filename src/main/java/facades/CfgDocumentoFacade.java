@@ -84,6 +84,16 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
         }
     }
 
+    public CfgDocumento buscarDocumentoDeSeparadoBySede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '7' AND d.finalizado = FALSE AND d.activo = TRUE");
+            query.setParameter(1, sede);
+            return (CfgDocumento) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public CfgDocumento buscarDocumentoDeCotizacionBySede(CfgEmpresasede sede) {
         try {
             Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '5' AND d.finalizado = FALSE AND d.activo = TRUE");
