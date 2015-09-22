@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "cfg_proveedor", catalog = "kalamarypos", schema = "")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "CfgProveedor.findAll", query = "SELECT c FROM CfgProveedor c"),
+     @NamedQuery(name = "CfgProveedor.findAll", query = "SELECT c FROM CfgProveedor c"),
     @NamedQuery(name = "CfgProveedor.findByIdProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.idProveedor = :idProveedor"),
     @NamedQuery(name = "CfgProveedor.findByNumDoc", query = "SELECT c FROM CfgProveedor c WHERE c.numDoc = :numDoc"),
     @NamedQuery(name = "CfgProveedor.findByNomProveedor", query = "SELECT c FROM CfgProveedor c WHERE c.nomProveedor = :nomProveedor"),
@@ -58,30 +58,21 @@ public class CfgProveedor implements Serializable {
     @Column(name = "idProveedor", nullable = false)
     private Long idProveedor;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "numDoc", nullable = false, length = 20)
     private String numDoc;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 150)
     @Column(name = "nomProveedor", nullable = false, length = 150)
     private String nomProveedor;
-    @Size(max = 150)
     @Column(name = "contactoProveedor", length = 150)
     private String contactoProveedor;
     @Basic(optional = false)
     @Column(name = "dirProveedor", nullable = false, length = 150)
     private String dirProveedor;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "tel1Proveedor", nullable = false, length = 10)
     private String tel1Proveedor;
-    @Size(max = 10)
     @Column(name = "tel2Proveedor", length = 10)
     private String tel2Proveedor;
-    @Size(max = 30)
     @Column(name = "websiteProveedor", length = 300)
     private String websiteProveedor;
     @Column(name = "mailProveedor", length = 200)
@@ -97,7 +88,7 @@ public class CfgProveedor implements Serializable {
     private String mail2Proveedor;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cupoCredito", precision = 12)
-    private Float cupoCredito;    
+    private Float cupoCredito;
     @OneToMany(mappedBy = "cfgproveedoridProveedor")
     private List<InvMovimiento> invMovimientoList;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
@@ -133,7 +124,7 @@ public class CfgProveedor implements Serializable {
         this.tel1Proveedor = tel1Proveedor;
         this.fecCrea = fecCrea;
     }
-    
+
     public Long getIdProveedor() {
         return idProveedor;
     }
@@ -229,14 +220,14 @@ public class CfgProveedor implements Serializable {
     public void setMail2Proveedor(String mail2Proveedor) {
         this.mail2Proveedor = mail2Proveedor;
     }
-    
+
     public Float getCupoCredito() {
         return cupoCredito;
     }
 
     public void setCupoCredito(Float cupoCredito) {
         this.cupoCredito = cupoCredito;
-    }    
+    }
 
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
@@ -286,7 +277,7 @@ public class CfgProveedor implements Serializable {
     public void setSegusuarioidUsuario(SegUsuario segusuarioidUsuario) {
         this.segusuarioidUsuario = segusuarioidUsuario;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;
