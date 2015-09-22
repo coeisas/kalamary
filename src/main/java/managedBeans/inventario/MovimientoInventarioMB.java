@@ -196,6 +196,10 @@ public class MovimientoInventarioMB implements Serializable {
 
     public void insertarItemProducto() {
         if (productoSeleccionado != null) {
+            if (productoSeleccionado.getEsServicio()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " es un servicio"));
+                return;
+            }
             InvMovimientoDetalle detalle = estaInsertado(productoSeleccionado);
             if (detalle == null) {
                 detalle = new InvMovimientoDetalle();
@@ -423,7 +427,7 @@ public class MovimientoInventarioMB implements Serializable {
                 actualizarTablaProducto(detalleMovimiento);//actualiza la informacion del producto precio
                 inventarioMovimientoDetalleFacade.create(detalleMovimiento);
             }
-            
+
 //            SE INCLUYE EL DETALLE DEL MOVIMIENTO AL MAESTRO
             invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
             inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
@@ -460,6 +464,8 @@ public class MovimientoInventarioMB implements Serializable {
     private void actualizarTablaConsolidado(CfgProducto producto, InvMovimientoDetalle detalleMovimiento) {
         try {
             InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, producto);
+            //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
+            List<InvConsolidado> listadoConsolidado = producto.getInvConsolidadoList();
             if (consolidado != null) {
 //                se determina que modificaciones se hara en el consolidado. De salida (resta) o entrada (suma)
                 if (tipoDocumento.equals("3")) {
@@ -472,6 +478,23 @@ public class MovimientoInventarioMB implements Serializable {
                     consolidado.setSalidas(consolidado.getSalidas() + detalleMovimiento.getCantidad());
                 }
                 consolidadoFacade.edit(consolidado);
+                //se identifica el index del listadoconsolidado afectado
+                int aux = 0;
+                for (InvConsolidado ic : listadoConsolidado) {
+                    if (ic.equals(consolidado)) {
+                        break;
+                    }
+                    aux++;
+                }
+                //se actualiza la informacion del consolidado afectado del producto en cuestion
+                listadoConsolidado.get(aux).setCfgEmpresasede(consolidado.getCfgEmpresasede());
+                listadoConsolidado.get(aux).setCfgProducto(consolidado.getCfgProducto());
+                listadoConsolidado.get(aux).setEntradas(consolidado.getEntradas());
+                listadoConsolidado.get(aux).setExistencia(consolidado.getExistencia());
+                listadoConsolidado.get(aux).setFechaUltEntrada(consolidado.getFechaUltEntrada());
+                listadoConsolidado.get(aux).setFechaUltSalida(consolidado.getFechaUltSalida());
+                listadoConsolidado.get(aux).setInvConsolidadoPK(consolidado.getInvConsolidadoPK());
+                listadoConsolidado.get(aux).setSalidas(consolidado.getSalidas());
             } else {
                 consolidado = new InvConsolidado(new InvConsolidadoPK(producto.getIdProducto(), sedeActual.getIdSede()));
                 consolidado.setCfgEmpresasede(sedeActual);
@@ -481,7 +504,11 @@ public class MovimientoInventarioMB implements Serializable {
                 consolidado.setExistencia(detalleMovimiento.getCantidad());
                 consolidado.setSalidas(0);
                 consolidadoFacade.create(consolidado);
+                //se inserta  la nueva informacion del consolidado en listado del producto
+                listadoConsolidado.add(consolidado);
             }
+            //se guarda los cambios del listado inventario en el producto
+            productoFacade.edit(producto);
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario)"));
         }

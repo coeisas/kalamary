@@ -45,10 +45,14 @@
                             <p:inputText class="campoFormulario upperCase" value="#{productoMB.codigoBarra}" size="15"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Color:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.color}"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{productoMB.idcolor}">
+                                <f:selectItems value="#{productoMB.listaColor}" var="color" itemLabel="#{color.color}" itemValue="#{color.idColor}"/>
+                            </p:selectOneMenu>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Talla:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.talla}" size="15"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{productoMB.idtalla}">
+                                <f:selectItems value="#{productoMB.listaTalla}" var="talla" itemLabel="#{talla.talla}" itemValue="#{talla.idTalla}"/>
+                            </p:selectOneMenu>
                         </p:column>
                     </p:row>
                     <p:row>
@@ -152,6 +156,7 @@
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
             <h:form id="FormModalProducto">
                 <p:dataTable value="#{productoMB.listaProducto}" var="producto" lazy="true" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{productoMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single">
+                    <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                     <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>

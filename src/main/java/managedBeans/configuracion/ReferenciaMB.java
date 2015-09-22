@@ -90,7 +90,11 @@ public class ReferenciaMB implements Serializable {
     public void buscarReferencia() {
         if (empresaActual != null) {
             if (!codigoReferencia.trim().isEmpty()) {
-                referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoReferencia);
+                if (categoriaSeleccionada == null) {
+                    referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoReferencia);
+                } else {
+                    referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaCategoriaAndCodigo(empresaActual, categoriaSeleccionada, codigoReferencia);
+                }
             }
             cargarReferencia();
         }

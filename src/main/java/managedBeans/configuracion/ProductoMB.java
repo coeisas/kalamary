@@ -6,16 +6,21 @@
 package managedBeans.configuracion;
 
 import entities.CfgCategoriaproducto;
+import entities.CfgColor;
 import entities.CfgEmpresa;
 import entities.CfgMarcaproducto;
 import entities.CfgProducto;
 import entities.CfgReferenciaproducto;
+import entities.CfgTalla;
+import entities.CfgUnidad;
 import entities.SegUsuario;
 import facades.CfgCategoriaproductoFacade;
+import facades.CfgColorFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgMarcaproductoFacade;
 import facades.CfgProductoFacade;
 import facades.CfgReferenciaproductoFacade;
+import facades.CfgTallaFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -38,14 +43,14 @@ import utilities.LazyProductosModel;
 @ManagedBean
 @SessionScoped
 public class ProductoMB implements Serializable {
-
-
+    
     private String codigoProducto;
     private String codigoBarra;
-    private String color;
-    private String talla;
+    private int idcolor;
+    private int idtalla;
+    private int idunidad;
     private String nombreProducto;
-    private float stockMin;
+    private int stockMin;
     private float costoAdq;
     private float iva;
     private float flete;
@@ -55,47 +60,57 @@ public class ProductoMB implements Serializable {
     private float precio;
     private boolean activo;
     private boolean esServicio;
-
+    
     private String nombreEmpresa;
     private SesionMB sesionMB;
     private SegUsuario usuarioActual;
-
+    
     private List<CfgCategoriaproducto> listaCategoria;
     private List<CfgReferenciaproducto> listaReferencia;
     private List<CfgMarcaproducto> listaMarca;
+    private List<CfgColor> listaColor;
+    private List<CfgTalla> listaTalla;
     private LazyDataModel<CfgProducto> listaProducto;
     private List<String> listFormsModal;
-
+    
     private CfgEmpresa empresaSeleccionada;
     private CfgCategoriaproducto categoriaSeleccionada;
     private CfgReferenciaproducto referenciaSeleccionada;
     private CfgMarcaproducto marcaSeleccionada;
     private CfgProducto productoSeleccionado;
-
+    
     @EJB
     CfgEmpresaFacade empresaFacade;
-
+    
     @EJB
     CfgCategoriaproductoFacade categoriaFacade;
-
+    
     @EJB
     CfgReferenciaproductoFacade referenciaFacade;
-
+    
     @EJB
     CfgMarcaproductoFacade marcaFacade;
-
+    
     @EJB
     CfgProductoFacade productoFacade;
-
+    
+    @EJB
+    CfgColorFacade colorFacade;
+    
+    @EJB
+    CfgTallaFacade tallaFacade;
+    
     public ProductoMB() {
     }
-
+    
     @PostConstruct
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
+        listaColor = colorFacade.findAll();
+        listaTalla = tallaFacade.findAll();
         if (empresaSeleccionada != null) {
             listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
         } else {
@@ -113,12 +128,13 @@ public class ProductoMB implements Serializable {
         activo = true;
         esServicio = false;
     }
-
+    
     private void limpiarFormulario() {
         codigoProducto = null;
         codigoBarra = null;
-        color = null;
-        talla = null;
+        setIdcolor(1);
+        setIdtalla(1);
+        setIdunidad(1);
         nombreProducto = null;
         stockMin = 0;
         costoAdq = 0;
@@ -131,7 +147,7 @@ public class ProductoMB implements Serializable {
         activo = true;
         esServicio = false;
     }
-
+    
     public void cargarInformacionCategoria() {
         if (categoriaSeleccionada != null) {
 //            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
@@ -142,7 +158,7 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormModalReferencia");
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
-
+    
     public void cargarInformacionReferencia() {
         if (referenciaSeleccionada != null) {
 //            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
@@ -153,11 +169,11 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormModalMarca");
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
-
+    
     public void cargarInformacionMarca() {
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
-
+    
     public void cargarProductos() {
         listaProducto = new LazyProductosModel(empresaSeleccionada, marcaSeleccionada, referenciaSeleccionada, categoriaSeleccionada, productoFacade);
         if (empresaSeleccionada != null) {
@@ -190,7 +206,6 @@ public class ProductoMB implements Serializable {
 //        }
 //
 //    }
-
     public void cargarInformacionProducto() {
         if (productoSeleccionado != null) {
             setMarcaSeleccionada(productoSeleccionado.getCfgmarcaproductoidMarca());
@@ -198,8 +213,8 @@ public class ProductoMB implements Serializable {
             setCategoriaSeleccionada(referenciaSeleccionada.getCfgcategoriaproductoidCategoria());
             setCodigoProducto(productoSeleccionado.getCodProducto());
             setCodigoBarra(productoSeleccionado.getCodBarProducto());
-            setColor(productoSeleccionado.getColor());
-            setTalla(productoSeleccionado.getTalla());
+            setIdcolor(productoSeleccionado.getCfgColorIdColor().getIdColor());
+            setIdtalla(productoSeleccionado.getCfgTallaIdTalla().getIdTalla());
             setNombreProducto(productoSeleccionado.getNomProducto());
             setStockMin(determinarValor(productoSeleccionado.getStockMin()));
             setCostoAdq(determinarValor(productoSeleccionado.getCostoAdquisicion()));
@@ -211,11 +226,11 @@ public class ProductoMB implements Serializable {
             setPrecio((float) productoSeleccionado.getPrecio());
             setActivo(productoSeleccionado.getActivo());
             setEsServicio(productoSeleccionado.getEsServicio());
-
+            
         } else {
             setCodigoBarra(null);
-            setColor(null);
-            setTalla(null);
+            setIdcolor(1);
+            setIdtalla(1);
             setNombreProducto(null);
             setStockMin(0);
             setCostoAdq(0);
@@ -231,7 +246,7 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
     }
-
+    
     public void determinarAccion() {
         if (productoSeleccionado != null) {
             editarProducto();
@@ -239,7 +254,7 @@ public class ProductoMB implements Serializable {
             crearProducto();
         }
     }
-
+    
     private void editarProducto() {
         if (!validacion()) {
             return;
@@ -249,8 +264,11 @@ public class ProductoMB implements Serializable {
             productoSeleccionado.setNomProducto(nombreProducto.toUpperCase());
             productoSeleccionado.setStockMin(stockMin);
             productoSeleccionado.setCostoAdquisicion(costoAdq);
-            productoSeleccionado.setColor(color.toUpperCase());
-            productoSeleccionado.setTalla(talla.toUpperCase());
+            CfgColor color = colorFacade.find(idcolor);
+            productoSeleccionado.setCfgColorIdColor(color);
+            CfgTalla talla = tallaFacade.find(idtalla);
+            productoSeleccionado.setCfgTallaIdTalla(talla);
+            productoSeleccionado.setCodigoInterno(codigoProducto + color.getIdColor() + talla.getIdTalla());
             productoSeleccionado.setIva(iva);
             productoSeleccionado.setFlete(flete);
             productoSeleccionado.setCostoIndirecto(costoInd);
@@ -263,9 +281,9 @@ public class ProductoMB implements Serializable {
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no Modificado"));
         }
-
+        
     }
-
+    
     public void determinarCostoFinalAndPrecio() {
         setCostoFinal(0);
         setPrecio(0);
@@ -278,7 +296,7 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormProducto:IdCostoFinal");
         RequestContext.getCurrentInstance().update("IdFormProducto:IdPrecio");
     }
-
+    
     private void crearProducto() {
         if (!validacion()) {
             return;
@@ -296,8 +314,13 @@ public class ProductoMB implements Serializable {
             producto.setCostoIndirecto(costoInd);
             producto.setCosto(getCostoFinal());
             producto.setUtilidad(utilidad);
-            producto.setColor(color.toUpperCase());
-            producto.setTalla(talla.toUpperCase());            
+            CfgColor color = colorFacade.find(idcolor);
+            producto.setCfgColorIdColor(color);
+            CfgTalla talla = tallaFacade.find(idtalla);
+            producto.setCfgTallaIdTalla(talla);
+            producto.setCodigoInterno(codigoProducto + color.getIdColor() + talla.getIdTalla());
+            //la unidad de medida del producto por defecto es UND. Cambiar esto cuando la unidad sea dinamico.
+            producto.setCfgUnidadIdUnidad(new CfgUnidad(1));
             producto.setPrecio(getPrecio());
             producto.setEsServicio(esServicio);
             producto.setActivo(activo);
@@ -312,7 +335,7 @@ public class ProductoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no creado"));
         }
     }
-
+    
     private boolean validacion() {
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Elija la empresa"));
@@ -333,13 +356,13 @@ public class ProductoMB implements Serializable {
         boolean ban = validarValores();
         return ban;
     }
-
+    
     private boolean validarValores() {
         boolean ban = true;
         if (stockMin < 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Stock Min no valido"));
             return false;
-
+            
         }
         if (costoAdq < 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Costo de adquisicion no valido"));
@@ -363,11 +386,15 @@ public class ProductoMB implements Serializable {
         }
         return ban;
     }
-
+    
     private Float determinarValor(Float valor) {
         return valor == null ? 0 : valor;
     }
-
+    
+    private Integer determinarValor(Integer valor) {
+        return valor == null ? 0 : valor;
+    }
+    
     public void cancelar() {
         limpiarFormulario();
         marcaSeleccionada = null;
@@ -378,207 +405,227 @@ public class ProductoMB implements Serializable {
         listaReferencia.clear();
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
-
+        
     }
-
+    
     public String getCodigoProducto() {
         return codigoProducto;
     }
-
+    
     public void setCodigoProducto(String codigoProducto) {
         this.codigoProducto = codigoProducto;
     }
-
+    
     public String getCodigoBarra() {
         return codigoBarra;
     }
-
+    
     public void setCodigoBarra(String codigoBarra) {
         this.codigoBarra = codigoBarra;
     }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getTalla() {
-        return talla;
-    }
-
-    public void setTalla(String talla) {
-        this.talla = talla;
-    }
-
+    
     public String getNombreProducto() {
         return nombreProducto;
     }
-
+    
     public void setNombreProducto(String nombreProducto) {
         this.nombreProducto = nombreProducto;
     }
-
+    
     public float getCostoAdq() {
         return costoAdq;
     }
-
+    
     public void setCostoAdq(float costoAdq) {
         this.costoAdq = costoAdq;
     }
-
+    
     public float getIva() {
         return iva;
     }
-
+    
     public void setIva(float iva) {
         this.iva = iva;
     }
-
+    
     public float getFlete() {
         return flete;
     }
-
+    
     public void setFlete(float flete) {
         this.flete = flete;
     }
-
+    
     public float getCostoInd() {
         return costoInd;
     }
-
+    
     public void setCostoInd(float costoInd) {
         this.costoInd = costoInd;
     }
-
+    
     public float getUtilidad() {
         return utilidad;
     }
-
+    
     public void setUtilidad(float utilidad) {
         this.utilidad = utilidad;
     }
-
+    
     public boolean isActivo() {
         return activo;
     }
-
+    
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-
-    public float getStockMin() {
+    
+    public int getStockMin() {
         return stockMin;
     }
-
-    public void setStockMin(float stockMin) {
+    
+    public void setStockMin(int stockMin) {
         this.stockMin = stockMin;
     }
-
+    
     public CfgEmpresa getEmpresaSeleccionada() {
         return empresaSeleccionada;
     }
-
+    
     public void setEmpresaSeleccionada(CfgEmpresa empresaSeleccionada) {
         this.empresaSeleccionada = empresaSeleccionada;
     }
-
+    
     public String getNombreEmpresa() {
         return nombreEmpresa;
     }
-
+    
     public void setNombreEmpresa(String nombreEmpresa) {
         this.nombreEmpresa = nombreEmpresa;
     }
-
+    
     public List<CfgCategoriaproducto> getListaCategoria() {
         return listaCategoria;
     }
-
+    
     public void setListaCategoria(List<CfgCategoriaproducto> listaCategoria) {
         this.listaCategoria = listaCategoria;
     }
-
+    
     public CfgCategoriaproducto getCategoriaSeleccionada() {
         return categoriaSeleccionada;
     }
-
+    
     public void setCategoriaSeleccionada(CfgCategoriaproducto categoriaSeleccionada) {
         this.categoriaSeleccionada = categoriaSeleccionada;
     }
-
+    
     public CfgReferenciaproducto getReferenciaSeleccionada() {
         return referenciaSeleccionada;
     }
-
+    
     public void setReferenciaSeleccionada(CfgReferenciaproducto referenciaSeleccionada) {
         this.referenciaSeleccionada = referenciaSeleccionada;
     }
-
+    
     public List<CfgReferenciaproducto> getListaReferencia() {
         return listaReferencia;
     }
-
+    
     public void setListaReferencia(List<CfgReferenciaproducto> listaReferencia) {
         this.listaReferencia = listaReferencia;
     }
-
+    
     public CfgMarcaproducto getMarcaSeleccionada() {
         return marcaSeleccionada;
     }
-
+    
     public void setMarcaSeleccionada(CfgMarcaproducto marcaSeleccionada) {
         this.marcaSeleccionada = marcaSeleccionada;
     }
-
+    
     public List<CfgMarcaproducto> getListaMarca() {
         return listaMarca;
     }
-
+    
     public void setListaMarca(List<CfgMarcaproducto> listaMarca) {
         this.listaMarca = listaMarca;
     }
-
+    
     public CfgProducto getProductoSeleccionado() {
         return productoSeleccionado;
     }
-
+    
     public void setProductoSeleccionado(CfgProducto productoSeleccionado) {
         this.productoSeleccionado = productoSeleccionado;
     }
-
+    
     public LazyDataModel<CfgProducto> getListaProducto() {
         return listaProducto;
     }
-
+    
     public void setListaProducto(LazyDataModel<CfgProducto> listaProducto) {
         this.listaProducto = listaProducto;
     }
-
+    
     public float getPrecio() {
         return precio;
     }
-
+    
     public void setPrecio(float precio) {
         this.precio = precio;
     }
-
+    
     public float getCostoFinal() {
         return costoFinal;
     }
-
+    
     public void setCostoFinal(float costoFinal) {
         this.costoFinal = costoFinal;
     }
-
+    
     public boolean isEsServicio() {
         return esServicio;
     }
-
+    
     public void setEsServicio(boolean esServicio) {
         this.esServicio = esServicio;
     }
-
+    
+    public int getIdcolor() {
+        return idcolor;
+    }
+    
+    public void setIdcolor(int idcolor) {
+        this.idcolor = idcolor;
+    }
+    
+    public int getIdtalla() {
+        return idtalla;
+    }
+    
+    public void setIdtalla(int idtalla) {
+        this.idtalla = idtalla;
+    }
+    
+    public int getIdunidad() {
+        return idunidad;
+    }
+    
+    public void setIdunidad(int idunidad) {
+        this.idunidad = idunidad;
+    }
+    
+    public List<CfgColor> getListaColor() {
+        return listaColor;
+    }
+    
+    public void setListaColor(List<CfgColor> listaColor) {
+        this.listaColor = listaColor;
+    }
+    
+    public List<CfgTalla> getListaTalla() {
+        return listaTalla;
+    }
+    
 }

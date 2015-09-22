@@ -94,7 +94,11 @@ public class MarcaMB implements Serializable {
     public void buscarMarca() {
         if (empresaActual != null) {
             if (!codigoMarca.trim().isEmpty()) {
-                marcaSeleccionada = marcaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoMarca);
+                if (referenciaSeleccionada == null) {
+                    marcaSeleccionada = marcaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoMarca);
+                } else {
+                    marcaSeleccionada = marcaproductoFacade.buscarPorEmpresaReferenciaAndCodigo(empresaActual, referenciaSeleccionada, codigoMarca);
+                }
             }
             cargarMarca();
         }
@@ -169,7 +173,7 @@ public class MarcaMB implements Serializable {
         if (!validar()) {
             return;
         }
-        if(marcaSeleccionada == null){
+        if (marcaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Marca no seleccionada"));
             return;
         }

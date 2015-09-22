@@ -239,7 +239,7 @@ public class InformeFacturaMB implements Serializable {
                 aux += impuesto.getValorImpuesto();
             }
             elemento.setImpuesto(aux);
-            elemento.setTotal(factura.getTotalFactura());
+            elemento.setTotal(factura.getTotal());
             aux = factura.getUtilidad() != null ? factura.getUtilidad() : 0;
             elemento.setUtilidad(aux);
             elemento.setTipoPago(factura.formasPagoString());

@@ -25,8 +25,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -61,37 +59,24 @@ public class CfgCliente implements Serializable {
     @Column(name = "idCliente", nullable = false)
     private Integer idCliente;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 20)
     @Column(name = "numDoc", nullable = false, length = 20)
     private String numDoc;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "nom1Cliente", nullable = false, length = 50)
     private String nom1Cliente;
-    @Size(max = 50)
     @Column(name = "nom2Cliente", length = 50)
     private String nom2Cliente;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "apellido1", nullable = false, length = 50)
     private String apellido1;
-    @Size(max = 50)
     @Column(name = "apellido2", length = 50)
     private String apellido2;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 150)
     @Column(name = "dirCliente", nullable = false, length = 150)
     private String dirCliente;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 10)
     @Column(name = "tel1", nullable = false, length = 10)
     private String tel1;
-    @Size(max = 30)
     @Column(name = "mail", length = 30)
     private String mail;
     @Column(name = "fecNacimiento")
@@ -103,20 +88,17 @@ public class CfgCliente implements Serializable {
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cupoCredito", precision = 12)
     private Float cupoCredito;
-    @Size(max = 20)
     @Column(name = "tarjetaMembresia", length = 20)
     private String tarjetaMembresia;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
-    @Basic(optional = false)
     @Column(name = "codigoCliente", length = 10)
-    private String codigoCliente;    
+    private String codigoCliente;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
-    private CfgEmpresa cfgempresaidEmpresa;    
+    private CfgEmpresa cfgempresaidEmpresa;
     @JoinColumns({
         @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio", nullable = false),
         @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
@@ -124,16 +106,18 @@ public class CfgCliente implements Serializable {
     private CfgMunicipio cfgMunicipio;
     @JoinColumn(name = "cfg_tipoempresa_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
-    private CfgTipoempresa cfgTipoempresaId;    
+    private CfgTipoempresa cfgTipoempresaId;
     @JoinColumn(name = "cfg_tipoidentificacion_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private CfgTipoidentificacion cfgTipoidentificacionId;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgCliente")
+    private List<FacCarteraCliente> facCarteraClienteList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgclienteidCliente")
     private List<FacDocumentosmaster> facDocumentosmasterList;
-   
+
     public CfgCliente() {
     }
 
@@ -150,23 +134,6 @@ public class CfgCliente implements Serializable {
         this.tel1 = tel1;
         this.fecCrea = fecCrea;
     }
-    
-    public String nombreCompleto() {
-        String strNombre = "";
-        if (nom1Cliente != null) {
-            strNombre = strNombre + nom1Cliente + " ";
-        }
-        if (nom2Cliente != null) {
-            strNombre = strNombre + nom2Cliente + " ";
-        }
-        if (apellido1 != null) {
-            strNombre = strNombre + apellido1 + " ";
-        }
-        if (apellido2 != null) {
-            strNombre = strNombre + apellido2;
-        }
-        return strNombre;
-    }    
 
     public Integer getIdCliente() {
         return idCliente;
@@ -287,7 +254,7 @@ public class CfgCliente implements Serializable {
     public void setCodigoCliente(String codigoCliente) {
         this.codigoCliente = codigoCliente;
     }
-    
+
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }
@@ -295,7 +262,7 @@ public class CfgCliente implements Serializable {
     public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
-    
+
     public CfgMunicipio getCfgMunicipio() {
         return cfgMunicipio;
     }
@@ -311,7 +278,7 @@ public class CfgCliente implements Serializable {
     public void setCfgTipoempresaId(CfgTipoempresa cfgTipoempresaId) {
         this.cfgTipoempresaId = cfgTipoempresaId;
     }
-    
+
     public CfgTipoidentificacion getCfgTipoidentificacionId() {
         return cfgTipoidentificacionId;
     }
@@ -329,6 +296,15 @@ public class CfgCliente implements Serializable {
     }
 
     @XmlTransient
+    public List<FacCarteraCliente> getFacCarteraClienteList() {
+        return facCarteraClienteList;
+    }
+
+    public void setFacCarteraClienteList(List<FacCarteraCliente> facCarteraClienteList) {
+        this.facCarteraClienteList = facCarteraClienteList;
+    }
+
+    @XmlTransient
     public List<FacDocumentosmaster> getFacDocumentosmasterList() {
         return facDocumentosmasterList;
     }
@@ -336,6 +312,23 @@ public class CfgCliente implements Serializable {
     public void setFacDocumentosmasterList(List<FacDocumentosmaster> facDocumentosmasterList) {
         this.facDocumentosmasterList = facDocumentosmasterList;
     }
+    
+    public String nombreCompleto() {
+        String strNombre = "";
+        if (nom1Cliente != null) {
+            strNombre = strNombre + nom1Cliente + " ";
+        }
+        if (nom2Cliente != null) {
+            strNombre = strNombre + nom2Cliente + " ";
+        }
+        if (apellido1 != null) {
+            strNombre = strNombre + apellido1 + " ";
+        }
+        if (apellido2 != null) {
+            strNombre = strNombre + apellido2;
+        }
+        return strNombre;
+    }    
 
     @Override
     public int hashCode() {
@@ -361,5 +354,5 @@ public class CfgCliente implements Serializable {
     public String toString() {
         return "entities.CfgCliente[ idCliente=" + idCliente + " ]";
     }
-    
+
 }

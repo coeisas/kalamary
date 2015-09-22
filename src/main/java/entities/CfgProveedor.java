@@ -82,9 +82,9 @@ public class CfgProveedor implements Serializable {
     @Column(name = "tel2Proveedor", length = 10)
     private String tel2Proveedor;
     @Size(max = 30)
-    @Column(name = "websiteProveedor", length = 30)
+    @Column(name = "websiteProveedor", length = 300)
     private String websiteProveedor;
-    @Column(name = "mailProveedor", length = 100)
+    @Column(name = "mailProveedor", length = 200)
     private String mailProveedor;
     @Lob
     @Column(name = "logo")
@@ -93,7 +93,7 @@ public class CfgProveedor implements Serializable {
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
-    @Column(name = "mail2Proveedor", length = 45)
+    @Column(name = "mail2Proveedor", length = 200)
     private String mail2Proveedor;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "cupoCredito", precision = 12)

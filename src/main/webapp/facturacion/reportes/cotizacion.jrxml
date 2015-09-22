@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="528" leftMargin="42" rightMargin="42" topMargin="42" bottomMargin="42" uuid="e2decc6e-399c-48df-9711-03c573432f26">
 	<property name="ireport.zoom" value="1.5421731577181266"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="96"/>
+	<property name="ireport.x" value="10"/>
+	<property name="ireport.y" value="159"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -66,7 +66,7 @@
 				<reportElement x="409" y="21" width="117" height="22" uuid="b62ad682-b0ba-4ae3-b81d-f651d2dcce73"/>
 			</rectangle>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="211" y="11" width="74" height="10" uuid="6694974e-1cfa-4c9a-bc26-9687ed6be5ae"/>
+				<reportElement x="211" y="11" width="74" height="12" uuid="6694974e-1cfa-4c9a-bc26-9687ed6be5ae"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="8"/>
 				</textElement>
@@ -76,7 +76,7 @@
 				<reportElement x="211" y="23" width="74" height="1" uuid="a466c970-af60-44bb-92cb-de7214e4b397"/>
 			</line>
 			<staticText>
-				<reportElement x="211" y="23" width="74" height="10" uuid="0d0f4b98-5e6d-4501-a4ff-6c13e24e8b2d"/>
+				<reportElement x="211" y="23" width="74" height="12" uuid="0d0f4b98-5e6d-4501-a4ff-6c13e24e8b2d"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
@@ -104,7 +104,7 @@
 				<textFieldExpression><![CDATA["TELEFONO(S): "+$P{telefono}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy">
-				<reportElement x="317" y="11" width="74" height="10" uuid="496b233c-495b-4d1d-8af3-b781bfad62f4"/>
+				<reportElement x="317" y="11" width="74" height="12" uuid="496b233c-495b-4d1d-8af3-b781bfad62f4"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="8"/>
 				</textElement>
@@ -114,7 +114,7 @@
 				<reportElement x="317" y="23" width="74" height="1" uuid="66840883-3f88-4c2e-bf89-b59cd0492b77"/>
 			</line>
 			<staticText>
-				<reportElement x="317" y="23" width="74" height="19" uuid="b975a9a6-b5be-4f6f-983f-6facad260aa8"/>
+				<reportElement x="317" y="23" width="74" height="24" uuid="b975a9a6-b5be-4f6f-983f-6facad260aa8"/>
 				<textElement textAlignment="Center">
 					<font size="8"/>
 				</textElement>
@@ -177,7 +177,7 @@
 			<line>
 				<reportElement x="409" y="38" width="119" height="1" uuid="c0c3c72f-6d96-4210-a2ca-b7c2552a32a5"/>
 			</line>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="213" y="40" width="313" height="20" uuid="8609ba0f-3ada-4519-85cd-3f43f1fe07bb"/>
 				<textElement verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$P{emailcli}]]></textFieldExpression>
@@ -325,7 +325,7 @@
 				<textFieldExpression><![CDATA["C.C No " + $P{identificacionUsuario}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="5" y="32" width="168" height="10" uuid="da5b3cb6-2ac6-4e9d-b106-cca31117d225"/>
+				<reportElement x="5" y="30" width="168" height="12" uuid="da5b3cb6-2ac6-4e9d-b106-cca31117d225"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>

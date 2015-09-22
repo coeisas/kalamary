@@ -38,10 +38,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacDocumentosmaster.findAll", query = "SELECT f FROM FacDocumentosmaster f"),
     @NamedQuery(name = "FacDocumentosmaster.findByCfgdocumentoidDoc", query = "SELECT f FROM FacDocumentosmaster f WHERE f.facDocumentosmasterPK.cfgdocumentoidDoc = :cfgdocumentoidDoc"),
     @NamedQuery(name = "FacDocumentosmaster.findByNumDocumento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.facDocumentosmasterPK.numDocumento = :numDocumento"),
-    @NamedQuery(name = "FacDocumentosmaster.findByTotalFactura", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFactura = :totalFactura"),
+    @NamedQuery(name = "FacDocumentosmaster.findByTotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.total = :total"),
     @NamedQuery(name = "FacDocumentosmaster.findByFecCrea", query = "SELECT f FROM FacDocumentosmaster f WHERE f.fecCrea = :fecCrea"),
     @NamedQuery(name = "FacDocumentosmaster.findByEstado", query = "SELECT f FROM FacDocumentosmaster f WHERE f.estado = :estado"),
-    @NamedQuery(name = "FacDocumentosmaster.findByTotalFacturaUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalFacturaUSD = :totalFacturaUSD"),
+    @NamedQuery(name = "FacDocumentosmaster.findByTotalUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalUSD = :totalUSD"),
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento"),
     @NamedQuery(name = "FacDocumentosmaster.findByUtilidad", query = "SELECT f FROM FacDocumentosmaster f WHERE f.utilidad = :utilidad")})
@@ -50,8 +50,8 @@ public class FacDocumentosmaster implements Serializable {
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
     @Basic(optional = false)
-    @Column(name = "totalFactura", nullable = false)
-    private float totalFactura;
+    @Column(name = "total", nullable = false)
+    private float total;
     @Lob
     @Column(name = "observaciones", length = 65535)
     private String observaciones;
@@ -62,8 +62,8 @@ public class FacDocumentosmaster implements Serializable {
     @Column(name = "estado", length = 10)
     private String estado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "totalFacturaUSD", precision = 12)
-    private Float totalFacturaUSD;
+    @Column(name = "totalUSD", precision = 12)
+    private Float totalUSD;
     @Column(name = "subtotal", precision = 12)
     private Float subtotal;
     @Column(name = "descuento", precision = 12)
@@ -72,6 +72,10 @@ public class FacDocumentosmaster implements Serializable {
     private Float utilidad;
     @OneToMany(mappedBy = "facDocumentosmaster")
     private List<InvMovimiento> invMovimientoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
+    private List<FacCarteraDetalle> facCarteraDetalleList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
+    private List<FacCarteraCliente> facCarteraClienteList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocuementopago> facDocuementopagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
@@ -113,9 +117,9 @@ public class FacDocumentosmaster implements Serializable {
         this.facDocumentosmasterPK = facDocumentosmasterPK;
     }
 
-    public FacDocumentosmaster(FacDocumentosmasterPK facDocumentosmasterPK, float totalFactura, Date fecCrea) {
+    public FacDocumentosmaster(FacDocumentosmasterPK facDocumentosmasterPK, float total, Date fecCrea) {
         this.facDocumentosmasterPK = facDocumentosmasterPK;
-        this.totalFactura = totalFactura;
+        this.total = total;
         this.fecCrea = fecCrea;
     }
 
@@ -131,12 +135,12 @@ public class FacDocumentosmaster implements Serializable {
         this.facDocumentosmasterPK = facDocumentosmasterPK;
     }
 
-    public float getTotalFactura() {
-        return totalFactura;
+    public float getTotal() {
+        return total;
     }
 
-    public void setTotalFactura(float totalFactura) {
-        this.totalFactura = totalFactura;
+    public void setTotal(float total) {
+        this.total = total;
     }
 
     public String getObservaciones() {
@@ -163,12 +167,12 @@ public class FacDocumentosmaster implements Serializable {
         this.estado = estado;
     }
 
-    public Float getTotalFacturaUSD() {
-        return totalFacturaUSD;
+    public Float getTotalUSD() {
+        return totalUSD;
     }
 
-    public void setTotalFacturaUSD(Float totalFacturaUSD) {
-        this.totalFacturaUSD = totalFacturaUSD;
+    public void setTotalUSD(Float totalUSD) {
+        this.totalUSD = totalUSD;
     }
 
     public Float getSubtotal() {
@@ -186,14 +190,14 @@ public class FacDocumentosmaster implements Serializable {
     public void setDescuento(Float descuento) {
         this.descuento = descuento;
     }
-    
+
     public Float getUtilidad() {
         return utilidad;
     }
 
     public void setUtilidad(Float utilidad) {
         this.utilidad = utilidad;
-    }    
+    }
 
     @XmlTransient
     public List<InvMovimiento> getInvMovimientoList() {
@@ -202,6 +206,24 @@ public class FacDocumentosmaster implements Serializable {
 
     public void setInvMovimientoList(List<InvMovimiento> invMovimientoList) {
         this.invMovimientoList = invMovimientoList;
+    }
+
+    @XmlTransient
+    public List<FacCarteraDetalle> getFacCarteraDetalleList() {
+        return facCarteraDetalleList;
+    }
+
+    public void setFacCarteraDetalleList(List<FacCarteraDetalle> facCarteraDetalleList) {
+        this.facCarteraDetalleList = facCarteraDetalleList;
+    }
+
+    @XmlTransient
+    public List<FacCarteraCliente> getFacCarteraClienteList() {
+        return facCarteraClienteList;
+    }
+
+    public void setFacCarteraClienteList(List<FacCarteraCliente> facCarteraClienteList) {
+        this.facCarteraClienteList = facCarteraClienteList;
     }
 
     @XmlTransient

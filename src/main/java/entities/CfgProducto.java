@@ -5,6 +5,7 @@
  */
 package entities;
 
+import facades.InvConsolidadoFacade;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -24,7 +25,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -38,10 +38,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "CfgProducto.findAll", query = "SELECT c FROM CfgProducto c"),
     @NamedQuery(name = "CfgProducto.findByIdProducto", query = "SELECT c FROM CfgProducto c WHERE c.idProducto = :idProducto"),
+    @NamedQuery(name = "CfgProducto.findByCodigoInterno", query = "SELECT c FROM CfgProducto c WHERE c.codigoInterno = :codigoInterno"),
     @NamedQuery(name = "CfgProducto.findByCodProducto", query = "SELECT c FROM CfgProducto c WHERE c.codProducto = :codProducto"),
     @NamedQuery(name = "CfgProducto.findByCodBarProducto", query = "SELECT c FROM CfgProducto c WHERE c.codBarProducto = :codBarProducto"),
     @NamedQuery(name = "CfgProducto.findByNomProducto", query = "SELECT c FROM CfgProducto c WHERE c.nomProducto = :nomProducto"),
-    @NamedQuery(name = "CfgProducto.findByIdUnidad", query = "SELECT c FROM CfgProducto c WHERE c.idUnidad = :idUnidad"),
     @NamedQuery(name = "CfgProducto.findByStockMin", query = "SELECT c FROM CfgProducto c WHERE c.stockMin = :stockMin"),
     @NamedQuery(name = "CfgProducto.findByCostoAdquisicion", query = "SELECT c FROM CfgProducto c WHERE c.costoAdquisicion = :costoAdquisicion"),
     @NamedQuery(name = "CfgProducto.findByIva", query = "SELECT c FROM CfgProducto c WHERE c.iva = :iva"),
@@ -55,23 +55,24 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "CfgProducto.findByEsServicio", query = "SELECT c FROM CfgProducto c WHERE c.esServicio = :esServicio"),
     @NamedQuery(name = "CfgProducto.findByEsKit", query = "SELECT c FROM CfgProducto c WHERE c.esKit = :esKit")})
 public class CfgProducto implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "idProducto", nullable = false)
     private Integer idProducto;
-    @Column(name = "codProducto", length = 45)
+    @Column(name = "codigoInterno", length = 50)
+    private String codigoInterno;
+    @Column(name = "codProducto", length = 10)
     private String codProducto;
     @Column(name = "codBarProducto", length = 45)
     private String codBarProducto;
     @Column(name = "nomProducto", length = 400)
     private String nomProducto;
-    @Column(name = "idUnidad")
-    private Integer idUnidad;
+    @Column(name = "stockMin")
+    private Integer stockMin;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "stockMin", precision = 12)
-    private Float stockMin;
     @Column(name = "costoAdquisicion", precision = 12)
     private Float costoAdquisicion;
     @Column(name = "iva", precision = 12)
@@ -87,19 +88,13 @@ public class CfgProducto implements Serializable {
     @Column(name = "precio", precision = 12)
     private Float precio;
     @Lob
-    @Column(name = "imgProducto")
-    private byte[] imgProducto;
+    @Column(name = "imgProducto", length = 65535)
+    private String imgProducto;
     @Column(name = "activo")
     private Boolean activo;
     @Column(name = "fecCrea")
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
-    @Lob
-    @Column(name = "color", length = 65535)
-    private String color;
-    @Lob
-    @Column(name = "talla", length = 65535)
-    private String talla;
     @Basic(optional = false)
     @Column(name = "esServicio", nullable = false)
     private boolean esServicio;
@@ -112,6 +107,9 @@ public class CfgProducto implements Serializable {
     private List<InvConsolidado> invConsolidadoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgProducto")
     private List<CfgKitproductodetalle> cfgKitproductodetalleList;
+    @JoinColumn(name = "cfg_color_id_color", referencedColumnName = "id_color")
+    @ManyToOne
+    private CfgColor cfgColorIdColor;
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
@@ -121,6 +119,12 @@ public class CfgProducto implements Serializable {
     @JoinColumn(name = "cfg_marcaproducto_idMarca", referencedColumnName = "idMarca", nullable = false)
     @ManyToOne(optional = false)
     private CfgMarcaproducto cfgmarcaproductoidMarca;
+    @JoinColumn(name = "cfg_talla_id_talla", referencedColumnName = "id_talla")
+    @ManyToOne
+    private CfgTalla cfgTallaIdTalla;
+    @JoinColumn(name = "cfg_unidad_id_unidad", referencedColumnName = "id_unidad")
+    @ManyToOne
+    private CfgUnidad cfgUnidadIdUnidad;
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario", nullable = false)
     @ManyToOne(optional = false)
     private SegUsuario segusuarioidUsuario;
@@ -148,6 +152,14 @@ public class CfgProducto implements Serializable {
         this.idProducto = idProducto;
     }
 
+    public String getCodigoInterno() {
+        return codigoInterno;
+    }
+
+    public void setCodigoInterno(String codigoInterno) {
+        this.codigoInterno = codigoInterno;
+    }
+
     public String getCodProducto() {
         return codProducto;
     }
@@ -172,19 +184,11 @@ public class CfgProducto implements Serializable {
         this.nomProducto = nomProducto;
     }
 
-    public Integer getIdUnidad() {
-        return idUnidad;
-    }
-
-    public void setIdUnidad(Integer idUnidad) {
-        this.idUnidad = idUnidad;
-    }
-
-    public Float getStockMin() {
+    public Integer getStockMin() {
         return stockMin;
     }
 
-    public void setStockMin(Float stockMin) {
+    public void setStockMin(Integer stockMin) {
         this.stockMin = stockMin;
     }
 
@@ -244,11 +248,11 @@ public class CfgProducto implements Serializable {
         this.precio = precio;
     }
 
-    public byte[] getImgProducto() {
+    public String getImgProducto() {
         return imgProducto;
     }
 
-    public void setImgProducto(byte[] imgProducto) {
+    public void setImgProducto(String imgProducto) {
         this.imgProducto = imgProducto;
     }
 
@@ -266,22 +270,6 @@ public class CfgProducto implements Serializable {
 
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getTalla() {
-        return talla;
-    }
-
-    public void setTalla(String talla) {
-        this.talla = talla;
     }
 
     public boolean getEsServicio() {
@@ -327,6 +315,14 @@ public class CfgProducto implements Serializable {
         this.cfgKitproductodetalleList = cfgKitproductodetalleList;
     }
 
+    public CfgColor getCfgColorIdColor() {
+        return cfgColorIdColor;
+    }
+
+    public void setCfgColorIdColor(CfgColor cfgColorIdColor) {
+        this.cfgColorIdColor = cfgColorIdColor;
+    }
+
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }
@@ -351,6 +347,22 @@ public class CfgProducto implements Serializable {
         this.cfgmarcaproductoidMarca = cfgmarcaproductoidMarca;
     }
 
+    public CfgTalla getCfgTallaIdTalla() {
+        return cfgTallaIdTalla;
+    }
+
+    public void setCfgTallaIdTalla(CfgTalla cfgTallaIdTalla) {
+        this.cfgTallaIdTalla = cfgTallaIdTalla;
+    }
+
+    public CfgUnidad getCfgUnidadIdUnidad() {
+        return cfgUnidadIdUnidad;
+    }
+
+    public void setCfgUnidadIdUnidad(CfgUnidad cfgUnidadIdUnidad) {
+        this.cfgUnidadIdUnidad = cfgUnidadIdUnidad;
+    }
+
     public SegUsuario getSegusuarioidUsuario() {
         return segusuarioidUsuario;
     }
@@ -366,6 +378,27 @@ public class CfgProducto implements Serializable {
 
     public void setFacDocumentodetalleList(List<FacDocumentodetalle> facDocumentodetalleList) {
         this.facDocumentodetalleList = facDocumentodetalleList;
+    }
+
+    public int unidadesDisponibles(CfgEmpresasede sede) {
+        if (!invConsolidadoList.isEmpty()) {
+            InvConsolidado consolidado = null;
+            //el producto tiene consolidados por cada sede de la empresa
+            for (InvConsolidado ic : invConsolidadoList) {
+                //se busca el consolidado para la sede en cuestion
+                if (ic.getCfgEmpresasede().equals(sede)) {
+                    consolidado = ic;
+                    break;
+                }
+            }
+            if (consolidado != null) {
+                return consolidado.getExistencia();
+            } else {//si no se encontro consolidado significa que no esta registrado el producto en el inventario
+               return 0;
+            }
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -392,5 +425,5 @@ public class CfgProducto implements Serializable {
     public String toString() {
         return "entities.CfgProducto[ idProducto=" + idProducto + " ]";
     }
-    
+
 }

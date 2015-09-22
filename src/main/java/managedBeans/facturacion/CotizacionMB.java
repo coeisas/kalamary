@@ -217,7 +217,7 @@ public class CotizacionMB implements Serializable {
             RequestContext.getCurrentInstance().update("FormModalProducto");
             clienteSeleccionado = clienteFacade.buscarClienteDefault(empresaActual);
             if (clienteSeleccionado != null) {
-                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
             }
             cargarInformacionCliente();
         }
@@ -286,7 +286,7 @@ public class CotizacionMB implements Serializable {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
             setIdentificacionCliente(clienteSeleccionado.getNumDoc());
-            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
         } else {
             setNombreCliente(null);
             listaImpuestos.clear();
@@ -304,7 +304,7 @@ public class CotizacionMB implements Serializable {
     }
 
     private void actualizarListadoClientes() {
-        if (sedeActual != null) {
+        if (getSedeActual() != null) {
             listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
@@ -323,7 +323,7 @@ public class CotizacionMB implements Serializable {
         if (productoSeleccionado != null) {
             InvConsolidado consolidado = null;
             if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
-                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
+                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {//el producto no esta en el inventario
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
                     return;
@@ -489,7 +489,7 @@ public class CotizacionMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de cotizacion. Revice la configuracion de documentos"));
             return false;
         }
-        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento.getIdDoc(), documento.getActDocumento()) != null) {
+        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(getSedeActual(), documento.getIdDoc(), documento.getActDocumento()) != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Consecutivo de cotizacion duplicado. Revice la configuracion de documentos"));
             return false;
         }
@@ -497,7 +497,7 @@ public class CotizacionMB implements Serializable {
     }
 
     public void guardarCotizacion() {
-        CfgDocumento documento = documentoFacade.buscarDocumentoDeCotizacionBySede(sedeActual);
+        CfgDocumento documento = documentoFacade.buscarDocumentoDeCotizacionBySede(getSedeActual());
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a cotizacion"));
             return;
@@ -515,14 +515,14 @@ public class CotizacionMB implements Serializable {
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
             documentosmaster.setCfgDocumento(documento);
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
-            documentosmaster.setCfgempresasedeidSede(sedeActual);
+            documentosmaster.setCfgempresasedeidSede(getSedeActual());
             documentosmaster.setDescuento(totalDescuento);
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSubtotal(subtotal);
-            documentosmaster.setTotalFactura(totalFactura);
+            documentosmaster.setTotal(totalFactura);
             documentosmaster.setSegusuarioidUsuario(vendedorSeleccionado);//vendedor            
             documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);//vendedor
-            documentosmaster.setTotalFacturaUSD(totalUSD);
+            documentosmaster.setTotalUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setEstado("PENDIENTE");
             documentosmasterFacade.create(documentosmaster);
@@ -580,14 +580,13 @@ public class CotizacionMB implements Serializable {
 
     private void generarCotizacion(String ruta) throws IOException, JRException {
         FacDocumentosmaster documento
-                = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
-                        sedeActual,
+                = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(getSedeActual(),
                         documentoActual.getFacDocumentosmasterPK().getCfgdocumentoidDoc(),
                         documentoActual.getFacDocumentosmasterPK().getNumDocumento()
                 );
-        byte[] bites = sedeActual.getLogo();
+        byte[] bites = getSedeActual().getLogo();
         if (bites != null) {
-            bites = sedeActual.getCfgempresaidEmpresa().getLogo();
+            bites = getSedeActual().getCfgempresaidEmpresa().getLogo();
         }
         List<FacturaReporte> facturas = new ArrayList();
         FacturaReporte facturaReporte = new FacturaReporte();
@@ -595,7 +594,7 @@ public class CotizacionMB implements Serializable {
         facturaReporte.setNumFac(documento.determinarNumFactura());
         facturaReporte.setDescuento(documento.getDescuento());
         facturaReporte.setSubtotal(documento.getSubtotal());
-        facturaReporte.setTotalFactura(documento.getTotalFactura());
+        facturaReporte.setTotalFactura(documento.getTotal());
         facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
         facturas.add(facturaReporte);
@@ -611,15 +610,15 @@ public class CotizacionMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
-            CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
-            parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
-            parametros.put("direccion", sedeActual.getDireccion());
-            String telefono = sedeActual.getTel1();
-            if (sedeActual.getTel2() != null && !sedeActual.getTel2().isEmpty()) {
-                telefono = telefono + "-".concat(sedeActual.getTel2());
+            CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
+            parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
+            parametros.put("direccion", getSedeActual().getDireccion());
+            String telefono = getSedeActual().getTel1();
+            if (getSedeActual().getTel2() != null && !sedeActual.getTel2().isEmpty()) {
+                telefono = telefono + "-".concat(getSedeActual().getTel2());
             }
             parametros.put("telefono", telefono);
-            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
+            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + getSedeActual().getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
             parametros.put("tipoDoc", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura());
             parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
@@ -633,7 +632,7 @@ public class CotizacionMB implements Serializable {
             parametros.put("telcli", cliente.getTel1());
             parametros.put("ciudadcli", cliente.getCfgMunicipio().getNomMunicipio());
             parametros.put("emailcli", cliente.getMail());
-            parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            parametros.put("ubicacion", getSedeActual().getCfgMunicipio().getNomMunicipio() + " " + getSedeActual().getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             parametros.put("usuario", usuarioActual.nombreCompleto());
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
             parametros.put("SUBREPORT_DIR", rutaReportes);
@@ -675,8 +674,8 @@ public class CotizacionMB implements Serializable {
 
     private void limpiarFormulario() {
         listaDetalle.clear();
-        clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
-        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+        clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
+        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
@@ -692,9 +691,9 @@ public class CotizacionMB implements Serializable {
 //------------------------------------    
 
     public void buscarClienteModal() {
-        if (sedeActual != null) {
+        if (getSedeActual() != null) {
             if (numIdentificacion != null && !numIdentificacion.trim().isEmpty()) {
-                clienteSeleccionadoModal = clienteFacade.buscarPorIdentificacionAndIdEmpresa(numIdentificacion, sedeActual.getCfgempresaidEmpresa());
+                clienteSeleccionadoModal = clienteFacade.buscarPorIdentificacionAndIdEmpresa(numIdentificacion, getSedeActual().getCfgempresaidEmpresa());
                 cargarInformacionClienteModal();
             }
         } else {
@@ -783,7 +782,7 @@ public class CotizacionMB implements Serializable {
     }
 
     private boolean validarCamposFormulario() {
-        if (sedeActual == null) {
+        if (getSedeActual() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
             return false;
         }
@@ -829,7 +828,7 @@ public class CotizacionMB implements Serializable {
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
             cliente.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
-            cliente.setCfgempresaidEmpresa(sedeActual.getCfgempresaidEmpresa());
+            cliente.setCfgempresaidEmpresa(getSedeActual().getCfgempresaidEmpresa());
             cliente.setCfgTipoempresaId(tipocliente);
             cliente.setDirCliente(direccion.trim().toUpperCase());
             cliente.setFecCrea(new Date());
@@ -1186,6 +1185,10 @@ public class CotizacionMB implements Serializable {
 
     public void setNumCotizacion(String numCotizacion) {
         this.numCotizacion = numCotizacion;
+    }
+
+    public CfgEmpresasede getSedeActual() {
+        return sedeActual;
     }
 
 }

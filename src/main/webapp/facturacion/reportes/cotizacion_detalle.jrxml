@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="590" leftMargin="8" rightMargin="14" topMargin="14" bottomMargin="14" uuid="d46ec925-ba03-4a7e-8cbe-b6de0f47c15c">
 	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="121"/>
 	<property name="ireport.y" value="0"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
@@ -82,42 +82,42 @@
 	<detail>
 		<band height="13" splitType="Stretch">
 			<textField pattern="¤ #,##0.0">
-				<reportElement x="302" y="0" width="66" height="10" uuid="bc2c1eaa-397b-4708-9848-6b3d603b586d"/>
+				<reportElement x="302" y="0" width="66" height="12" uuid="bc2c1eaa-397b-4708-9848-6b3d603b586d"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorUnitario}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="369" y="0" width="35" height="10" uuid="c93d3f4a-13a3-4667-9a67-1b5f39a223fb"/>
+				<reportElement x="369" y="0" width="35" height="12" uuid="c93d3f4a-13a3-4667-9a67-1b5f39a223fb"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="407" y="0" width="52" height="10" uuid="a4591c8f-7342-4e5f-a614-0bfd86a57684"/>
+				<reportElement x="407" y="0" width="52" height="12" uuid="a4591c8f-7342-4e5f-a614-0bfd86a57684"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{descuento}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤ #,##0.0">
-				<reportElement x="458" y="0" width="67" height="10" uuid="0adbe1eb-af06-4b8f-95b4-7683db443827"/>
+				<reportElement x="458" y="0" width="67" height="12" uuid="0adbe1eb-af06-4b8f-95b4-7683db443827"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{valorTotal}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1" y="0" width="67" height="10" uuid="9946bd59-dbd6-4659-be27-d96110827a50"/>
+				<reportElement x="1" y="0" width="67" height="12" uuid="9946bd59-dbd6-4659-be27-d96110827a50"/>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{codProducto}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="69" y="0" width="232" height="10" uuid="79bda92c-b429-4b5d-8861-0cf8d5426671"/>
+				<reportElement x="69" y="0" width="232" height="12" uuid="79bda92c-b429-4b5d-8861-0cf8d5426671"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>

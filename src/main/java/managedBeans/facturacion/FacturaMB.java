@@ -19,6 +19,8 @@ import entities.CfgProducto;
 import entities.CfgTipoempresa;
 import entities.InvConsolidado;
 import entities.FacCaja;
+import entities.FacCarteraCliente;
+import entities.FacCarteraClientePK;
 import entities.FacDocuementopago;
 import entities.FacDocuementopagoPK;
 import entities.FacDocumentodetalle;
@@ -45,6 +47,8 @@ import facades.CfgMunicipioFacade;
 import facades.CfgProductoFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
+import facades.FacCarteraClienteFacade;
+import facades.FacCarteraDetalleFacade;
 import facades.FacDocuementopagoFacade;
 import facades.FacDocumentodetalleFacade;
 import facades.FacDocumentoimpuestoFacade;
@@ -216,6 +220,10 @@ public class FacturaMB implements Serializable {
     CfgMovInventarioDetalleFacade movInventarioDetalleFacade;
     @EJB
     CfgMovInventarioMaestroFacade movInventarioMaestroFacade;
+    @EJB
+    FacCarteraClienteFacade carteraClienteFacade;
+    @EJB
+    FacCarteraDetalleFacade carteraDetalleFacade;
 
     public FacturaMB() {
 
@@ -234,13 +242,14 @@ public class FacturaMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeActual = sesionMB.getSedeActual();
         empresaActual = sesionMB.getEmpresaActual();
+        display = "none";
         if (empresaActual != null) {
             actualizarListadoClientes();
             listaProducto = new LazyProductosModel(empresaActual, null, null, null, productoFacade);
             RequestContext.getCurrentInstance().update("FormModalProducto");
             clienteSeleccionado = clienteFacade.buscarClienteDefault(empresaActual);
             if (clienteSeleccionado != null) {
-                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
             }
             listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
             cargarInformacionCliente();
@@ -249,8 +258,8 @@ public class FacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(2, "ESPECIAL");
             listaTipoFactura.add(aux);
-            aux = new SelectItem(3, "SEPARADO");
-            listaTipoFactura.add(aux);
+//            aux = new SelectItem(3, "SEPARADO");
+//            listaTipoFactura.add(aux);
             tipoFactura = 1;
         }
         if (usuarioActual != null) {
@@ -307,23 +316,24 @@ public class FacturaMB implements Serializable {
     }
 
     public void validarTipoFacturacion() {
-        if (sedeActual == null) {
+        if (getSedeActual() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la sede"));
             return;
         }
         display = "none";
         CfgDocumento documento = null;
         if (tipoFactura == 1) {//se valida la existencia del documento aplicado a facturacion
-            documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeFacturaBySede(getSedeActual());
         } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
-            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(getSedeActual());
         } else if (tipoFactura == 3) {//se valida la existencia del documento aplicado a remision especial
-            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(getSedeActual());
             display = documento != null ? "block" : "none";
         }
         if (tipoFactura != 0 && documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento que aplique al tipo de factura seleccionada"));
         }
+        RequestContext.getCurrentInstance().update("FormModalFactura");
     }
 
     public void cargarModalProductos() {
@@ -342,7 +352,7 @@ public class FacturaMB implements Serializable {
 
     public void cargarCotizaciones() {
         if (empresaActual != null) {
-            listadoCotizacion = new LazyCotizacionDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado);
+            listadoCotizacion = new LazyCotizacionDataModel(documentosmasterFacade, getSedeActual(), clienteSeleccionado);
             RequestContext.getCurrentInstance().update("FormBuscarCotizacion");
             RequestContext.getCurrentInstance().execute("PF('dlgCotizacion').show()");
         } else {
@@ -362,17 +372,19 @@ public class FacturaMB implements Serializable {
             cargarInformacionVendedor();
             for (FacDocumentodetalle detalle : lista) {
                 CfgProducto producto = detalle.getCfgProducto();
-                InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, producto);
-                if (consolidado == null) {//el producto no esta en el inventario
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + producto.getNomProducto() + " en el inventario"));
-                    return;
+                if (!producto.getEsServicio()) {
+                    InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), producto);
+                    if (consolidado == null) {//el producto no esta en el inventario
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + producto.getNomProducto() + " en el inventario"));
+                        return;
+                    }
+                    if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + producto.getNomProducto()));
+                        return;
+                    }
+                    //se determina como cantidad posible el total de las existencias en el inventario
+                    detalle.setCantidadPosible(consolidado.getExistencia());
                 }
-                if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + producto.getNomProducto()));
-                    return;
-                }
-                //se determina como cantidad posible el total de las existencias en el inventario
-                detalle.setCantidadPosible(consolidado.getExistencia());
                 //el valor del documento master no es el definitivo
                 detalle.setFacDocumentodetallePK(new FacDocumentodetallePK(producto.getIdProducto(), 1, 1));
                 detalle.setPrecioOriginal(detalle.getValorUnitario());
@@ -395,7 +407,7 @@ public class FacturaMB implements Serializable {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
             setIdentificacionCliente(clienteSeleccionado.getNumDoc());
-            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
+            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
         } else {
             setNombreCliente(null);
             listaImpuestos.clear();
@@ -414,7 +426,7 @@ public class FacturaMB implements Serializable {
     }
 
     private void actualizarListadoClientes() {
-        if (sedeActual != null) {
+        if (getSedeActual() != null) {
             listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
@@ -433,7 +445,7 @@ public class FacturaMB implements Serializable {
         if (productoSeleccionado != null) {
             InvConsolidado consolidado = null;
             if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
-                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(sedeActual, productoSeleccionado);
+                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {//el producto no esta en el inventario
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
                     return;
@@ -617,7 +629,7 @@ public class FacturaMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de la creacion de factura. Revice la configuracion de documentos"));
             return false;
         }
-        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(sedeActual, documento.getIdDoc(), documento.getActDocumento()) != null) {
+        if (documentosmasterFacade.buscarBySedeAndDocumentoAndNum(getSedeActual(), documento.getIdDoc(), documento.getActDocumento()) != null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Consecutivo de factura duplicado. Revice la configuracion de documentos"));
             return false;
         }
@@ -636,11 +648,11 @@ public class FacturaMB implements Serializable {
         }
         CfgDocumento documento = null;
         if (tipoFactura == 1) {//se valida la existencia del documento aplicado a facturacion
-            documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeFacturaBySede(getSedeActual());
         } else if (tipoFactura == 2) {//se valida la existencia del documento aplicado a remision especial
-            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(getSedeActual());
         } else if (tipoFactura == 3) {//se valida la existencia del documento aplicado a separado
-            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
+            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(getSedeActual());
         }
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
@@ -654,25 +666,25 @@ public class FacturaMB implements Serializable {
         if (!validarCampos(documento)) {
             return;
         }
-        CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
+        CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(getSedeActual());
         if (documentoMovInventario == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a movimiento de inventario de salida"));
             return;
         }
         try {
-//            CREANDO EL DOCUEMENTO MASTER DE FACTURA ESPECIAL, NORMAL, SEPARADO
+//            CREANDO EL DOCUEMENTO MASTER DE: FACTURA ESPECIAL, NORMAL, SEPARADO
             FacDocumentosmaster documentosmaster = new FacDocumentosmaster();
             documentosmaster.setFacDocumentosmasterPK(new FacDocumentosmasterPK(documento.getIdDoc(), documento.getActDocumento()));
             documentosmaster.setCfgDocumento(documento);
             documentosmaster.setCfgclienteidCliente(clienteSeleccionado);
-            documentosmaster.setCfgempresasedeidSede(sedeActual);
+            documentosmaster.setCfgempresasedeidSede(getSedeActual());
             documentosmaster.setDescuento(totalDescuento);
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setSubtotal(subtotal);
-            documentosmaster.setTotalFactura(totalFactura);
+            documentosmaster.setTotal(totalFactura);
             documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);
-            documentosmaster.setTotalFacturaUSD(totalUSD);
+            documentosmaster.setTotalUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
             documentosmaster.setFaccajaidCaja(cajaUsuario);
             calcularTotalUtilidad();
@@ -762,7 +774,13 @@ public class FacturaMB implements Serializable {
 
             documentoActual = documentosmaster;
             crearMovimientoInventario(listaDetalle, documentosmaster);
-            generarMovimientoCaja(documentosmaster);
+            if (tipoFactura != 3) {//el movimiento de caja se comporta diferente para los separados
+//                se registra el total de la factura o remision
+                generarMovimientoCaja(documentosmaster);
+            } else {
+//                se crea cartera por el separado y se genera recibo de caja por cuota inicial.
+                generarMovimientoCajaAlternativo(documentosmaster);
+            }
             limpiarFormulario();
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
@@ -791,14 +809,53 @@ public class FacturaMB implements Serializable {
         }
     }
 
+    private void generarMovimientoCajaAlternativo(FacDocumentosmaster documento) {
+        try {
+            FacCarteraCliente carteraCliente = new FacCarteraCliente();
+            carteraCliente.setFacCarteraClientePK(new FacCarteraClientePK(clienteSeleccionado.getIdCliente(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento()));
+            carteraCliente.setCfgCliente(clienteSeleccionado);
+            carteraCliente.setFacDocumentosmaster(documento);
+            carteraCliente.setCuotaactual(0);
+            carteraCliente.setEstado("PENDIENTE");
+
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro abrir cartera para " + documento.determinarNumFactura()));
+        }
+
+    }
+
     private void actualizarTablaConsolidado(FacDocumentodetalle documentodetalle) {
         try {
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, documentodetalle.getCfgProducto());
+            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), documentodetalle.getCfgProducto());
+            //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
+            List<InvConsolidado> listadoConsolidado = documentodetalle.getCfgProducto().getInvConsolidadoList();
             if (consolidado != null) {
                 consolidado.setFechaUltSalida(new Date());
                 consolidado.setExistencia(consolidado.getExistencia() - documentodetalle.getCantidad());
                 consolidado.setSalidas(consolidado.getSalidas() + documentodetalle.getCantidad());
                 consolidadoFacade.edit(consolidado);
+                //se actualiza la informacion del inventario consolidado en el producto
+                //el producto en el inventario consolidado esta una sola vez por cada sede de la empresa.  el producto no debe ser un servicio
+                //se identifica el index del listadoconsolidado afectado
+                int aux = 0;
+                for (InvConsolidado ic : listadoConsolidado) {
+                    if (ic.equals(consolidado)) {
+                        break;
+                    }
+                    aux++;
+                }
+                //se actualiza la informacion la nueva informacion del consolidado
+                listadoConsolidado.get(aux).setCfgEmpresasede(consolidado.getCfgEmpresasede());
+                listadoConsolidado.get(aux).setCfgProducto(consolidado.getCfgProducto());
+                listadoConsolidado.get(aux).setEntradas(consolidado.getEntradas());
+                listadoConsolidado.get(aux).setExistencia(consolidado.getExistencia());
+                listadoConsolidado.get(aux).setFechaUltEntrada(consolidado.getFechaUltEntrada());
+                listadoConsolidado.get(aux).setFechaUltSalida(consolidado.getFechaUltSalida());
+                listadoConsolidado.get(aux).setInvConsolidadoPK(consolidado.getInvConsolidadoPK());
+                listadoConsolidado.get(aux).setSalidas(consolidado.getSalidas());
+
+                //se guarda los cambios del listado inventario en el producto
+                productoFacade.edit(documentodetalle.getCfgProducto());
             }
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario para el producto " + documentodetalle.getCfgProducto().getNomProducto()));
@@ -807,7 +864,7 @@ public class FacturaMB implements Serializable {
 
     private void crearMovimientoInventario(List<FacDocumentodetalle> listaDetalle, FacDocumentosmaster documentosmaster) {
 //        BUSCA EL DOCUMENTO APLICADO AL MOVIMIENTO DE INVENTARIO DE SALIDA
-        CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
+        CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(getSedeActual());
         if (documento.getActDocumento() == 0) {
             documento.setActDocumento(documento.getIniDocumento());
         } else {
@@ -820,7 +877,7 @@ public class FacturaMB implements Serializable {
             InvMovimiento invMovimientoMaestro = new InvMovimiento();
             invMovimientoMaestro.setInvMovimientoPK(new InvMovimientoPK(documento.getIdDoc(), documento.getActDocumento()));
             invMovimientoMaestro.setCfgDocumento(documento);
-            invMovimientoMaestro.setCfgempresasedeidSede(sedeActual);
+            invMovimientoMaestro.setCfgempresasedeidSede(getSedeActual());
             invMovimientoMaestro.setCfgmovinventariodetalleidMovInventarioDetalle(movInventarioDetalle);
             invMovimientoMaestro.setDescuento(totalDescuento);
             invMovimientoMaestro.setFacDocumentosmaster(documentosmaster);
@@ -975,14 +1032,13 @@ public class FacturaMB implements Serializable {
 
     private void generarFactura(String ruta) throws IOException, JRException {
         FacDocumentosmaster documento
-                = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(
-                        sedeActual,
+                = documentosmasterFacade.buscarBySedeAndDocumentoAndNum(getSedeActual(),
                         documentoActual.getFacDocumentosmasterPK().getCfgdocumentoidDoc(),
                         documentoActual.getFacDocumentosmasterPK().getNumDocumento()
                 );
-        byte[] bites = sedeActual.getLogo();
+        byte[] bites = getSedeActual().getLogo();
         if (bites != null) {
-            bites = sedeActual.getCfgempresaidEmpresa().getLogo();
+            bites = getSedeActual().getCfgempresaidEmpresa().getLogo();
         }
         List<FacturaReporte> facturas = new ArrayList();
         FacturaReporte facturaReporte = new FacturaReporte();
@@ -990,7 +1046,7 @@ public class FacturaMB implements Serializable {
         facturaReporte.setNumFac(documento.determinarNumFactura());
         facturaReporte.setDescuento(documento.getDescuento());
         facturaReporte.setSubtotal(documento.getSubtotal());
-        facturaReporte.setTotalFactura(documento.getTotalFactura());
+        facturaReporte.setTotalFactura(documento.getTotal());
         facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setPago(crearListadoPago(docuementopagoFacade.buscarByDocumentoMaster(documento)));
@@ -1007,19 +1063,24 @@ public class FacturaMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
-            CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
-            parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
-            parametros.put("direccion", sedeActual.getDireccion());
-            String telefono = sedeActual.getTel1();
-            if (sedeActual.getTel2() != null && !sedeActual.getTel2().isEmpty()) {
-                telefono = telefono + "-".concat(sedeActual.getTel2());
+            CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
+            parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
+            parametros.put("direccion", getSedeActual().getDireccion());
+            String telefono = getSedeActual().getTel1();
+            if (getSedeActual().getTel2() != null && !sedeActual.getTel2().isEmpty()) {
+                telefono = telefono + "-".concat(getSedeActual().getTel2());
             }
             parametros.put("telefono", telefono);
-            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
+            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + getSedeActual().getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
-            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
+            if (tipoImpresion != 2) { //no es impresion carta
+                parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
+            } else {
+                parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
+                parametros.put("tipoDoc", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura());
+            }
             parametros.put("fecha", documento.getFecCrea());
-            parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            parametros.put("ubicacion", getSedeActual().getCfgMunicipio().getNomMunicipio() + " " + getSedeActual().getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             parametros.put("usuario", usuarioActual.nombreCompleto());
             parametros.put("identificacionUsuario", usuarioActual.getNumDoc());
             parametros.put("SUBREPORT_DIR", rutaReportes);
@@ -1073,9 +1134,9 @@ public class FacturaMB implements Serializable {
 
     private void limpiarFormulario() {
         listaDetalle.clear();
-        clienteSeleccionado = clienteFacade.buscarClienteDefault(sedeActual.getCfgempresaidEmpresa());
-        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), sedeActual));
-        listaFormapagos = formapagoFacade.buscarPorEmpresa(sedeActual.getCfgempresaidEmpresa());
+        clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
+        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
+        listaFormapagos = formapagoFacade.buscarPorEmpresa(getSedeActual().getCfgempresaidEmpresa());
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
@@ -1094,9 +1155,9 @@ public class FacturaMB implements Serializable {
 //------------------------------------    
 
     public void buscarClienteModal() {
-        if (sedeActual != null) {
+        if (getSedeActual() != null) {
             if (numIdentificacion != null && !numIdentificacion.trim().isEmpty()) {
-                clienteSeleccionadoModal = clienteFacade.buscarPorIdentificacionAndIdEmpresa(numIdentificacion, sedeActual.getCfgempresaidEmpresa());
+                clienteSeleccionadoModal = clienteFacade.buscarPorIdentificacionAndIdEmpresa(numIdentificacion, getSedeActual().getCfgempresaidEmpresa());
                 cargarInformacionClienteModal();
             }
         } else {
@@ -1185,7 +1246,7 @@ public class FacturaMB implements Serializable {
     }
 
     private boolean validarCamposFormulario() {
-        if (sedeActual == null) {
+        if (getSedeActual() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
             return false;
         }
@@ -1235,7 +1296,7 @@ public class FacturaMB implements Serializable {
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
             cliente.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
-            cliente.setCfgempresaidEmpresa(sedeActual.getCfgempresaidEmpresa());
+            cliente.setCfgempresaidEmpresa(getSedeActual().getCfgempresaidEmpresa());
             cliente.setCfgTipoempresaId(tipocliente);
             cliente.setDirCliente(direccion.trim().toUpperCase());
             cliente.setFecCrea(new Date());
@@ -1623,5 +1684,9 @@ public class FacturaMB implements Serializable {
 
     public String getDisplay() {
         return display;
+    }
+
+    public CfgEmpresasede getSedeActual() {
+        return sedeActual;
     }
 }

@@ -275,7 +275,7 @@ public class ListadoFacturaMB implements Serializable {
         facturaReporte.setNumFac(documento.determinarNumFactura());
         facturaReporte.setDescuento(documento.getDescuento());
         facturaReporte.setSubtotal(documento.getSubtotal());
-        facturaReporte.setTotalFactura(documento.getTotalFactura());
+        facturaReporte.setTotalFactura(documento.getTotal());
         facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setPago(crearListadoPago(docuementopagoFacade.buscarByDocumentoMaster(documento)));
@@ -302,7 +302,12 @@ public class ListadoFacturaMB implements Serializable {
             parametros.put("telefono", telefono);
             parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
-            parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
+            if (tipoImpresion != 2) { //no es impresion carta
+                parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
+            } else {
+                parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getNumDoc());
+                parametros.put("tipoDoc", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura());
+            }
             parametros.put("fecha", documento.getFecCrea());
             parametros.put("usuario", usuarioActual.nombreCompleto());
             parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());

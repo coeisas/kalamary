@@ -22,7 +22,7 @@
 				<textFieldExpression><![CDATA[$F{valorImpuesto}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="3" width="43" height="12" uuid="70a2c773-14b2-40c4-aa4b-b8ca5e483d73"/>
+				<reportElement x="0" y="3" width="43" height="14" uuid="70a2c773-14b2-40c4-aa4b-b8ca5e483d73"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>

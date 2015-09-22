@@ -74,5 +74,17 @@ public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
             return null;
         }
     }
+    
+    public CfgMarcaproducto buscarPorEmpresaReferenciaAndCodigo(CfgEmpresa empresa, CfgReferenciaproducto referencia, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1 AND m.cfgreferenciaproductoidReferencia = ?2 AND m.codigoMarca LIKE ?3");
+            query.setParameter(1, empresa);
+            query.setParameter(2, referencia);
+            query.setParameter(3, codigo);
+            return (CfgMarcaproducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
 }

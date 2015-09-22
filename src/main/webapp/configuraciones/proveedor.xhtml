@@ -20,7 +20,7 @@
                 <p:row>
                     <p:column>
                         <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                        <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{proveedorMB.numIdentificacion}">
+                        <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{proveedorMB.numIdentificacion}" maxlength="20">
                             <p:ajax event="blur" listener="#{proveedorMB.buscarProveedor}" update="@none"/>
                         </p:inputText>
                         <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{proveedorMB.cargarProveedores}"/>
@@ -51,10 +51,10 @@
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.proveedor}"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.proveedor}" maxlength="150"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormulario" value="Contacto:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.contacto}"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.contacto}" maxlength="150"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -69,31 +69,31 @@
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Direccion:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.direccion}" />
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.direccion}" maxlength="150" size="70" />
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Telefono 1:"/>
-                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono1}"/>
+                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono1}" maxlength="10"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormulario" value="Telefono 2:"/>
-                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono2}"/>  
+                        <p:inputText class="campoFormulario" value="#{proveedorMB.telefono2}" maxlength="10"/>  
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormulario" value="Website:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.website}"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.website}" maxlength="300"/>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormularioObligatorio" value="Mail 1:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail1}"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail1}" maxlength="200"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormulario" value="Mail 2:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail2}"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{proveedorMB.mail2}" maxlength="200"/>
                     </p:column>
                 </p:row>
                 <p:row>

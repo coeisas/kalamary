@@ -99,9 +99,16 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
             String sqlFilters = "";
             String codProducto = "";
             String nomProducto = "";
+            String codInterno = "";
             for (Map.Entry<String, Object> entry : filters.entrySet()) {
                 String filterProperty = entry.getKey();                
                 switch (filterProperty) {
+                    case "codigoInterno":
+                        codInterno = entry.getValue().toString().trim();
+                        if(!codInterno.isEmpty()){
+                            sqlFilters = sqlFilters.concat(" AND p.codigoInterno LIKE CONCAT(?4, '%')");
+                        }                        
+                        break;                        
                     case "codProducto":                        
                         codProducto = entry.getValue().toString().trim();
                         if(!codProducto.isEmpty()){
@@ -116,8 +123,8 @@ public class LazyProductosModel extends LazyDataModel<CfgProducto> {
                         break;
                 }
             }
-            data = productoFacade.buscarPorEmpresaFilter(empresa, first, pageSize, sqlFilters, codProducto, nomProducto);
-            this.setRowCount(productoFacade.totalProductosPorEmpresaFilter(empresa, sqlFilters, codProducto, nomProducto));
+            data = productoFacade.buscarPorEmpresaFilter(empresa, first, pageSize, sqlFilters, codInterno, codProducto, nomProducto);
+            this.setRowCount(productoFacade.totalProductosPorEmpresaFilter(empresa, sqlFilters, codInterno, codProducto, nomProducto));
         }
         return data;
     }
