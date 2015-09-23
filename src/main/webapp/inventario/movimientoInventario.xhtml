@@ -11,6 +11,7 @@
     <ui:define name="title">Movimiento Inventario</ui:define>
     <ui:define name="content">
         <p:growl autoUpdate="true" showDetail="true"/>
+        <p:growl id="msg" showDetail="true"/>
         <h:form id="IdFormMovimientoInventario">
             <p:remoteCommand name="updateTabla" actionListener="#{movimientoInventarioMB.updateTabla}"/>
             <p:panelGrid style="margin: 0 auto;width: 90%">
@@ -201,13 +202,14 @@
             <p:commandButton value="Aceptar" actionListener="#{movimientoInventarioMB.cargarInformacionProveedor}"/>
         </h:form>                                
     </p:dialog>
-    <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">
+    <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
         <h:form id="FormModalProducto">
             <p:dataTable value="#{movimientoInventarioMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{movimientoInventarioMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
                 <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                 <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                 <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
                 <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                <p:column headerText="Disponibilidad">#{producto.unidadesDisponibles(movimientoInventarioMB.sedeActual)}</p:column>
             </p:dataTable>
             <p:separator/>
             <p:commandButton value="Insertar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>

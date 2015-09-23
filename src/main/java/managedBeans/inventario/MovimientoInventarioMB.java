@@ -32,6 +32,8 @@ import facades.InvMovimientoFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.faces.context.FacesContext;
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -200,22 +202,56 @@ public class MovimientoInventarioMB implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " es un servicio"));
                 return;
             }
+            //variable tenida en cuanta cuando el movimiento corresponde a una salida
+            int unidadesDisponibles = 0;
+            CfgMovInventarioMaestro inventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
+            if (inventarioMaestro.getCodMovInvetario().equals("2")) {//si se esta realizando una salida del inventario se tiene encuenta unidades disponibles
+                InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
+                if (consolidado == null) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " no tiene unidades disponibles"));
+                    return;
+                } else {
+                    unidadesDisponibles = consolidado.getExistencia();
+                }
+            }
             InvMovimientoDetalle detalle = estaInsertado(productoSeleccionado);
             if (detalle == null) {
                 detalle = new InvMovimientoDetalle();
                 detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(0, 0, productoSeleccionado.getIdProducto()));
                 detalle.setCfgProducto(productoSeleccionado);
-                detalle.setCantidad(1);
-                detalle.setCostoAdquisicion(0);
-                detalle.setDescuento(0);
-                detalle.setFlete(0);
+                //cuando se realiza una salida(2). Se carga la informacion actual del producto.De lo contrario sera nueva
+                if (inventarioMaestro.getCodMovInvetario().equals("2")) {
+                    detalle.setCantidad(1);
+                    if (unidadesDisponibles < detalle.getCantidad()) {
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " La cantidad sobrepasa las unidades disponibles"));
+                        return;
+                    }
+                    detalle.setCostoAdquisicion(productoSeleccionado.getCostoAdquisicion());
+                    detalle.setFlete(productoSeleccionado.getFlete());
+                    detalle.setIva(productoSeleccionado.getIva());
+                    detalle.setCostoIndirecto(productoSeleccionado.getCostoIndirecto());
+                } else {
+                    detalle.setCantidad(1);
+                    detalle.setCostoAdquisicion(0);
+                    detalle.setDescuento(0);
+                    detalle.setFlete(0);
 //                detalle.setIva(0);
-                detalle.setIva(16);
-                detalle.setCostoIndirecto(0);
+                    detalle.setIva(16);
+                    detalle.setCostoIndirecto(0);
+                }
                 detalle.setInvMovimiento(null);//se crea cuando se guarde
                 listaItemsInventarioMovimiento.add(detalle);
             } else {
                 detalle.setCantidad(detalle.getCantidad() + 1);
+                //cuando se realiza una salida(2). Se valida que la cantidad no exceda a las unidades disponibles
+                if (inventarioMaestro.getCodMovInvetario().equals("2")) {
+                    if (unidadesDisponibles < detalle.getCantidad()) {
+                        detalle.setCantidad(detalle.getCantidad() - 1);
+                        updateTabla();
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " La cantidad sobrepasa las unidades disponibles"));
+                        return;
+                    }
+                }
             }
             determinarCostoFinal(detalle);
         }
@@ -248,6 +284,16 @@ public class MovimientoInventarioMB implements Serializable {
 
     public void onRowEdit(RowEditEvent event) {
         InvMovimientoDetalle detalle = (InvMovimientoDetalle) event.getObject();
+
+        CfgMovInventarioMaestro inventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
+        if (inventarioMaestro.getCodMovInvetario().equals("2")) {//si se esta realizando una salida del inventario se tiene encuenta unidades disponibles
+            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, detalle.getCfgProducto());
+            if (consolidado.getExistencia() < detalle.getCantidad()) {
+                detalle.setCantidad(consolidado.getExistencia());
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", productoSeleccionado.getNomProducto() + " tiene " + consolidado.getExistencia() + " unidades"));
+                RequestContext.getCurrentInstance().update("msg");
+            }
+        }
 //        FacesMessage msg = new FacesMessage("Edit", detalle.getCfgProducto().getNomProducto());
 //        FacesContext.getCurrentInstance().addMessage(null, msg);
 //        RequestContext.getCurrentInstance().update("msg");
@@ -275,11 +321,13 @@ public class MovimientoInventarioMB implements Serializable {
         float costoInd = detalle.getCostoIndirecto();
         costoInd = validarValor(costoInd);
         descuento = costoAdq * (descuento / 100) * cantidad;
+        descuento = Redondear(descuento, 0);
         detalle.setValorDescuento(descuento);
 //        costoAdq = costoAdq - (costoAdq * (descuento / 100));
         costoFinal = costoAdq + (costoAdq * (flete / 100));
         costoFinal = costoFinal + (costoFinal * (costoInd / 100));
         costoFinal = costoFinal * cantidad;//el valor mostrado en la tabla se aplica el iva
+        costoFinal = Redondear(costoFinal, 0);
         detalle.setCostoFinal(costoFinal);
         determinarSubtotales();
     }
@@ -298,6 +346,7 @@ public class MovimientoInventarioMB implements Serializable {
             totalDescuento += detalle.getValorDescuento();
         }
         totalIva = (subtotal - totalDescuento) * porcentajeIva / (float) 100;
+        totalIva = Redondear(totalIva, 0);
         totalMovimiento = subtotal - totalDescuento + totalIva;
     }
 
@@ -318,6 +367,7 @@ public class MovimientoInventarioMB implements Serializable {
         costoFinalIndividual = costoAdq + iva;
         costoFinalIndividual = costoFinalIndividual + (costoFinalIndividual * (flete / 100));
         costoFinalIndividual = costoFinalIndividual + (costoFinalIndividual * (costoInd / 100));
+        costoFinalIndividual = Redondear(costoFinalIndividual, 0);
         detalle.setCostoFinalIndividual(costoFinalIndividual);
     }
 
@@ -333,9 +383,15 @@ public class MovimientoInventarioMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormMovimientoInventario:IdSubTotal");
     }
 
+    public float Redondear(float pNumero, int pCantidadDecimales) {
+        BigDecimal value = new BigDecimal(pNumero);
+        value = value.setScale(pCantidadDecimales, RoundingMode.HALF_UP);
+        return value.floatValue();
+    }
+
     public boolean validar() {
         boolean ban = true;
-        if (sedeActual == null) {
+        if (getSedeActual() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene informacion de la sede"));
             return false;
         }
@@ -377,7 +433,7 @@ public class MovimientoInventarioMB implements Serializable {
         CfgMovInventarioMaestro movInventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
 //        si el tipo de movimiento es de codigo = 1. El documento a aplicar es el de ENTRADA INVENTARIO. De ser el codigo = 2. Se aplicara el documento SALIDA INVENTARIO
         tipoDocumento = movInventarioMaestro.getCodMovInvetario().equals("1") ? "3" : "4";
-        CfgDocumento documento = documentoFacade.buscarDocumentoDeMovInventarioBySede(sedeActual, tipoDocumento);
+        CfgDocumento documento = documentoFacade.buscarDocumentoDeMovInventarioBySede(getSedeActual(), tipoDocumento);
         if (documento == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a este tipo de movimiento"));
             return;
@@ -401,7 +457,7 @@ public class MovimientoInventarioMB implements Serializable {
             InvMovimiento invMovimientoMaestro = new InvMovimiento();
             invMovimientoMaestro.setInvMovimientoPK(new InvMovimientoPK(documento.getIdDoc(), documento.getActDocumento()));
             invMovimientoMaestro.setCfgDocumento(documento);
-            invMovimientoMaestro.setCfgempresasedeidSede(sedeActual);
+            invMovimientoMaestro.setCfgempresasedeidSede(getSedeActual());
             CfgformaPagoproveedor pagoproveedor = pagoproveedorFacade.find(formaPago);
             invMovimientoMaestro.setCfgformaPagoproveedoridFormaPago(pagoproveedor);
             invMovimientoMaestro.setCfgmovinventariodetalleidMovInventarioDetalle(movInventarioDetalle);
@@ -463,7 +519,7 @@ public class MovimientoInventarioMB implements Serializable {
 
     private void actualizarTablaConsolidado(CfgProducto producto, InvMovimientoDetalle detalleMovimiento) {
         try {
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, producto);
+            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), producto);
             //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
             List<InvConsolidado> listadoConsolidado = producto.getInvConsolidadoList();
             if (consolidado != null) {
@@ -496,8 +552,8 @@ public class MovimientoInventarioMB implements Serializable {
                 listadoConsolidado.get(aux).setInvConsolidadoPK(consolidado.getInvConsolidadoPK());
                 listadoConsolidado.get(aux).setSalidas(consolidado.getSalidas());
             } else {
-                consolidado = new InvConsolidado(new InvConsolidadoPK(producto.getIdProducto(), sedeActual.getIdSede()));
-                consolidado.setCfgEmpresasede(sedeActual);
+                consolidado = new InvConsolidado(new InvConsolidadoPK(producto.getIdProducto(), getSedeActual().getIdSede()));
+                consolidado.setCfgEmpresasede(getSedeActual());
                 consolidado.setCfgProducto(producto);
                 consolidado.setFechaUltEntrada(new Date());
                 consolidado.setEntradas(detalleMovimiento.getCantidad());
@@ -650,6 +706,10 @@ public class MovimientoInventarioMB implements Serializable {
 
     public void setDocumentoSoporte(String documentoSoporte) {
         this.documentoSoporte = documentoSoporte;
+    }
+
+    public CfgEmpresasede getSedeActual() {
+        return sedeActual;
     }
 
 }

@@ -86,6 +86,7 @@ public class MarcaMB implements Serializable {
     public void cargarInformacionReferencia() {
         if (referenciaSeleccionada != null) {
             referencia = referenciaSeleccionada.getCodigoReferencia() + "-" + referenciaSeleccionada.getNombreReferencia();
+            listaMarca = marcaproductoFacade.buscarPorReferencia(referenciaSeleccionada);
             RequestContext.getCurrentInstance().update("IdFormMarca");
         }
         RequestContext.getCurrentInstance().execute("PF('dlgReferencia').hide()");

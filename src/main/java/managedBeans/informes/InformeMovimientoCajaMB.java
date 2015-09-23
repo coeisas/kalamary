@@ -68,6 +68,8 @@ public class InformeMovimientoCajaMB implements Serializable {
         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         sedeActual = sesionMB.getSedeActual();
         usuarioActual = sesionMB.getUsuarioActual();
+        fechaFinal = new Date();
+        fechaInicial = new Date();
     }
 
     public void cargarCajas() {

@@ -26,11 +26,11 @@
                         </p:selectOneMenu>
                     </p:column>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Inicial:"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Fecha Inicial:"/>
                         <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeMovimientoCajaMB.fechaInicial}"/>                        
                     </p:column>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Fecha Final:"/>
                         <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeMovimientoCajaMB.fechaFinal}"/>                        
                     </p:column>
                 </p:row>

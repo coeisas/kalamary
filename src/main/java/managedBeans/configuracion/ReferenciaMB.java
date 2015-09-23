@@ -82,6 +82,7 @@ public class ReferenciaMB implements Serializable {
     public void cargarInformacionCategoria() {
         if (categoriaSeleccionada != null) {
             categoria = categoriaSeleccionada.getCodigoCategoria() + "-" + categoriaSeleccionada.getNombreCategoria();
+            listaReferencias = referenciaproductoFacade.buscarPorCategoria(categoriaSeleccionada);
             RequestContext.getCurrentInstance().update("IdFormReferencia");
         }
         RequestContext.getCurrentInstance().execute("PF('dlgCategoria').hide()");
