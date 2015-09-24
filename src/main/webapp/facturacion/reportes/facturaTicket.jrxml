@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="226" pageHeight="283" columnWidth="216" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" isIgnorePagination="true" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
-	<property name="ireport.zoom" value="7.0"/>
-	<property name="ireport.x" value="690"/>
-	<property name="ireport.y" value="288"/>
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="144"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
 		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/facturacion/reportes/"]]></defaultValueExpression>
 	</parameter>
@@ -19,6 +19,7 @@
 	<parameter name="vendedor" class="java.lang.String"/>
 	<parameter name="identificacionCliente" class="java.lang.String"/>
 	<parameter name="ubicacion" class="java.lang.String"/>
+	<parameter name="title" class="java.lang.String"/>
 	<field name="numFac" class="java.lang.String"/>
 	<field name="subtotal" class="java.lang.Float"/>
 	<field name="descuento" class="java.lang.Float"/>
@@ -76,7 +77,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA["FACTURA DE VENTA No." + $F{numFac}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{title} + " " + $F{numFac}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd/MM/yyyy h.mm a">
 				<reportElement x="135" y="13" width="63" height="8" uuid="9170ac7c-9757-471b-a2a7-2bffb3f16d83"/>

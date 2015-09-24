@@ -1,0 +1,38 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Informe Inventario</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormInformeInventario">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Informe Inventario</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Sede:"/>
+                        <p:selectOneMenu class="campoFormulario" value="#{informeInventarioMB.idSede}">
+                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{informeInventarioMB.listaSedes}" var="sede" itemLabel="#{sede.codSede} - #{sede.nomSede}" itemValue="#{sede.idSede}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" onclick="this.form.target = '_blank'" actionListener="#{informeInventarioMB.generarReporte}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeInventarioMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="528" leftMargin="42" rightMargin="42" topMargin="42" bottomMargin="42" uuid="e2decc6e-399c-48df-9711-03c573432f26">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="94"/>
+	<property name="ireport.y" value="0"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -26,6 +26,7 @@
 	<parameter name="observacion" class="java.lang.String"/>
 	<parameter name="ubicacion" class="java.lang.String"/>
 	<parameter name="tipoDoc" class="java.lang.String"/>
+	<parameter name="title" class="java.lang.String"/>
 	<field name="detalle" class="java.util.List"/>
 	<field name="pago" class="java.util.List"/>
 	<field name="impuesto" class="java.util.List"/>
@@ -50,13 +51,6 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="409" y="11" width="119" height="20" uuid="2bea90bb-d7d2-46da-a83b-abc083df7069"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[FACTURA DE VENTA]]></text>
-			</staticText>
 			<rectangle radius="10">
 				<reportElement x="409" y="31" width="117" height="22" uuid="b62ad682-b0ba-4ae3-b81d-f651d2dcce73"/>
 			</rectangle>
@@ -104,6 +98,11 @@
 					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA["TELEFONO(S): "+$P{telefono}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="411" y="11" width="119" height="20" uuid="159c0ccb-48e1-439e-a9ba-e7f102fd7c24"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$P{title}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

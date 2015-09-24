@@ -292,6 +292,14 @@ public class ListadoFacturaMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
+            switch (documento.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion()) {
+                case "1":
+                    parametros.put("title", "FACTURA DE VENTA No");
+                    break;
+                case "6":
+                    parametros.put("title", "REMISION DE VENTA No");
+                    break;
+            }
             CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
             parametros.put("direccion", sedeActual.getDireccion());

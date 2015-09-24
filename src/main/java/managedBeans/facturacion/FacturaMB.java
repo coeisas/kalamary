@@ -1063,6 +1063,14 @@ public class FacturaMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
+            switch (documento.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion()) {
+                case "1":
+                    parametros.put("title", "FACTURA DE VENTA No");
+                    break;
+                case "6":
+                    parametros.put("title", "REMISION DE VENTA No");
+                    break;
+            }
             CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
             parametros.put("direccion", getSedeActual().getDireccion());

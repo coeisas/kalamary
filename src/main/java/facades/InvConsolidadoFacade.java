@@ -20,6 +20,7 @@ import javax.persistence.Query;
  */
 @Stateless
 public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -31,8 +32,8 @@ public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
     public InvConsolidadoFacade() {
         super(InvConsolidado.class);
     }
-    
-    public InvConsolidado buscarByEmpresaAndProducto(CfgEmpresasede sede, CfgProducto producto){
+
+    public InvConsolidado buscarByEmpresaAndProducto(CfgEmpresasede sede, CfgProducto producto) {
         try {
             Query query = em.createQuery("SELECT c FROM InvConsolidado c WHERE c.cfgEmpresasede = ?1 AND c.cfgProducto = ?2");
             query.setParameter(1, sede);
@@ -41,6 +42,24 @@ public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
         } catch (Exception e) {
             return null;
         }
-           
+
+    }
+
+    public List<InvConsolidado> reporteConsolidadoBySede(CfgEmpresasede sede) {
+        try {
+            String sentencia = "SELECT i FROM InvConsolidado i";
+            if (sede != null) {
+                sentencia = sentencia.concat(" WHERE i.cfgEmpresasede = ?1");
+            }
+            sentencia = sentencia.concat(" GROUP BY i.cfgEmpresasede, i.cfgProducto ORDER BY i.cfgEmpresasede, i.cfgProducto");
+//            Query query = em.createQuery("SELECT i FROM InvConsolidado i WHERE i.cfgEmpresasede = ?1 GROUP BY i.cfgEmpresasede, i.cfgProducto ORDER BY i.cfgEmpresasede, i.cfgProducto");
+            Query query = em.createQuery(sentencia);
+            if (sede != null) {
+                query.setParameter(1, sede);
+            }
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
