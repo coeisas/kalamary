@@ -67,9 +67,9 @@ public class ImpuestoMB implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
-        if (sesionMB.getSedeActual() != null) {
-            sedeSeleccionada = sesionMB.getSedeActual();
-            empresaSeleccionada = sedeSeleccionada.getCfgempresaidEmpresa();
+        sedeSeleccionada = sesionMB.getSedeActual();
+        empresaSeleccionada = sesionMB.getEmpresaActual();
+        if (sedeSeleccionada != null) {
             listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
         } else {
             listaImpuestos = new ArrayList();
@@ -175,7 +175,7 @@ public class ImpuestoMB implements Serializable {
         }
         try {
             CfgImpuesto impuesto = new CfgImpuesto();
-            impuesto.setCfgempresasedeidSede(sedeSeleccionada);
+            impuesto.setCfgempresaidEmpresa(empresaSeleccionada);
             impuesto.setFecCrea(new Date());
             impuesto.setCodImpuesto(codigoImpuesto);
             impuesto.setNomImpuesto(nombreImpuesto.trim().toUpperCase());

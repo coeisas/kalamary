@@ -51,27 +51,23 @@ public class CfgImpuesto implements Serializable {
     @Basic(optional = false)
     @Column(name = "idImpuesto", nullable = false)
     private Integer idImpuesto;
+    @Column(name = "codImpuesto", length = 10)
+    private String codImpuesto;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
     @Column(name = "nomImpuesto", nullable = false, length = 50)
     private String nomImpuesto;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "porcentaje", nullable = false)
     private float porcentaje;
     @Basic(optional = false)
-    @NotNull
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
-    @Column(name = "codImpuesto", length = 10)
-    private String codImpuesto;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgImpuesto")
-    private List<FacDocumentoimpuesto> facDocumentoimpuestoList;    
-    @JoinColumn(name = "cfg_empresasede_idSede", referencedColumnName = "idSede", nullable = false)
+    private List<FacDocumentoimpuesto> facDocumentoimpuestoList;
+    @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
-    private CfgEmpresasede cfgempresasedeidSede;
+    private CfgEmpresa cfgempresaidEmpresa;
     @JoinColumn(name = "cfg_tipoempresa_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private CfgTipoempresa cfgTipoempresaId;
@@ -81,14 +77,14 @@ public class CfgImpuesto implements Serializable {
     @Transient
     private float totalImpuesto;//variable empleada principalmente en facturacion para almacenar el valor del impuesto correspondiente a la compra
 
-    public CfgImpuesto() {
+        public CfgImpuesto() {
     }
 
     public CfgImpuesto(Integer idImpuesto) {
         this.idImpuesto = idImpuesto;
     }
 
-    public CfgImpuesto(Integer idImpuesto, String nomImpuesto, float porcentaje, String tipoEmpresa, Date fecCrea) {
+    public CfgImpuesto(Integer idImpuesto, String nomImpuesto, float porcentaje, Date fecCrea) {
         this.idImpuesto = idImpuesto;
         this.nomImpuesto = nomImpuesto;
         this.porcentaje = porcentaje;
@@ -101,6 +97,14 @@ public class CfgImpuesto implements Serializable {
 
     public void setIdImpuesto(Integer idImpuesto) {
         this.idImpuesto = idImpuesto;
+    }
+
+    public String getCodImpuesto() {
+        return codImpuesto;
+    }
+
+    public void setCodImpuesto(String codImpuesto) {
+        this.codImpuesto = codImpuesto;
     }
 
     public String getNomImpuesto() {
@@ -127,14 +131,6 @@ public class CfgImpuesto implements Serializable {
         this.fecCrea = fecCrea;
     }
 
-    public String getCodImpuesto() {
-        return codImpuesto;
-    }
-
-    public void setCodImpuesto(String codImpuesto) {
-        this.codImpuesto = codImpuesto;
-    }
-    
     @XmlTransient
     public List<FacDocumentoimpuesto> getFacDocumentoimpuestoList() {
         return facDocumentoimpuestoList;
@@ -142,14 +138,14 @@ public class CfgImpuesto implements Serializable {
 
     public void setFacDocumentoimpuestoList(List<FacDocumentoimpuesto> facDocumentoimpuestoList) {
         this.facDocumentoimpuestoList = facDocumentoimpuestoList;
-    }  
-    
-    public CfgEmpresasede getCfgempresasedeidSede() {
-        return cfgempresasedeidSede;
     }
 
-    public void setCfgempresasedeidSede(CfgEmpresasede cfgempresasedeidSede) {
-        this.cfgempresasedeidSede = cfgempresasedeidSede;
+    public CfgEmpresa getCfgempresaidEmpresa() {
+        return cfgempresaidEmpresa;
+    }
+
+    public void setCfgempresaidEmpresa(CfgEmpresa cfgempresaidEmpresa) {
+        this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
 
     public CfgTipoempresa getCfgTipoempresaId() {

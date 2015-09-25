@@ -95,6 +95,8 @@ public class CfgEmpresa implements Serializable {
     @OneToMany(mappedBy = "cfgempresaidEmpresa")
     private List<SegUsuario> segUsuarioList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
+    private List<CfgImpuesto> cfgImpuestoList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
     private List<CfgFormapago> cfgFormapagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgempresaidEmpresa")
     private List<CfgKitproductomaestro> cfgKitproductomaestroList;
@@ -276,6 +278,15 @@ public class CfgEmpresa implements Serializable {
 
     public void setSegUsuarioList(List<SegUsuario> segUsuarioList) {
         this.segUsuarioList = segUsuarioList;
+    }
+
+    @XmlTransient
+    public List<CfgImpuesto> getCfgImpuestoList() {
+        return cfgImpuestoList;
+    }
+
+    public void setCfgImpuestoList(List<CfgImpuesto> cfgImpuestoList) {
+        this.cfgImpuestoList = cfgImpuestoList;
     }
 
     @XmlTransient
