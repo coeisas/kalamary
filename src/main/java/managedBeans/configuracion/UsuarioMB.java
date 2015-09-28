@@ -140,6 +140,7 @@ public class UsuarioMB implements Serializable {
         setSegundoApellido(null);
         setContrasenia(null);
         setContraseniaR(null);
+        setUsuarioActivo(true);
         setFechaNacimiento(null);
         setComision(0);
         setIdCaja(0);
@@ -317,9 +318,6 @@ public class UsuarioMB implements Serializable {
     }
 
     private void crearUsuario() {
-        if (!validarCamposFormulario()) {
-            return;
-        }
         //        solo los usuarios super y admin pueden crear y modificar
         if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
@@ -328,6 +326,22 @@ public class UsuarioMB implements Serializable {
         //solo el super y el admin pueden crear usuarios
         if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
+            return;
+        }
+        if (!validarCamposFormulario()) {
+            return;
+        }
+        if (contrasenia.trim().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta la contraseña"));
+            return;
+        }
+        if (contraseniaR.trim().isEmpty()) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Repita la contraseña"));
+            return;
+        }
+        validarContrasenia();
+        if (!contraseniaValidada) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Las contraseñas no coinciden"));
             return;
         }
         try {
@@ -373,6 +387,16 @@ public class UsuarioMB implements Serializable {
     }
 
     private void modificarUsuario() {
+        //solo el super y el admin pueden modificar usuarios sin restriccion
+        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
+//            if (!usuarioActual.equals(usuarioSeleccionado)) {//los otros usuarios unicamente puede modificar su perfil
+//                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No pude modificar este usuario"));
+//                return;
+//            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para crear o modificar usuarios"));
+            return;
+
+        }
         if (!validarCamposFormulario()) {
             return;
         }
@@ -381,10 +405,16 @@ public class UsuarioMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay usuario"));
             return;
         }
-        //solo el super y el admin pueden modificar usuarios sin restriccion
-        if (!usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") && !usuarioActual.getCfgRolIdrol().getCodrol().equals("00002")) {
-            if (!usuarioActual.equals(usuarioSeleccionado)) {//los otros usuarios unicamente puede modificar su perfil
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No pude modificar este usuario"));
+        //si la contraseña no esta vacia significa que se va a cambiar.
+        if (!contrasenia.trim().isEmpty()) {
+            //se debe repetir la nueva contraseña
+            if (contraseniaR.trim().isEmpty()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Repita la contraseña"));
+                return;
+            }
+            validarContrasenia();
+            if (!contraseniaValidada) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Las contraseñas no coinciden"));
                 return;
             }
         }
@@ -412,7 +442,9 @@ public class UsuarioMB implements Serializable {
             usuarioSeleccionado.setNom2Usuario(segundoNombre.trim().toUpperCase());
             usuarioSeleccionado.setNumDoc(numIdentificacion.trim());
             usuarioSeleccionado.setFecNacimiento(fechaNacimiento);
-            usuarioSeleccionado.setPassword(contrasenia.trim());
+            if (!contrasenia.isEmpty()) {
+                usuarioSeleccionado.setPassword(contrasenia.trim());
+            }
             usuarioSeleccionado.setTel1(telefono.trim());
             usuarioSeleccionado.setUsuario(usuario.trim().toLowerCase());
             usuarioFacade.edit(usuarioSeleccionado);
@@ -487,19 +519,19 @@ public class UsuarioMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Usuario no validado"));
             return false;
         }
-        if (contrasenia.trim().isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta la contraseña"));
-            return false;
-        }
-        if (contraseniaR.trim().isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Repita la contraseña"));
-            return false;
-        }
-        validarContrasenia();
-        if (!contraseniaValidada) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Las contraseñas no coinciden"));
-            return false;
-        }
+//        if (contrasenia.trim().isEmpty()) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Falta la contraseña"));
+//            return false;
+//        }
+//        if (contraseniaR.trim().isEmpty()) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Repita la contraseña"));
+//            return false;
+//        }
+//        validarContrasenia();
+//        if (!contraseniaValidada) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Las contraseñas no coinciden"));
+//            return false;
+//        }
         return true;
     }
 

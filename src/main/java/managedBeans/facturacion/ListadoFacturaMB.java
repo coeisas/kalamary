@@ -292,15 +292,17 @@ public class ListadoFacturaMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
+            CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
             switch (documento.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion()) {
                 case "1":
-                    parametros.put("title", "FACTURA DE VENTA No");
+                    parametros.put("title", "VENTA No");
+                    parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
+                    parametros.put("resdian", documento.getCfgDocumento().getResDian());
                     break;
                 case "6":
-                    parametros.put("title", "REMISION DE VENTA No");
+                    parametros.put("title", "VENTA No");
                     break;
             }
-            CfgEmpresa empresa = sedeActual.getCfgempresaidEmpresa();
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + sedeActual.getNomSede());
             parametros.put("direccion", sedeActual.getDireccion());
             String telefono = sedeActual.getTel1();
@@ -308,7 +310,6 @@ public class ListadoFacturaMB implements Serializable {
                 telefono = telefono + "-".concat(sedeActual.getTel2());
             }
             parametros.put("telefono", telefono);
-            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + sedeActual.getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
             if (tipoImpresion != 2) { //no es impresion carta
                 parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
@@ -328,7 +329,6 @@ public class ListadoFacturaMB implements Serializable {
             } else {
                 parametros.put("caja", null);
             }
-            parametros.put("resdian", documento.getCfgDocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();

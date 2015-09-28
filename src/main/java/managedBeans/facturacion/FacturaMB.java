@@ -248,9 +248,7 @@ public class FacturaMB implements Serializable {
             listaProducto = new LazyProductosModel(empresaActual, null, null, null, productoFacade);
             RequestContext.getCurrentInstance().update("FormModalProducto");
             clienteSeleccionado = clienteFacade.buscarClienteDefault(empresaActual);
-            if (clienteSeleccionado != null) {
-                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
-            }
+            setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
             listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
             cargarInformacionCliente();
             listaTipoFactura = new ArrayList();
@@ -261,6 +259,8 @@ public class FacturaMB implements Serializable {
 //            aux = new SelectItem(3, "SEPARADO");
 //            listaTipoFactura.add(aux);
             tipoFactura = 1;
+        } else {
+            listaImpuestos = new ArrayList();
         }
         if (usuarioActual != null) {
             cajaUsuario = usuarioActual.getFaccajaidCaja();
@@ -407,10 +407,8 @@ public class FacturaMB implements Serializable {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
             setIdentificacionCliente(clienteSeleccionado.getNumDoc());
-            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
         } else {
             setNombreCliente(null);
-            listaImpuestos.clear();
         }
         listaDetalle.clear();
         listaFormapagos = formapagoFacade.buscarPorEmpresa(empresaActual);
@@ -1063,15 +1061,17 @@ public class FacturaMB implements Serializable {
                 InputStream logo = new ByteArrayInputStream(bites);
                 parametros.put("logo", logo);
             }
+            CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
             switch (documento.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion()) {
                 case "1":
-                    parametros.put("title", "FACTURA DE VENTA No");
+                    parametros.put("title", "VENTA No");
+                    parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + getSedeActual().getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
+                    parametros.put("resdian", documento.getCfgDocumento().getResDian());
                     break;
                 case "6":
-                    parametros.put("title", "REMISION DE VENTA No");
+                    parametros.put("title", "VENTA No");
                     break;
             }
-            CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
             parametros.put("direccion", getSedeActual().getDireccion());
             String telefono = getSedeActual().getTel1();
@@ -1079,7 +1079,6 @@ public class FacturaMB implements Serializable {
                 telefono = telefono + "-".concat(getSedeActual().getTel2());
             }
             parametros.put("telefono", telefono);
-            parametros.put("nit", empresa.getCfgTipodocempresaId().getDocumentoempresa() + " " + getSedeActual().getNumDocumento() + " " + empresa.getCfgTipoempresaId().getDescripcion());
             parametros.put("cliente", documento.getCfgclienteidCliente().nombreCompleto());
             if (tipoImpresion != 2) { //no es impresion carta
                 parametros.put("identificacionCliente", documento.getCfgclienteidCliente().getCfgTipoidentificacionId().getAbreviatura() + " " + documento.getCfgclienteidCliente().getNumDoc());
@@ -1095,7 +1094,6 @@ public class FacturaMB implements Serializable {
             parametros.put("observacion", documento.getObservaciones());
             parametros.put("caja", documento.getFaccajaidCaja().getNomCaja());
             parametros.put("vendedor", documento.getSegusuarioidUsuario1().nombreCompleto());
-            parametros.put("resdian", documento.getCfgDocumento().getResDian());
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
             FacesContext.getCurrentInstance().responseComplete();
@@ -1143,7 +1141,7 @@ public class FacturaMB implements Serializable {
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
-        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
+//        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
         listaFormapagos = formapagoFacade.buscarPorEmpresa(getSedeActual().getCfgempresaidEmpresa());
         cargarInformacionCliente();
         setSubtotal(0);

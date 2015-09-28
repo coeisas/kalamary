@@ -57,11 +57,12 @@
             <div>
                 <p:commandButton  style="margin-top: .5em;" icon="ui-icon-circle-zoomin" value="Insertar Producto" title="Insertar Items" actionListener="#{facturaMB.cargarModalProductos}"/>
             </div>
+            <br/>
             <p:dataTable
                 id="IdTableItemFactura"
                 value="#{facturaMB.listaDetalle}"
                 var="itemFactura"
-                style="width: 70%;margin-top: .5em;margin: 0 auto"
+                style="width: 85%;margin-top: .5em;margin: 0 auto"
                 rows="15"
                 rowKey="#{itemFactura.facDocumentodetallePK}"
                 editable="true" editMode="cell"
@@ -70,6 +71,9 @@
                 <f:facet name="header">Items Factura</f:facet>
                 <p:column headerText="Producto" width="45%">
                     #{itemFactura.cfgProducto.nomProducto}
+                </p:column>
+                <p:column headerText="Inventario">
+                    #{itemFactura.cfgProducto.unidadesDisponibles(facturaMB.sedeActual)}
                 </p:column>
                 <p:column headerText="Cantidad">
                     <p:cellEditor>
@@ -104,7 +108,7 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:panel id="IdSubTotal" style="width: 70%;margin: 0 auto;padding: 0;border: none">
+            <p:panel id="IdSubTotal" style="width: 85%;margin: 0 auto;padding: 0;border: none">
                 <div class="divContent">
                     <p:panelGrid columns="2">
                         <p:outputLabel class="label" value="SUBTOTAL:"/>
@@ -292,9 +296,9 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%">
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%" resizable="false">
             <h:form id="FormModalVendedor">
-                <p:dataTable value="#{facturaMB.listaVendedor}" var="vendedor" selection="#{facturaMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single">
+                <p:dataTable value="#{facturaMB.listaVendedor}" var="vendedor" selection="#{facturaMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single" emptyMessage="No hay vendedores registrados">
                     <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
                     <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
                 </p:dataTable>

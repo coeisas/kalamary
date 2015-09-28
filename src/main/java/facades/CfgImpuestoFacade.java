@@ -5,6 +5,7 @@
  */
 package facades;
 
+import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
 import entities.CfgTipoempresa;
@@ -33,22 +34,11 @@ public class CfgImpuestoFacade extends AbstractFacade<CfgImpuesto> {
     public CfgImpuestoFacade() {
         super(CfgImpuesto.class);
     }
-
-    public List<CfgImpuesto> buscarImpuestoPorSede(CfgEmpresasede sede) {
+   
+    public CfgImpuesto buscarImpuestoPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
         try {
-            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgempresasedeidSede = ?1");
-            query.setParameter(1, sede);
-            return query.getResultList();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    
-    public CfgImpuesto buscarImpuestoPorSedeAndCodigo(CfgEmpresasede sede, String codigo) {
-        try {
-            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgempresasedeidSede = ?1 AND i.codImpuesto = ?2");
-            query.setParameter(1, sede);
+            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgempresaidEmpresa = ?1 AND i.codImpuesto = ?2");
+            query.setParameter(1, empresa);
             query.setParameter(2, codigo);
             return (CfgImpuesto) query.getSingleResult();
         } catch (Exception e) {
@@ -56,11 +46,11 @@ public class CfgImpuestoFacade extends AbstractFacade<CfgImpuesto> {
         }
     }
     
-    public List<CfgImpuesto> buscarImpuestosPorTipoEmpresaAndSede(CfgTipoempresa tipoempresa, CfgEmpresasede sede){
+    public List<CfgImpuesto> buscarImpuestosPorEmpresa(CfgEmpresa empresa){
         try {
-            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgTipoempresaId = ?1 AND i.cfgempresasedeidSede = ?2");
-            query.setParameter(1, tipoempresa);
-            query.setParameter(2, sede);
+            Query query = em.createQuery("SELECT i FROM CfgImpuesto i WHERE i.cfgTipoempresaId = ?1 AND i.cfgempresaidEmpresa = ?2");
+            query.setParameter(1, empresa.getCfgTipoempresaId());
+            query.setParameter(2, empresa);
             return query.getResultList();
         } catch (Exception e) {
             return new ArrayList();

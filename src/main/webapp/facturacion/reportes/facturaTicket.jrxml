@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="226" pageHeight="283" columnWidth="216" leftMargin="5" rightMargin="5" topMargin="5" bottomMargin="5" isIgnorePagination="true" uuid="bf4ab7fb-d89f-4a65-8e8a-9b38e5909131">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="144"/>
+	<property name="ireport.y" value="237"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String">
 		<defaultValueExpression><![CDATA["/home/mario/NetBeansProjects/kalamary/src/main/webapp/facturacion/reportes/"]]></defaultValueExpression>
 	</parameter>
@@ -40,7 +40,7 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$P{empresa}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="8" width="198" height="8" uuid="b398a1e7-18f9-4647-9288-9958c170ae1b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
@@ -59,7 +59,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
-				<textFieldExpression><![CDATA["TELFONO(S): " + $P{telefono}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["TELEFONO(S): " + $P{telefono}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="-1" y="32" width="196" height="8" uuid="664e508e-6e7b-4eb0-acfd-6a65ea29bb43"/>
@@ -244,17 +244,17 @@
 				<textFieldExpression><![CDATA[$P{observacion}]]></textFieldExpression>
 			</textField>
 		</band>
-		<band height="18">
+		<band height="23">
 			<staticText>
-				<reportElement x="-1" y="10" width="198" height="8" uuid="11f61548-ceaf-4b0f-9740-c38465b623b7"/>
+				<reportElement x="-2" y="15" width="198" height="8" uuid="11f61548-ceaf-4b0f-9740-c38465b623b7"/>
 				<textElement textAlignment="Center">
 					<font size="6"/>
 				</textElement>
 				<text><![CDATA[!! GRACIAS POR SU COMPRA !!]]></text>
 			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="0" width="198" height="8" uuid="dc8a28e7-7129-41f2-b647-5206495d852e"/>
-				<textElement textAlignment="Center">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="198" height="15" uuid="dc8a28e7-7129-41f2-b647-5206495d852e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="6"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{resdian}]]></textFieldExpression>

@@ -216,10 +216,11 @@ public class CotizacionMB implements Serializable {
             listaProducto = new LazyProductosModel(empresaActual, null, null, null, productoFacade);
             RequestContext.getCurrentInstance().update("FormModalProducto");
             clienteSeleccionado = clienteFacade.buscarClienteDefault(empresaActual);
-            if (clienteSeleccionado != null) {
-                setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
-            }
+            setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
+            setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
             cargarInformacionCliente();
+        } else {
+            listaImpuestos = new ArrayList();
         }
         if (usuarioActual != null) {
             if (usuarioActual.getCfgRolIdrol() != null) {
@@ -286,10 +287,8 @@ public class CotizacionMB implements Serializable {
         if (clienteSeleccionado != null) {
             setNombreCliente(clienteSeleccionado.nombreCompleto());
             setIdentificacionCliente(clienteSeleccionado.getNumDoc());
-            setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
         } else {
             setNombreCliente(null);
-            listaImpuestos.clear();
         }
         listaDetalle.clear();
         setSubtotal(0);
@@ -473,6 +472,10 @@ public class CotizacionMB implements Serializable {
 
     private boolean validarCampos(CfgDocumento documento) {
         boolean ban = true;
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion del usuario"));
+            return false;
+        }
         if (clienteSeleccionado == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay cliente seleccionado"));
             return false;
@@ -520,7 +523,7 @@ public class CotizacionMB implements Serializable {
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSubtotal(subtotal);
             documentosmaster.setTotal(totalFactura);
-            documentosmaster.setSegusuarioidUsuario(vendedorSeleccionado);//vendedor            
+            documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setSegusuarioidUsuario1(vendedorSeleccionado);//vendedor
             documentosmaster.setTotalUSD(totalUSD);
             documentosmaster.setObservaciones(observacion);
@@ -675,7 +678,7 @@ public class CotizacionMB implements Serializable {
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
-        setListaImpuestos(impuestoFacade.buscarImpuestosPorTipoEmpresaAndSede(clienteSeleccionado.getCfgTipoempresaId(), getSedeActual()));
+//        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
@@ -775,7 +778,7 @@ public class CotizacionMB implements Serializable {
 
     public void accion() {
         if (clienteSeleccionadoModal != null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No es posible modificar al cliente."));
+            modificarCliente();
         } else {
             crearCliente();
         }
@@ -784,6 +787,10 @@ public class CotizacionMB implements Serializable {
     private boolean validarCamposFormulario() {
         if (getSedeActual() == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
+            return false;
+        }
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene informacion del usuario"));
             return false;
         }
         if (idIdentificacion == 0) {
@@ -856,6 +863,45 @@ public class CotizacionMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Cliente creado"));
         } catch (NumberFormatException | ELException e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no creado"));
+        }
+    }
+
+    private void modificarCliente() {
+        if (!validarCamposFormulario()) {
+            return;
+        }
+        try {
+            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
+            clienteSeleccionadoModal.setApellido1(primerApellido.trim().toUpperCase());
+            clienteSeleccionadoModal.setApellido2(segundoApellido.trim().toUpperCase());
+            clienteSeleccionadoModal.setCfgMunicipio(municipio);
+            clienteSeleccionadoModal.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
+            clienteSeleccionadoModal.setCfgTipoempresaId(tipocliente);
+            clienteSeleccionadoModal.setCfgempresaidEmpresa(empresaActual);
+            clienteSeleccionadoModal.setDirCliente(direccion.trim().toUpperCase());
+            if (file != null) {
+                clienteSeleccionadoModal.setFoto(file.getContents());
+            }
+            clienteSeleccionadoModal.setMail(mail.trim().toUpperCase());
+            clienteSeleccionadoModal.setNom1Cliente(primerNombre.trim().toUpperCase());
+            clienteSeleccionadoModal.setNom2Cliente(segundoNombre.trim().toUpperCase());
+            clienteSeleccionadoModal.setCupoCredito(cupoCredito);
+            clienteSeleccionadoModal.setTarjetaMembresia(tarjetaMembresia);
+            clienteSeleccionadoModal.setNumDoc(numIdentificacion.trim());
+            clienteSeleccionadoModal.setFecNacimiento(fechaNacimiento);
+            clienteSeleccionadoModal.setTel1(telefono.trim());
+            clienteFacade.edit(clienteSeleccionadoModal);
+            limpiarFormularioModal();
+            setNumIdentificacion(null);
+            listaMunicipios.clear();
+            setClienteSeleccionadoModal(null);
+            RequestContext.getCurrentInstance().update("FormBuscarCliente");
+            RequestContext.getCurrentInstance().execute("PF('dlgCrearCliente').hide()");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Cliente modificado"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no modificado"));
         }
     }
 

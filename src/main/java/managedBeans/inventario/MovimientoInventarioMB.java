@@ -202,9 +202,17 @@ public class MovimientoInventarioMB implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " es un servicio"));
                 return;
             }
+            if (productoSeleccionado.getEsKit()) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " es un kit"));
+                return;
+            }            
             //variable tenida en cuanta cuando el movimiento corresponde a una salida
             int unidadesDisponibles = 0;
             CfgMovInventarioMaestro inventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
+            if (inventarioMaestro == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Especifique el tipo de movimiento a realizar"));
+                return;
+            }
             if (inventarioMaestro.getCodMovInvetario().equals("2")) {//si se esta realizando una salida del inventario se tiene encuenta unidades disponibles
                 InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {
@@ -220,25 +228,25 @@ public class MovimientoInventarioMB implements Serializable {
                 detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(0, 0, productoSeleccionado.getIdProducto()));
                 detalle.setCfgProducto(productoSeleccionado);
                 //cuando se realiza una salida(2). Se carga la informacion actual del producto.De lo contrario sera nueva
-                if (inventarioMaestro.getCodMovInvetario().equals("2")) {
-                    detalle.setCantidad(1);
-                    if (unidadesDisponibles < detalle.getCantidad()) {
-                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " La cantidad sobrepasa las unidades disponibles"));
-                        return;
-                    }
-                    detalle.setCostoAdquisicion(productoSeleccionado.getCostoAdquisicion());
-                    detalle.setFlete(productoSeleccionado.getFlete());
-                    detalle.setIva(productoSeleccionado.getIva());
-                    detalle.setCostoIndirecto(productoSeleccionado.getCostoIndirecto());
-                } else {
-                    detalle.setCantidad(1);
-                    detalle.setCostoAdquisicion(0);
-                    detalle.setDescuento(0);
-                    detalle.setFlete(0);
-//                detalle.setIva(0);
-                    detalle.setIva(16);
-                    detalle.setCostoIndirecto(0);
+////                if (inventarioMaestro.getCodMovInvetario().equals("2")) {
+                detalle.setCantidad(1);
+                if (unidadesDisponibles < detalle.getCantidad() && inventarioMaestro.getCodMovInvetario().equals("2")) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " La cantidad sobrepasa las unidades disponibles"));
+                    return;
                 }
+                detalle.setCostoAdquisicion(productoSeleccionado.getCostoAdquisicion());
+                detalle.setFlete(productoSeleccionado.getFlete());
+                detalle.setIva(productoSeleccionado.getIva());
+                detalle.setCostoIndirecto(productoSeleccionado.getCostoIndirecto());
+//                } else {
+//                    detalle.setCantidad(1);
+//                    detalle.setCostoAdquisicion(0);
+//                    detalle.setDescuento(0);
+//                    detalle.setFlete(0);
+////                detalle.setIva(0);
+//                    detalle.setIva(16);
+//                    detalle.setCostoIndirecto(0);
+//                }
                 detalle.setInvMovimiento(null);//se crea cuando se guarde
                 listaItemsInventarioMovimiento.add(detalle);
             } else {

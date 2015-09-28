@@ -69,8 +69,9 @@ public class ImpuestoMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeSeleccionada = sesionMB.getSedeActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
-        if (sedeSeleccionada != null) {
-            listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
+        if (empresaSeleccionada != null) {
+            listaImpuestos = impuestoFacade.buscarImpuestosPorEmpresa(empresaSeleccionada);
+            tipoEmpresa = empresaSeleccionada.getCfgTipoempresaId().getId();
         } else {
             listaImpuestos = new ArrayList();
         }
@@ -88,9 +89,9 @@ public class ImpuestoMB implements Serializable {
 
     public void buscarImpuesto() {
         impuestoSeleccionado = null;
-        if (sedeSeleccionada != null) {
+        if (empresaSeleccionada != null) {
             if (!codigoImpuesto.trim().isEmpty()) {
-                impuestoSeleccionado = impuestoFacade.buscarImpuestoPorSedeAndCodigo(sedeSeleccionada, codigoImpuesto);
+                impuestoSeleccionado = impuestoFacade.buscarImpuestoPorEmpresaAndCodigo(empresaSeleccionada, codigoImpuesto);
                 if (impuestoSeleccionado != null) {
                     cargarInformacionImpuesto();
                 }
@@ -115,7 +116,7 @@ public class ImpuestoMB implements Serializable {
         setNombreImpuesto(null);
         setPorcentajeImpuesto(0);
         setTipoEmpresa(0);
-        listaImpuestos = impuestoFacade.buscarImpuestoPorSede(sedeSeleccionada);
+        listaImpuestos = impuestoFacade.buscarImpuestosPorEmpresa(empresaSeleccionada);
     }
 
     public void accion() {
@@ -131,10 +132,6 @@ public class ImpuestoMB implements Serializable {
         boolean ban = true;
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Empresa no seleccionada"));
-            return false;
-        }
-        if (sedeSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Sede no seleccionada"));
             return false;
         }
         //        solo los usuarios super y admin pueden creary  modificar
@@ -197,7 +194,7 @@ public class ImpuestoMB implements Serializable {
         if (!validacion()) {
             return;
         }
-        if (impuestoSeleccionado != null) {
+        if (impuestoSeleccionado == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Impuesto no seleccionado"));
             return;
         }

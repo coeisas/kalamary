@@ -156,7 +156,7 @@ public class ClienteMB implements Serializable {
     }
 
     private void limpiarFormulario() {
-        setIdIdentificacion(0);    
+        setIdIdentificacion(0);
         setPrimerNombre(null);
         setIdDepartamento(null);
         setIdTipoCliente(0);
@@ -296,6 +296,10 @@ public class ClienteMB implements Serializable {
     private boolean validarCamposFormulario() {
         if (empresaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la empresa"));
+            return false;
+        }
+        if (usuarioActual == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Informacion de usuario no encontrada"));
             return false;
         }
 //        if (codigoCliente.isEmpty()) {
