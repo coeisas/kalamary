@@ -5,6 +5,7 @@
  */
 package entities;
 
+import com.google.common.base.Strings;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +21,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -65,7 +67,7 @@ public class InvMovimiento implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fecha;
     @Column(name = "documentoSoporte", length = 15)
-    private String documentoSoporte;    
+    private String documentoSoporte;
     @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgDocumento cfgDocumento;
@@ -89,6 +91,8 @@ public class InvMovimiento implements Serializable {
     @JoinColumn(name = "seg_usuario_idUsuario", referencedColumnName = "idUsuario")
     @ManyToOne
     private SegUsuario segusuarioidUsuario;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "invMovimiento")
+    private InvMovimientoInfoadicional invMovimientoInfoadicional;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "invMovimiento")
     private List<InvMovimientoDetalle> invMovimientoDetalleList;
 
@@ -163,7 +167,7 @@ public class InvMovimiento implements Serializable {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
-    
+
     public String getDocumentoSoporte() {
         return documentoSoporte;
     }
@@ -171,7 +175,7 @@ public class InvMovimiento implements Serializable {
     public void setDocumentoSoporte(String documentoSoporte) {
         this.documentoSoporte = documentoSoporte;
     }
-    
+
     public CfgDocumento getCfgDocumento() {
         return cfgDocumento;
     }
@@ -228,6 +232,14 @@ public class InvMovimiento implements Serializable {
         this.segusuarioidUsuario = segusuarioidUsuario;
     }
 
+    public InvMovimientoInfoadicional getInvMovimientoInfoadicional() {
+        return invMovimientoInfoadicional;
+    }
+
+    public void setInvMovimientoInfoadicional(InvMovimientoInfoadicional invMovimientoInfoadicional) {
+        this.invMovimientoInfoadicional = invMovimientoInfoadicional;
+    }
+
     @XmlTransient
     public List<InvMovimientoDetalle> getInvMovimientoDetalleList() {
         return invMovimientoDetalleList;
@@ -235,6 +247,13 @@ public class InvMovimiento implements Serializable {
 
     public void setInvMovimientoDetalleList(List<InvMovimientoDetalle> invMovimientoDetalleList) {
         this.invMovimientoDetalleList = invMovimientoDetalleList;
+    }
+
+    public String determinarNumConcecutivo() {
+        int fin = cfgDocumento.getFinDocumento();
+        String aux = String.valueOf(fin);
+        String numDocumento = String.valueOf(getInvMovimientoPK().getNumDoc());
+        return cfgDocumento.getPrefijoDoc().concat(Strings.padStart(numDocumento, aux.length(), '0'));
     }
 
     @Override

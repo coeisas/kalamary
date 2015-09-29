@@ -18,6 +18,8 @@ import entities.InvConsolidadoPK;
 import entities.InvMovimiento;
 import entities.InvMovimientoDetalle;
 import entities.InvMovimientoDetallePK;
+import entities.InvMovimientoInfoadicional;
+import entities.InvMovimientoInfoadicionalPK;
 import entities.InvMovimientoPK;
 import entities.SegUsuario;
 import facades.CfgDocumentoFacade;
@@ -29,6 +31,8 @@ import facades.CfgformaPagoproveedorFacade;
 import facades.InvConsolidadoFacade;
 import facades.InvMovimientoDetalleFacade;
 import facades.InvMovimientoFacade;
+import facades.InvMovimientoInfoadicionalFacade;
+import java.io.IOException;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
@@ -43,11 +47,28 @@ import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.event.ActionEvent;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import managedBeans.facturacion.FacturaMB;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.model.LazyDataModel;
 import utilities.LazyProductosModel;
 import utilities.LazyProveedorDataModel;
+import utilities.RemisionReporte;
+import java.util.HashMap;
+import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import utilities.RemisionDetalleReporte;
 
 /**
  *
@@ -68,6 +89,17 @@ public class MovimientoInventarioMB implements Serializable {
     private float totalDescuento;
     private float totalIva;
     private float totalMovimiento;
+
+    private String ciudad;
+    private String direccion;
+    private String transportadora;
+    private String conductor;
+    private String placa;
+    private String peso;
+
+    private String concecutivo;//concecutivo del movimiento generado
+    private boolean displayInfoAdicional;
+    private InvMovimiento movimientoInventarioActual;
 
     private List<CfgMovInventarioMaestro> listaMovInventarioMaestro;
     private List<CfgMovInventarioDetalle> listaMovInventarioDetalle;
@@ -101,6 +133,8 @@ public class MovimientoInventarioMB implements Serializable {
     @EJB
     InvMovimientoDetalleFacade inventarioMovimientoDetalleFacade;
     @EJB
+    InvMovimientoInfoadicionalFacade inventarioMovimientoInfoadicionalFacade;
+    @EJB
     InvConsolidadoFacade consolidadoFacade;
 
     public MovimientoInventarioMB() {
@@ -115,6 +149,7 @@ public class MovimientoInventarioMB implements Serializable {
         sedeActual = sesionMB.getSedeActual();
         listaItemsInventarioMovimiento = new ArrayList();
         listaMovInventarioMaestro = new ArrayList();
+        displayInfoAdicional = false;
         if (empresaActual != null) {
             listaMovInventarioMaestro = movInventarioMaestroFacade.findAll();
             listaFormaPago = pagoproveedorFacade.buscarFormasPagoByEmpresa(empresaActual);
@@ -129,6 +164,19 @@ public class MovimientoInventarioMB implements Serializable {
             listaMovInventarioDetalle = new ArrayList();
         }
         RequestContext.getCurrentInstance().update("IdFormMovimientoInventario:IdListDetalleMovimiento");
+    }
+
+    public void cargarInformacionAdicional() {
+        displayInfoAdicional = false;
+        if (idMovInventarioMaestro != 0 && idMovInventarioDetalle != 0) {
+            CfgMovInventarioMaestro maestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
+            CfgMovInventarioDetalle detalle = movInventarioDetalleFacade.find(idMovInventarioDetalle);
+            //si el movimiento es una salida y corresponde a un translado de bodega. se habilitar la informacion adicional
+            if (maestro.getCodMovInvetario().equals("2") && detalle.getCodMovInvetarioDetalle().equals("3")) {
+                displayInfoAdicional = true;
+            }
+        }
+        RequestContext.getCurrentInstance().update("IdFormMovimientoInventario");
     }
 
     public void cargarProveedores() {
@@ -179,6 +227,13 @@ public class MovimientoInventarioMB implements Serializable {
         totalIva = 0;
         totalMovimiento = 0;
         documentoSoporte = null;
+        ciudad = null;
+        direccion = null;
+        transportadora = null;
+        conductor = null;
+        placa = null;
+        peso = null;
+        observacion = null;
     }
 
     public void cargarModalProductos() {
@@ -205,7 +260,7 @@ public class MovimientoInventarioMB implements Serializable {
             if (productoSeleccionado.getEsKit()) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " es un kit"));
                 return;
-            }            
+            }
             //variable tenida en cuanta cuando el movimiento corresponde a una salida
             int unidadesDisponibles = 0;
             CfgMovInventarioMaestro inventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
@@ -485,16 +540,34 @@ public class MovimientoInventarioMB implements Serializable {
             documentoFacade.edit(documento);
 
 //            CREACION DEL DETALLE MOVIMIENTO
+            List<InvMovimientoDetalle> aux = new ArrayList();
             for (InvMovimientoDetalle detalleMovimiento : listaItemsInventarioMovimiento) {
                 detalleMovimiento.setInvMovimientoDetallePK(new InvMovimientoDetallePK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc(), detalleMovimiento.getCfgProducto().getIdProducto()));
                 detalleMovimiento.setInvMovimiento(invMovimientoMaestro);
                 actualizarTablaProducto(detalleMovimiento);//actualiza la informacion del producto precio
                 inventarioMovimientoDetalleFacade.create(detalleMovimiento);
+                aux.add(detalleMovimiento);
             }
 
+//            CREACION DE LA INFORMACION ADICIONAL DEL MOVIMIENTO. APLICA A SALIDA DE INVETARIO - TRASLADO ENTRE BODEGAS
+            if (displayInfoAdicional) {
+                InvMovimientoInfoadicional infoadicional = new InvMovimientoInfoadicional();
+                infoadicional.setInvMovimiento(invMovimientoMaestro);
+                infoadicional.setInvMovimientoInfoadicionalPK(new InvMovimientoInfoadicionalPK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc()));
+                infoadicional.setInvMovimiento(invMovimientoMaestro);
+                infoadicional.setCiudad(ciudad.toUpperCase());
+                infoadicional.setDireccion(direccion.toUpperCase());
+                infoadicional.setTransportadora(transportadora.toUpperCase());
+                infoadicional.setConductor(conductor.toUpperCase());
+                infoadicional.setPlaca(placa.toUpperCase());
+                infoadicional.setPesoTotal(peso.toUpperCase());
+                inventarioMovimientoInfoadicionalFacade.create(infoadicional);
+                invMovimientoMaestro.setInvMovimientoInfoadicional(infoadicional);
+            }
 //            SE INCLUYE EL DETALLE DEL MOVIMIENTO AL MAESTRO
-            invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
+            invMovimientoMaestro.setInvMovimientoDetalleList(aux);
             inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
+            movimientoInventarioActual = invMovimientoMaestro;
             cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Movimiento guardado"));
         } catch (Exception e) {
@@ -578,9 +651,98 @@ public class MovimientoInventarioMB implements Serializable {
         }
     }
 
+    public void impresion() {
+        if (movimientoInventarioActual != null) {
+            concecutivo = movimientoInventarioActual.determinarNumConcecutivo();
+            RequestContext.getCurrentInstance().update("IdFormConfirmacion");
+            RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un movimiento reciente"));
+        }
+    }
+
+    public void generarPDF() {
+        if (movimientoInventarioActual != null) {
+            ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+            String ruta = servletContext.getRealPath("/inventario/reportes/remisionInventario.jasper");
+            try {
+                generarRemision(ruta);
+            } catch (IOException ex) {
+                Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (JRException ex) {
+                Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+
+    private void generarRemision(String ruta) throws IOException, JRException {
+        byte[] bites = getSedeActual().getLogo();
+        if (bites != null) {
+            bites = getSedeActual().getCfgempresaidEmpresa().getLogo();
+        }
+        List<RemisionReporte> lista = new ArrayList();
+        RemisionReporte remision = new RemisionReporte();
+        remision.setFecha(movimientoInventarioActual.getFecha());
+        remision.setConsecutivo(movimientoInventarioActual.determinarNumConcecutivo());
+        InvMovimientoInfoadicional infoadicional = movimientoInventarioActual.getInvMovimientoInfoadicional();
+        if (infoadicional != null) {
+            remision.setCiudad(infoadicional.getCiudad());
+            remision.setDireccion(infoadicional.getDireccion());
+            remision.setTransportadora(infoadicional.getTransportadora());
+            remision.setConductor(infoadicional.getConductor());
+            remision.setPlaca(infoadicional.getPlaca());
+            remision.setPeso(infoadicional.getPesoTotal());
+            remision.setDespachador(movimientoInventarioActual.getSegusuarioidUsuario().nombreCompleto());
+        }
+        remision.setObservacion(movimientoInventarioActual.getObservacion());
+        remision.setDetalle(construirDetalle(movimientoInventarioActual.getInvMovimientoDetalleList()));
+        lista.add(remision);
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(lista);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse httpServletResponse = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
+            httpServletResponse.setContentType("application/pdf");
+            ServletContext servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+            String rutaReportes = servletContext.getRealPath("/inventario/reportes/");//ubicacion para los subreportes
+            Map<String, Object> parametros = new HashMap<>();
+            if (bites != null) {
+                InputStream logo = new ByteArrayInputStream(bites);
+                parametros.put("logo", logo);
+            }
+            CfgEmpresa empresa = getSedeActual().getCfgempresaidEmpresa();
+            parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
+            parametros.put("direccion", getSedeActual().getDireccion());
+            String telefono = getSedeActual().getTel1();
+            if (getSedeActual().getTel2() != null && !sedeActual.getTel2().isEmpty()) {
+                telefono = telefono + "-".concat(getSedeActual().getTel2());
+            }
+            parametros.put("telefono", telefono);
+            parametros.put("ubicacion", getSedeActual().getCfgMunicipio().getNomMunicipio() + " " + getSedeActual().getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            parametros.put("SUBREPORT_DIR", rutaReportes);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
+            JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
+            FacesContext.getCurrentInstance().responseComplete();
+        }
+    }
+
+    private List<RemisionDetalleReporte> construirDetalle(List<InvMovimientoDetalle> detalle) {
+        List<RemisionDetalleReporte> lista = new ArrayList();
+        for (InvMovimientoDetalle movimientoDetalle : detalle) {
+            RemisionDetalleReporte detalleReporte = new RemisionDetalleReporte();
+            detalleReporte.setCodigo(movimientoDetalle.getCfgProducto().getCodProducto());
+            detalleReporte.setCantidad(movimientoDetalle.getCantidad());
+            detalleReporte.setProducto(movimientoDetalle.getCfgProducto().getNomProducto());
+            lista.add(detalleReporte);                   
+        }
+        return lista;
+    }
+
     public void cancelar() {
         numIdentificacion = null;
+        listaMovInventarioDetalle.clear();
         limpiarFormulario();
+        displayInfoAdicional = false;
         RequestContext.getCurrentInstance().update("IdFormMovimientoInventario");
     }
 
@@ -718,6 +880,62 @@ public class MovimientoInventarioMB implements Serializable {
 
     public CfgEmpresasede getSedeActual() {
         return sedeActual;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getTransportadora() {
+        return transportadora;
+    }
+
+    public void setTransportadora(String transportadora) {
+        this.transportadora = transportadora;
+    }
+
+    public String getConductor() {
+        return conductor;
+    }
+
+    public void setConductor(String conductor) {
+        this.conductor = conductor;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
+    }
+
+    public String getPeso() {
+        return peso;
+    }
+
+    public void setPeso(String peso) {
+        this.peso = peso;
+    }
+
+    public boolean isDisplayInfoAdicional() {
+        return displayInfoAdicional;
+    }
+
+    public String getConcecutivo() {
+        return concecutivo;
     }
 
 }

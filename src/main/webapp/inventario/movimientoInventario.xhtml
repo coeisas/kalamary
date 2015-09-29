@@ -48,10 +48,35 @@
                         <p:selectOneMenu id="IdListDetalleMovimiento" class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioDetalle}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{movimientoInventarioMB.listaMovInventarioDetalle}" var="movInvDetalle" itemLabel="#{movInvDetalle.nomMovimientoDetalle}" itemValue="#{movInvDetalle.idMovInventarioDetalle}"/>
+                            <p:ajax event="change" listener="#{movimientoInventarioMB.cargarInformacionAdicional()}" update="@none"/>
                         </p:selectOneMenu>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormulario" style="width: 130px" value="Documento Soporte:"/>
                         <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.documentoSoporte}" maxlength="15"/>
+                    </p:column>
+                </p:row>
+                <p:row rendered="#{movimientoInventarioMB.displayInfoAdicional}">
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Ciudad:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.ciudad}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Dirección:"/>
+                        <p:inputText class="campoFormulario upperCase" size="80" value="#{movimientoInventarioMB.direccion}"/>
+                    </p:column>
+                </p:row>
+                <p:row rendered="#{movimientoInventarioMB.displayInfoAdicional}">
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Transportadora:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.transportadora}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Conductor:"/>
+                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.conductor}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Placa:"/>
+                        <p:inputText class="campoFormulario upperCase" size="7" value="#{movimientoInventarioMB.placa}"/>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Peso:"/>
+                        <p:inputText class="campoFormulario upperCase" size="9" value="#{movimientoInventarioMB.peso}"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -188,7 +213,8 @@
             <br/>
             <div style="text-align: center">
                 <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar Movimiento" actionListener="#{movimientoInventarioMB.guardar}"/>&nbsp;
-                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{movimientoInventarioMB.cancelar}"/>               
+                <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{movimientoInventarioMB.cancelar}"/>&nbsp;
+                <p:commandButton icon="ui-icon-print" value="Generar PDF" actionListener="#{movimientoInventarioMB.impresion}" title="Generar PDF"/>
             </div>
         </h:form>
         <p:dialog widgetVar="dlgProveedor" header="BUSCAR PROVEEDOR" modal="true" resizable="false" width="50%">
@@ -217,7 +243,24 @@
                 <p:separator/>
                 <p:commandButton value="Insertar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
             </h:form>
-        </p:dialog>        
+        </p:dialog>
+        <p:dialog widgetVar="dlgResult" modal="true" header="CONFIRMAR IMPRESION" resizable="false" width="25%">
+            <h:form id="IdFormConfirmacion">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Mov Inventario:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.concecutivo}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-circle-check" value="&nbsp;" actionListener="#{movimientoInventarioMB.generarPDF}" ajax="false" onclick="this.form.target = '_blank'"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
     </ui:define>
 
 </ui:composition>
