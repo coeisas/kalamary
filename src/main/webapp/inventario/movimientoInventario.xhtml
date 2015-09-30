@@ -14,7 +14,7 @@
         <p:growl id="msg" showDetail="true"/>
         <h:form id="IdFormMovimientoInventario">
             <p:remoteCommand name="updateTabla" actionListener="#{movimientoInventarioMB.updateTabla}"/>
-            <p:panelGrid style="margin: 0 auto;width: 90%">
+            <p:panelGrid style="margin: 0 auto;width: 95%">
                 <f:facet name="header">
                     <p:row>
                         <p:column>
@@ -24,7 +24,7 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Proveedor:"/>
+                        <p:outputLabel class="labelFormulario" value="Proveedor:"/>
                         <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
                             <p:ajax event="blur" listener="#{movimientoInventarioMB.buscarProveedor}" update="@none"/>
                         </p:inputText>
@@ -234,6 +234,7 @@
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
             <h:form id="FormModalProducto">
                 <p:dataTable value="#{movimientoInventarioMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{movimientoInventarioMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:ajax event="rowSelect" listener="#{movimientoInventarioMB.insertarItemProducto}" update="@none" />
                     <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                     <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
@@ -241,7 +242,9 @@
                     <p:column headerText="Disponibilidad">#{producto.unidadesDisponibles(movimientoInventarioMB.sedeActual)}</p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Insertar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+                <div>
+                    <p:commandButton value="Aceptar" actionListener="#{movimientoInventarioMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+                </div>
             </h:form>
         </p:dialog>
         <p:dialog widgetVar="dlgResult" modal="true" header="CONFIRMAR IMPRESION" resizable="false" width="25%">

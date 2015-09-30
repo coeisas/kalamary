@@ -199,6 +199,7 @@
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
             <h:form id="FormModalProducto">
                 <p:dataTable value="#{facturaMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{facturaMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:ajax event="rowSelect" listener="#{facturaMB.insertarItemProducto}" update="@none" />
                     <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                     <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
@@ -211,7 +212,9 @@
                     <p:column headerText="Disponibilidad">#{producto.unidadesDisponibles(facturaMB.sedeActual)}</p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Insertar" actionListener="#{facturaMB.insertarItemProducto}" onclick="PF('dlgProducto').hide()"/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" onclick="PF('dlgProducto').hide()"/>
+                </div>
             </h:form>
         </p:dialog>
 

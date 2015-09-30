@@ -7,6 +7,7 @@ package facades;
 
 import entities.CfgCategoriaproducto;
 import entities.CfgEmpresa;
+import entities.CfgKitproductomaestro;
 import entities.CfgMarcaproducto;
 import entities.CfgProducto;
 import entities.CfgReferenciaproducto;
@@ -98,6 +99,16 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
             query.setParameter(1, empresa);
             query.setParameter(2, categoriaproducto);
             query.setParameter(3, codigo);
+            return (CfgProducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public CfgProducto buscarProductoKit(CfgKitproductomaestro kitproductomaestro) {
+        try {
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgkitproductomaestroidKit = ?1");
+            query.setParameter(1, kitproductomaestro);
             return (CfgProducto) query.getSingleResult();
         } catch (Exception e) {
             return null;

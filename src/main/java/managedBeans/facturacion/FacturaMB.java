@@ -11,6 +11,8 @@ import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgFormapago;
 import entities.CfgImpuesto;
+import entities.CfgKitproductodetalle;
+import entities.CfgKitproductomaestro;
 import entities.CfgMovInventarioDetalle;
 import entities.CfgMovInventarioMaestro;
 import entities.CfgMunicipio;
@@ -41,6 +43,8 @@ import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.CfgImpuestoFacade;
+import facades.CfgKitproductodetalleFacade;
+import facades.CfgKitproductomaestroFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
@@ -188,6 +192,8 @@ public class FacturaMB implements Serializable {
     CfgDocumentoFacade documentoFacade;
     @EJB
     CfgProductoFacade productoFacade;
+    @EJB
+    CfgKitproductodetalleFacade kitproductodetalleFacade;
     @EJB
     CfgFormapagoFacade formapagoFacade;
     @EJB
@@ -373,7 +379,7 @@ public class FacturaMB implements Serializable {
             for (FacDocumentodetalle detalle : lista) {
                 CfgProducto producto = detalle.getCfgProducto();
                 if (!producto.getEsServicio()) {
-                    InvConsolidado consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), producto);
+                    InvConsolidado consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), producto);
                     if (consolidado == null) {//el producto no esta en el inventario
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + producto.getNomProducto() + " en el inventario"));
                         return;
@@ -442,8 +448,8 @@ public class FacturaMB implements Serializable {
         }
         if (productoSeleccionado != null) {
             InvConsolidado consolidado = null;
-            if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
-                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
+            if (!productoSeleccionado.getEsServicio() && !productoSeleccionado.getEsKit()) {//si el producto seleccionado no es un servicio y tampoco un kit se tiene encuenta la existencia en el inventario
+                consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {//el producto no esta en el inventario
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
                     return;
@@ -453,13 +459,58 @@ public class FacturaMB implements Serializable {
                     return;
                 }
             }
+            int cantidadPosibleKit = 0;
+            if (productoSeleccionado.getEsKit()) {//si el producto es un kit. se busca existencia de cada elemento en el inventario
+                CfgKitproductomaestro kitproductomaestro = productoSeleccionado.getCfgkitproductomaestroidKit();
+                List<CfgKitproductodetalle> itemsKit = kitproductomaestro.getCfgKitproductodetalleList();
+                if (itemsKit.isEmpty()) {
+                    itemsKit = kitproductodetalleFacade.buscarByMaestro(kitproductomaestro);
+                }
+                boolean ban = true;
+                int aux;
+                int totalCantidadItemKit = 0;
+                //se recorre cada item del kit buscando su existencia en inventario
+                for (CfgKitproductodetalle detallekit : itemsKit) {
+                    CfgProducto productokit = detallekit.getCfgProducto();
+                    if (!productokit.getEsServicio()) {//si el item actual no es un servicio se tiene encuenta la existencia en el inventario                    
+                        consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productokit);
+                        if (consolidado == null) {//el producto no esta en el inventario
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + productokit.getNomProducto() + " en el inventario"));
+                            ban = false;
+                            break;
+                        }
+                        if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + productokit.getNomProducto()));
+                            ban = false;
+                            break;
+                        }
+                        totalCantidadItemKit = consolidado.getExistencia();
+                        aux = totalCantidadItemKit / (int) detallekit.getCant();
+                        if (aux == 0) {//se debe satisfacer completamente la cantidad requerida de un elemento del kit
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias suficientes de " + productokit.getNomProducto()));
+                            ban = false;
+                            break;
+                        }
+                        if (cantidadPosibleKit == 0) {
+                            cantidadPosibleKit = aux;
+                        } else if (cantidadPosibleKit > aux) {
+                            cantidadPosibleKit = aux;
+                        }
+                    }
+                }
+                if (!ban) {
+                    return;
+                }
+            }
             FacDocumentodetalle facdetalle = obtenerItemEnLista(productoSeleccionado);
             if (facdetalle == null) {
                 facdetalle = new FacDocumentodetalle();
                 facdetalle.setCfgProducto(productoSeleccionado);
-                if (consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
+                if (!productoSeleccionado.getEsKit() && consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
                     //se determina como cantidad posible el total de las existencias en el inventario
                     facdetalle.setCantidadPosible(consolidado.getExistencia());
+                } else if (productoSeleccionado.getEsKit()) {
+                    facdetalle.setCantidadPosible(cantidadPosibleKit);
                 }
                 //el valor del documento master no es el definitivo
                 facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1, 1));
@@ -714,8 +765,19 @@ public class FacturaMB implements Serializable {
                     documentodetalle.setValorDescuento(valorDescuento);
                 }
                 documentodetalleFacade.create(documentodetalle);
-                if (!documentodetalle.getCfgProducto().getEsServicio() && tipoFactura != 3) {//si el producto no es un servicio y el tipo de factura no es un separado, se descontara del inventario
+                if (!documentodetalle.getCfgProducto().getEsServicio() && !documentodetalle.getCfgProducto().getEsKit() && tipoFactura != 3) {//si el producto no es un servicio tampoco kit y el tipo de factura no es un separado, se descontara del inventario de forma simple
                     actualizarTablaConsolidado(documentodetalle);
+                } else if (documentodetalle.getCfgProducto().getEsKit() && tipoFactura != 3) {//si el producto es un kit se actualizara el consolidada de cada producto que conforma el kit
+                    CfgKitproductomaestro kitproductomaestro = documentodetalle.getCfgProducto().getCfgkitproductomaestroidKit();
+                    List<CfgKitproductodetalle> itemsKit = kitproductomaestro.getCfgKitproductodetalleList();
+                    if (itemsKit.isEmpty()) {
+                        itemsKit = kitproductodetalleFacade.buscarByMaestro(kitproductomaestro);
+                    }
+                    for (CfgKitproductodetalle detallekit : itemsKit) {
+                        if (!detallekit.getCfgProducto().getEsServicio()) {
+                            actualizarTablaConsolidadoKit(documentodetalle, detallekit);
+                        }
+                    }
                 }
             }
             if (tipoFactura == 2) {//si el tipo de factura es especial. Se actualiza el subtotal y el totaldescuento en el documentomaster
@@ -824,7 +886,7 @@ public class FacturaMB implements Serializable {
 
     private void actualizarTablaConsolidado(FacDocumentodetalle documentodetalle) {
         try {
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), documentodetalle.getCfgProducto());
+            InvConsolidado consolidado = consolidadoFacade.buscarBySedeAndProducto(getSedeActual(), documentodetalle.getCfgProducto());
             //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
             List<InvConsolidado> listadoConsolidado = documentodetalle.getCfgProducto().getInvConsolidadoList();
             if (consolidado != null) {
@@ -854,6 +916,44 @@ public class FacturaMB implements Serializable {
 
                 //se guarda los cambios del listado inventario en el producto
                 productoFacade.edit(documentodetalle.getCfgProducto());
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario para el producto " + documentodetalle.getCfgProducto().getNomProducto()));
+        }
+    }
+
+    private void actualizarTablaConsolidadoKit(FacDocumentodetalle documentodetalle, CfgKitproductodetalle detalleKit) {
+        try {
+            InvConsolidado consolidado = consolidadoFacade.buscarBySedeAndProducto(getSedeActual(), detalleKit.getCfgProducto());
+            //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
+            List<InvConsolidado> listadoConsolidado = detalleKit.getCfgProducto().getInvConsolidadoList();
+            if (consolidado != null) {
+                consolidado.setFechaUltSalida(new Date());
+                consolidado.setExistencia(consolidado.getExistencia() - (documentodetalle.getCantidad() * (int) detalleKit.getCant()));
+                consolidado.setSalidas(consolidado.getSalidas() + (documentodetalle.getCantidad() * (int) detalleKit.getCant()));
+                consolidadoFacade.edit(consolidado);
+                //se actualiza la informacion del inventario consolidado en el producto
+                //el producto en el inventario consolidado esta una sola vez por cada sede de la empresa.  el producto no debe ser un servicio
+                //se identifica el index del listadoconsolidado afectado
+                int aux = 0;
+                for (InvConsolidado ic : listadoConsolidado) {
+                    if (ic.equals(consolidado)) {
+                        break;
+                    }
+                    aux++;
+                }
+                //se actualiza la informacion la nueva informacion del consolidado
+                listadoConsolidado.get(aux).setCfgEmpresasede(consolidado.getCfgEmpresasede());
+                listadoConsolidado.get(aux).setCfgProducto(consolidado.getCfgProducto());
+                listadoConsolidado.get(aux).setEntradas(consolidado.getEntradas());
+                listadoConsolidado.get(aux).setExistencia(consolidado.getExistencia());
+                listadoConsolidado.get(aux).setFechaUltEntrada(consolidado.getFechaUltEntrada());
+                listadoConsolidado.get(aux).setFechaUltSalida(consolidado.getFechaUltSalida());
+                listadoConsolidado.get(aux).setInvConsolidadoPK(consolidado.getInvConsolidadoPK());
+                listadoConsolidado.get(aux).setSalidas(consolidado.getSalidas());
+
+                //se guarda los cambios del listado inventario en el producto
+                productoFacade.edit(detalleKit.getCfgProducto());
             }
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo la informacion consolidada del inventario para el producto " + documentodetalle.getCfgProducto().getNomProducto()));

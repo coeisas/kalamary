@@ -10,11 +10,13 @@ import entities.CfgEmpresasede;
 import entities.CfgKitproductodetalle;
 import entities.CfgKitproductodetallePK;
 import entities.CfgKitproductomaestro;
+import entities.CfgMarcaproducto;
 import entities.CfgProducto;
 import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgKitproductodetalleFacade;
 import facades.CfgKitproductomaestroFacade;
+import facades.CfgMarcaproductoFacade;
 import facades.CfgProductoFacade;
 import javax.faces.bean.ManagedBean;
 import javax.ejb.EJB;
@@ -67,6 +69,8 @@ public class KitMB implements Serializable {
     @EJB
     CfgEmpresaFacade empresaFacade;
     @EJB
+    CfgMarcaproductoFacade marcaFacade;
+    @EJB
     CfgProductoFacade productoFacade;
     @EJB
     CfgKitproductomaestroFacade kitMaestroFacade;
@@ -111,7 +115,7 @@ public class KitMB implements Serializable {
             listaKitMaestro.clear();
         }
         RequestContext.getCurrentInstance().update("FormModalKit");
-        RequestContext.getCurrentInstance().execute("PF('dlgKit').show()");       
+        RequestContext.getCurrentInstance().execute("PF('dlgKit').show()");
     }
 
     public void buscarKit() {
@@ -282,11 +286,16 @@ public class KitMB implements Serializable {
             kitmaestro.setSegusuarioidUsuario(usuarioActual);
             kitmaestro.setUtilidad(utilidad);
             kitMaestroFacade.create(kitmaestro);
+            List<CfgKitproductodetalle> aux = new ArrayList();
             for (CfgKitproductodetalle kitproductodetalle : listaKitDetalle) {
                 kitproductodetalle.getCfgKitproductodetallePK().setCfgkitproductomaestroidKit(kitmaestro.getIdKit());
                 kitproductodetalle.setCfgKitproductomaestro(kitmaestro);
                 kitDetalleFacade.create(kitproductodetalle);
+                aux.add(kitproductodetalle);
             }
+            kitmaestro.setCfgKitproductodetalleList(aux);
+            kitMaestroFacade.edit(kitmaestro);
+            crearProductoKit(kitmaestro);
             setCodigoKit(null);
             limpiarInformacionKit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Kit creado"));
@@ -310,6 +319,7 @@ public class KitMB implements Serializable {
                 kitDetalleFacade.remove(kitproductodetalle);
             }
 //            se crea los nuevos items o se modifica. Dependiendo del caso
+            List<CfgKitproductodetalle> aux = new ArrayList();
             for (CfgKitproductodetalle kitproductodetalle : listaKitDetalle) {
                 if (kitproductodetalle.isNuevo()) {
                     kitproductodetalle.getCfgKitproductodetallePK().setCfgkitproductomaestroidKit(kitMaestroSeleccionado.getIdKit());
@@ -318,6 +328,7 @@ public class KitMB implements Serializable {
                 } else {
                     kitDetalleFacade.edit(kitproductodetalle);
                 }
+                aux.add(kitproductodetalle);
             }
 //          se actuliza los campos del kitmaestro
             kitMaestroSeleccionado.setActivo(activo);
@@ -325,7 +336,9 @@ public class KitMB implements Serializable {
             kitMaestroSeleccionado.setNomKit(nombreKit.toUpperCase());
             kitMaestroSeleccionado.setPrecio(precio);
             kitMaestroSeleccionado.setUtilidad(utilidad);
+            kitMaestroSeleccionado.setCfgKitproductodetalleList(aux);
             kitMaestroFacade.edit(kitMaestroSeleccionado);
+            modificarProductoKit(kitMaestroSeleccionado);
             setCodigoKit(null);
             limpiarInformacionKit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Kit modificado"));
@@ -333,6 +346,45 @@ public class KitMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Kit no modificado"));
         }
 
+    }
+
+    //un kit sera visto como un producto. solo que estara relacionado a un kit y la bandera de que si es un kit sera igual a true
+    private void crearProductoKit(CfgKitproductomaestro kitmaestro) {
+        try {
+            CfgProducto producto = new CfgProducto();
+            producto.setCodProducto(kitmaestro.getCodKit());
+            producto.setCodigoInterno(kitmaestro.getCodKit());
+            //la marca con codigo 1 corresponde a SIN MARCA - SIN REFERENCIA - SIN CATEGORIA. Toda empresa debe tenerla
+            CfgMarcaproducto marcaproducto = marcaFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, "1");
+            producto.setCfgmarcaproductoidMarca(marcaproducto);
+            producto.setNomProducto(kitmaestro.getNomKit());
+            producto.setActivo(kitmaestro.getActivo());
+            producto.setCosto(kitmaestro.getCosto());
+            producto.setUtilidad(kitmaestro.getUtilidad());
+            producto.setPrecio(kitmaestro.getPrecio());
+            producto.setEsKit(true);
+            producto.setCfgkitproductomaestroidKit(kitmaestro);
+            producto.setFecCrea(new Date());
+            producto.setCfgempresaidEmpresa(empresaSeleccionada);
+            producto.setSegusuarioidUsuario(usuarioActual);
+            productoFacade.create(producto);
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Kit no Insertado en la tabla productos"));
+        }
+    }
+
+    private void modificarProductoKit(CfgKitproductomaestro kitmaestro) {
+        try {
+            CfgProducto producto = productoFacade.buscarProductoKit(kitmaestro);
+            producto.setNomProducto(kitmaestro.getNomKit());
+            producto.setActivo(kitmaestro.getActivo());
+            producto.setCosto(kitmaestro.getCosto());
+            producto.setUtilidad(kitmaestro.getUtilidad());
+            producto.setPrecio(kitmaestro.getPrecio());
+            productoFacade.edit(producto);
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Kit no actualizado en la tabla productos"));
+        }
     }
 
     public void cancelar() {

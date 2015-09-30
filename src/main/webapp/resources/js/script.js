@@ -1,8 +1,8 @@
-$(document).ready(function () {
-
-    $('.InputText').keydown(function () {
-        $(".InputText").val(function (i, val) {
-            return val.toUpperCase();
-        });
-    });
+$(document).ready(function(){
+  $('.bxslider').bxSlider({
+      speed: 500,
+      auto: true,
+      pause: 5000,
+      infiniteLoop: true
+  });
 });

@@ -322,7 +322,7 @@ public class CotizacionMB implements Serializable {
         if (productoSeleccionado != null) {
             InvConsolidado consolidado = null;
             if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
-                consolidado = invConsolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
+                consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {//el producto no esta en el inventario
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
                     return;

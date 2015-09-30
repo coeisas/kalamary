@@ -6,23 +6,31 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Kalamary</title>
-        <h:outputStylesheet library="css" name="styles.css"/>
+        <h:outputScript library="js" name="jquery.bxslider.min.js"/>
+        <h:outputScript library="js" name="script.js"/>
+        <h:outputStylesheet library="css" name="jquery.bxslider.min.css"/>       
+        <h:outputStylesheet library="css" name="styles.css"/>       
         <meta http-equiv="refresh" content="#{session.maxInactiveInterval};url=#{request.contextPath}/"/>
     </h:head>
     <h:body>
         <p:growl id="message" autoUpdate="false" showDetail="true"/>
         <h:form>
-            <!--padding: 5em 10em;-->
-            <div style="padding: 2.5em 0">
-                <div style="width: 60%;display: inline-block;">
-                    <!-- panelWidth="640" panelHeight="480"-->
-                    <p:galleria value="#{aplicacionMB.imagenes}" var="imagen" style="margin: 0 auto" panelWidth="672" panelHeight="504">
-                        <p:graphicImage  library="img" name="#{imagen}" styleClass="presentacionIndex"/>
-                        <!--div class="caption"># {imagen}</div-->
-                    </p:galleria>
+            <div style="padding: 3em 3em">
+                <div style="width: 65%;display: inline-block">
+                    <!--p:galleria value="# {aplicacionMB.imagenes}" var="imagen" style="margin: 0 auto" panelWidth="672" panelHeight="504">
+                        <p:graphicImage  library="img" name="# {imagen}" styleClass="presentacionIndex"/>
+                    </p:galleria-->
+                    <ul class="bxslider">
+                        <li><img src="resources/img/idx1.jpg" /></li>
+                        <li><img src="resources/img/idx2.jpg" /></li>
+                        <li><img src="resources/img/idx3.jpg" /></li>
+                        <li><img src="resources/img/idx4.jpg" /></li>
+                        <li><img src="resources/img/idx5.jpg" /></li>
+                        <li><img src="resources/img/idx6.jpg" /></li>
+                    </ul>
                 </div>
 
-                <div style="display: inline-block;width: 38%; vertical-align: top">
+                <div style="display: inline-block;width: 30%; vertical-align: top">
                     <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
                         <p:row>
                             <p:column><h1>KALAMARY POS</h1></p:column>

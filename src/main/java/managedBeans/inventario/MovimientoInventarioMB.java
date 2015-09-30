@@ -269,7 +269,7 @@ public class MovimientoInventarioMB implements Serializable {
                 return;
             }
             if (inventarioMaestro.getCodMovInvetario().equals("2")) {//si se esta realizando una salida del inventario se tiene encuenta unidades disponibles
-                InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), productoSeleccionado);
+                InvConsolidado consolidado = consolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", productoSeleccionado.getNomProducto() + " no tiene unidades disponibles"));
                     return;
@@ -350,7 +350,7 @@ public class MovimientoInventarioMB implements Serializable {
 
         CfgMovInventarioMaestro inventarioMaestro = movInventarioMaestroFacade.find(idMovInventarioMaestro);
         if (inventarioMaestro.getCodMovInvetario().equals("2")) {//si se esta realizando una salida del inventario se tiene encuenta unidades disponibles
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(sedeActual, detalle.getCfgProducto());
+            InvConsolidado consolidado = consolidadoFacade.buscarBySedeAndProducto(sedeActual, detalle.getCfgProducto());
             if (consolidado.getExistencia() < detalle.getCantidad()) {
                 detalle.setCantidad(consolidado.getExistencia());
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Advertencia", productoSeleccionado.getNomProducto() + " tiene " + consolidado.getExistencia() + " unidades"));
@@ -466,10 +466,10 @@ public class MovimientoInventarioMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
             return false;
         }
-        if (proveedorSeleccionado == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione el proveedor"));
-            return false;
-        }
+//        if (proveedorSeleccionado == null) {
+//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione el proveedor"));
+//            return false;
+//        }
         if (formaPago == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la forma de pago"));
             return false;
@@ -600,7 +600,7 @@ public class MovimientoInventarioMB implements Serializable {
 
     private void actualizarTablaConsolidado(CfgProducto producto, InvMovimientoDetalle detalleMovimiento) {
         try {
-            InvConsolidado consolidado = consolidadoFacade.buscarByEmpresaAndProducto(getSedeActual(), producto);
+            InvConsolidado consolidado = consolidadoFacade.buscarBySedeAndProducto(getSedeActual(), producto);
             //el producto si no es un servicio existira en el inventario consolidado por cada cada sede de la empresa
             List<InvConsolidado> listadoConsolidado = producto.getInvConsolidadoList();
             if (consolidado != null) {

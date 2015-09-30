@@ -33,7 +33,7 @@ public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
         super(InvConsolidado.class);
     }
 
-    public InvConsolidado buscarByEmpresaAndProducto(CfgEmpresasede sede, CfgProducto producto) {
+    public InvConsolidado buscarBySedeAndProducto(CfgEmpresasede sede, CfgProducto producto) {
         try {
             Query query = em.createQuery("SELECT c FROM InvConsolidado c WHERE c.cfgEmpresasede = ?1 AND c.cfgProducto = ?2");
             query.setParameter(1, sede);
