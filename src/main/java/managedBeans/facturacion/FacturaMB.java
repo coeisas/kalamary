@@ -833,7 +833,18 @@ public class FacturaMB implements Serializable {
             }
 
             documentoActual = documentosmaster;
-            crearMovimientoInventario(listaDetalle, documentosmaster);
+            //ban sera true cuando el detalle incluya al menos un kit y un producto que no sea un servicio
+            boolean ban = false;
+            for (FacDocumentodetalle fd : listaDetalle) {
+                if (!fd.getCfgProducto().getEsServicio() || fd.getCfgProducto().getEsKit()) {
+                    ban = true;
+                    break;
+                }
+            }
+            //si ban = true. se creara un movimiento de salida en el inventario.
+            if (ban) {
+                crearMovimientoInventario(listaDetalle, documentosmaster);
+            }
             if (tipoFactura != 3) {//el movimiento de caja se comporta diferente para los separados
 //                se registra el total de la factura o remision
                 generarMovimientoCaja(documentosmaster);
