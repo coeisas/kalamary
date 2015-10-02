@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../templates/layout.xhtml">    
+    <ui:define name="title">Abonos</ui:define>
+    <ui:define name="content">
+        <script>
+            function focusValorFormaPago(idFormaPago, valor) {
+                if (valor == 0) {
+                    determinarValorFormaPago([{name: 'idPago', value: idFormaPago}, {name: 'valor', value: valor}]);
+                }
+            }
+        </script>
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <p:growl id="msg" showDetail="true"/>
+        <h:form id="IdFormAbono">
+            <p:remoteCommand name="updateTablaFormaPago" actionListener="#{abonoMB.actualizarTablaFormaPago}"/>
+            <p:remoteCommand name="determinarValorFormaPago" actionListener="#{abonoMB.determinarValorFormaPago}"/>
+            <p:panelGrid style="margin: 0 auto;width: 80%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Registrar Abono</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormularioObligatorio" value="Cliente:"/>
+                        <p:inputText id="IdNumDocumento" class="campoFormulario" value="#{abonoMB.identificacionCliente}">
+                            <p:ajax event="blur" listener="#{abonoMB.buscarCliente}" update="@none"/>
+                        </p:inputText>
+                        <p:watermark for="IdNumDocumento" value="Identificación"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{abonoMB.cargarClientes}"/>
+                        <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.nombreCliente}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-circle-zoomin" value="Cargar Separado" title="Buscar Separado" actionListener="#{abonoMB.cargarSeparardos}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <p:dataTable
+                value="#{abonoMB.listaDetalleCartera}"
+                var="detalle"
+                disabledSelection="true"
+                style="width: 80%;margin: 0 auto"
+                emptyMessage="No hay abonos registrados">
+                <f:facet name="header">Detalle Separado</f:facet>
+                <p:column headerText="Valor">
+                    <h:outputText value="#{detalle.abono}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Fecha">
+                    <h:outputText value="#{detalle.facCarteraDetallePK.fecha}">
+                        <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="dd/MM/yyyy h:mm a"/>
+                    </h:outputText>
+                </p:column>
+            </p:dataTable>
+            <br/>
+            <p:panelGrid style="margin: 0 auto;width: 80%">
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Total:"/>
+                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.total}">
+                            <f:convertNumber type="currency"/>
+                        </p:inputText>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Saldo:"/>
+                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.saldo}">
+                            <f:convertNumber type="currency"/>
+                        </p:inputText>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel class="labelFormulario" value="Cuotas:"/>
+                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.cuotas}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-note" title="Abonar" value="Abonar" actionListener="#{abonoMB.cargarFormularioPago}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-print" title="Recibo Caja" value="Recibo Caja" actionListener="#{abonoMB.cargarModalRC}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-script" title="Crear Factura" value="Crear Factura" actionListener="#{abonoMB.cargarFactura}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{abonoMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{abonoMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Empresa">
+                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{abonoMB.cargarInformacionCliente}" />
+                </div>
+            </h:form>            
+        </p:dialog>
+        
+        <p:dialog widgetVar="dlgSeparados" header="BUSCAR SEPARADOS" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarSeparado">
+                <p:dataTable value="#{abonoMB.listaCarteras}" emptyMessage="No se encontraron carteras pendientes" var="cartera" selectionMode="single" selection="#{abonoMB.carteraSeleccionada}" rows="10" rowKey="#{cartera.facCarteraClientePK}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Separado">
+                        <h:outputText value="#{cartera.facDocumentosmaster.determinarNumFactura()}"/>
+                    </p:column>
+                    <p:column headerText="Total">
+                        <h:outputText value="#{cartera.valor}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Saldo">
+                        <h:outputText value="#{cartera.saldo}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>                    
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{abonoMB.cargarCartera}" />
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="25%" resizable="false">
+            <h:form id="FormModalPago">
+                <p:panelGrid class="panelGridSinBorder">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Saldo:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.saldo}">
+                                <f:convertNumber type="currency"/>
+                            </p:outputLabel>                            
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+                <br/>
+                <p:dataTable  id="IdTableFormaPago" value="#{abonoMB.listaFormapagos}" var="formaPago" editable="true" editMode="row">
+                    <p:ajax event="rowEdit" listener="#{abonoMB.onRowEdit}" update="@none" oncomplete="updateTablaFormaPago()" />
+                    <p:ajax event="rowEditCancel" listener="#{abonoMB.onRowCancel}" update="@none" oncomplete="updateTablaFormaPago()"/>
+                    <p:column headerText="Forma de Pago">
+                        #{formaPago.nomFormaPago}
+                    </p:column>
+                    <p:column headerText="Valor">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{formaPago.subtotal}">
+                                    <f:convertNumber type="currency"/>
+                                </h:outputText>
+                            </f:facet>
+                            <f:facet name="input"><h:inputText value="#{formaPago.subtotal}" onfocus="focusValorFormaPago('#{formaPago.idFormaPago}', '#{formaPago.subtotal}');"/></f:facet>
+                        </p:cellEditor>                        
+                    </p:column>
+                    <p:column style="width:32px">
+                        <p:rowEditor />
+                    </p:column>
+                </p:dataTable>
+                <br/>
+                <div style="text-align: center">
+                    <p:commandButton id="IdBtnPrint" value="Guardar" disabled="#{abonoMB.enableBtnGuardar eq false}"  icon="ui-icon-disk" actionListener="#{abonoMB.guardar}"/>
+                </div>                
+            </h:form>
+        </p:dialog>
+        
+        <p:dialog widgetVar="dlgResult" modal="true" header="GENERAR RECIBO DE CAJA" resizable="false" width="25%">
+            <h:form id="FormModalRC">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Recibo Caja:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.reciboReciente.determinarNumFactura()}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-circle-check" value="&nbsp;" actionListener="#{abonoMB.generarRC}" ajax="false" onclick="this.form.target = '_blank'"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>    
+</ui:composition>
+

@@ -23,6 +23,8 @@ import entities.InvConsolidado;
 import entities.FacCaja;
 import entities.FacCarteraCliente;
 import entities.FacCarteraClientePK;
+import entities.FacCarteraDetalle;
+import entities.FacCarteraDetallePK;
 import entities.FacDocuementopago;
 import entities.FacDocuementopagoPK;
 import entities.FacDocumentodetalle;
@@ -44,7 +46,6 @@ import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.CfgImpuestoFacade;
 import facades.CfgKitproductodetalleFacade;
-import facades.CfgKitproductomaestroFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
@@ -105,6 +106,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
+import utilities.FacturaCuotasReporte;
 import utilities.FacturaDetalleReporte;
 import utilities.FacturaImpuestoReporte;
 import utilities.FacturaPagoReporte;
@@ -126,6 +128,8 @@ public class FacturaMB implements Serializable {
     private float totalFactura;
     private float totalUSD;
     private float utilidad;
+    private float cuotaInicial;
+    private int numCuotas;
     private String observacion;
     private SegUsuario vendedorSeleccionado;
     private LazyDataModel<CfgProducto> listaProducto;
@@ -140,7 +144,7 @@ public class FacturaMB implements Serializable {
     private String documentoVendedor;
     private String nombreVendedor;
 
-    private String display;//style para ocultar o no la informacion adicional de separados y credito
+    private String display;//style para ocultar o no la informacion adicional de separados: cuota inicial y numero de cuotas
 
     private List<SelectItem> listaTipoFactura;//los tipos de factura son: normal y remision.
     private int tipoFactura;
@@ -248,6 +252,7 @@ public class FacturaMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeActual = sesionMB.getSedeActual();
         empresaActual = sesionMB.getEmpresaActual();
+        numCuotas = 2;
         display = "none";
         if (empresaActual != null) {
             actualizarListadoClientes();
@@ -262,8 +267,8 @@ public class FacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(2, "ESPECIAL");
             listaTipoFactura.add(aux);
-//            aux = new SelectItem(3, "SEPARADO");
-//            listaTipoFactura.add(aux);
+            aux = new SelectItem(3, "SEPARADO");
+            listaTipoFactura.add(aux);
             tipoFactura = 1;
         } else {
             listaImpuestos = new ArrayList();
@@ -704,7 +709,7 @@ public class FacturaMB implements Serializable {
             documento = documentoFacade.buscarDocumentoDeSeparadoBySede(getSedeActual());
         }
         if (documento == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a factura"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado al tipo de factura seleccionado"));
             return;
         }
         if (documento.getActDocumento() == 0) {
@@ -765,9 +770,10 @@ public class FacturaMB implements Serializable {
                     documentodetalle.setValorDescuento(valorDescuento);
                 }
                 documentodetalleFacade.create(documentodetalle);
+                //UN SEPARADO NO HACE MOVIMIENTOS DE IVENTARIO. SOLO CUANDO SE CUMPLE EL TOTAL DE LAS CUOTAS
                 if (!documentodetalle.getCfgProducto().getEsServicio() && !documentodetalle.getCfgProducto().getEsKit() && tipoFactura != 3) {//si el producto no es un servicio tampoco kit y el tipo de factura no es un separado, se descontara del inventario de forma simple
                     actualizarTablaConsolidado(documentodetalle);
-                } else if (documentodetalle.getCfgProducto().getEsKit() && tipoFactura != 3) {//si el producto es un kit se actualizara el consolidada de cada producto que conforma el kit
+                } else if (documentodetalle.getCfgProducto().getEsKit() && tipoFactura != 3) {//si el producto es un kit y no se esta realizandoo un separado, se actualizara el inventario consolidado de cada producto que conforma el kit
                     CfgKitproductomaestro kitproductomaestro = documentodetalle.getCfgProducto().getCfgkitproductomaestroidKit();
                     List<CfgKitproductodetalle> itemsKit = kitproductomaestro.getCfgKitproductodetalleList();
                     if (itemsKit.isEmpty()) {
@@ -789,7 +795,7 @@ public class FacturaMB implements Serializable {
 
             //GUARDANDO LOS IMPUESTOS APLICADOS A LA FACTURA
             List<FacDocumentoimpuesto> listaDocumentoImpuesto = new ArrayList();
-            if (tipoFactura == 1) {//para la factura normal. los impuestos estan discriminados
+            if (tipoFactura == 1 || tipoFactura == 3) {//para la factura normal o separado. los impuestos estan discriminados
                 for (CfgImpuesto impuesto : listaImpuestos) {
                     FacDocumentoimpuesto documentoimpuesto = new FacDocumentoimpuesto();
                     documentoimpuesto.setFacDocumentoimpuestoPK(new FacDocumentoimpuestoPK(impuesto.getIdImpuesto(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento()));
@@ -849,8 +855,8 @@ public class FacturaMB implements Serializable {
 //                se registra el total de la factura o remision
                 generarMovimientoCaja(documentosmaster);
             } else {
-//                se crea cartera por el separado y se genera recibo de caja por cuota inicial.
-                generarMovimientoCajaAlternativo(documentosmaster);
+//                se crea cartera del cliente por el separado, en movimiento caja se registra el pago de la cuota inicial
+                generarMovimientoAlternativo(documentosmaster);
             }
             limpiarFormulario();
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
@@ -880,14 +886,53 @@ public class FacturaMB implements Serializable {
         }
     }
 
-    private void generarMovimientoCajaAlternativo(FacDocumentosmaster documento) {
+    private void generarMovimientoAlternativo(FacDocumentosmaster documento) {
         try {
+            //SE ABRE CARTERA POR CONCEPTO DEL SEPARADO
             FacCarteraCliente carteraCliente = new FacCarteraCliente();
             carteraCliente.setFacCarteraClientePK(new FacCarteraClientePK(clienteSeleccionado.getIdCliente(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento()));
-            carteraCliente.setCfgCliente(clienteSeleccionado);
+            carteraCliente.setCfgCliente(documento.getCfgclienteidCliente());
             carteraCliente.setFacDocumentosmaster(documento);
-            carteraCliente.setCuotaactual(0);
-            carteraCliente.setEstado("PENDIENTE");
+            carteraCliente.setTotalcuotas(numCuotas);
+            carteraCliente.setCuotaactual(1);//corresponde a la inicial
+            carteraCliente.setEstado("PENDIENTE");//cuando se termine de pagar todas la cuotas pasara A FINALIZADA
+            float totalSeparado = documento.getTotal();
+            carteraCliente.setValor(totalSeparado);
+            carteraCliente.setSaldo(totalSeparado - cuotaInicial);
+            carteraClienteFacade.create(carteraCliente);
+
+            //SE REGISTRA LA CUOTA INICIAL COMO EL PRIMER DETALLE DE LA CARTERA
+            List<FacCarteraDetalle> listaDetalleCartera = new ArrayList();
+            FacCarteraDetalle carteraDetalle = new FacCarteraDetalle();
+            carteraDetalle.setFacCarteraDetallePK(new FacCarteraDetallePK(carteraCliente.getFacCarteraClientePK().getCfgclienteidCliente(), carteraCliente.getFacCarteraClientePK().getFacdocumentosmastercfgdocumentoidDoc(), carteraCliente.getFacCarteraClientePK().getFacdocumentosmasternumDocumento(), new Date()));
+            carteraDetalle.setFacCarteraCliente(carteraCliente);
+            carteraDetalle.setAbono(cuotaInicial);
+            //PARA LA CUOTA INICIAL FacDocumentosmaster HARA REFERENCIA AL DOCUMENTO SEPERADO. PERO PARA PROXIMOS ABONADOS HARA REFERENCIA AL RECIBO DE CAJA
+            carteraDetalle.setFacDocumentosmaster(documento);
+            carteraDetalle.setSaldo(carteraCliente.getSaldo());
+            carteraDetalleFacade.create(carteraDetalle);
+            listaDetalleCartera.add(carteraDetalle);
+
+            //SE INCLUYE LA INFORMACION DEL DETALLE EN LA CARTERA
+            carteraCliente.setFacCarteraDetalleList(listaDetalleCartera);
+            carteraClienteFacade.edit(carteraCliente);
+
+            //creamos el detalle del movimiento de caja por concepto de la cuota inicial de la factura
+            //la cuota inicial puede ser pagada mediante una o varias formas de pago (EFE, TDB, TCR, TRG, CHE)
+            List<FacDocuementopago> listaformapago = documento.getFacDocuementopagoList();
+            if (listaformapago.isEmpty()) {
+                listaformapago = docuementopagoFacade.buscarByDocumentoMaster(documento);
+            }
+            for (FacDocuementopago formapago : listaformapago) {
+                FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
+                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago()));
+                movcajadetalle.setFacMovcaja(movimientoCajaMaster);
+                movcajadetalle.setFacDocumentosmaster(documento);
+                movcajadetalle.setCfgFormapago(formapago.getCfgFormapago());
+                movcajadetalle.setFecha(new Date());
+                movcajadetalle.setValor(formapago.getValorPago());
+                movcajadetalleFacade.create(movcajadetalle);
+            }
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro abrir cartera para " + documento.determinarNumFactura()));
@@ -1064,20 +1109,46 @@ public class FacturaMB implements Serializable {
 
     public void onRowEdit(RowEditEvent event) {
         CfgFormapago formapago = (CfgFormapago) event.getObject();
+        //cuando es un separado se valida con respecto a la cuota inicial y no con la totalidad de la compra
+        float pago;
+        if (tipoFactura != 3) {
+            pago = totalFactura;
+        } else {
+            if (cuotaInicial <= 0) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Valor de la cuota inicial incorrecto"));
+                RequestContext.getCurrentInstance().update("msg");
+                setEnableBtnPrint(false);
+                return;
+            }
+            pago = cuotaInicial;
+        }
         float aux = totalFormaPago();
         if (formapago.getSubtotal() < 0 || !validarFormaPago(aux)) {
             formapago.setSubtotal(0);
         }
-        setEnableBtnPrint(totalFactura == aux);
+        setEnableBtnPrint(pago == aux);
     }
 
     public void onRowCancel(RowEditEvent event) {
 //        FacesMessage msg = new FacesMessage("Edit Cancelled", ((CfgFormapago) event.getObject()).getNomFormaPago());
 //        FacesContext.getCurrentInstance().addMessage(null, msg);
         CfgFormapago formapago = (CfgFormapago) event.getObject();
+        //cuando es un separado se valida con respecto a la cuota inicial y no con la totalidad de la compra
+        float pago;
+        if (tipoFactura != 3) {
+            pago = totalFactura;
+        } else {
+            if (cuotaInicial <= 0) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Valor de la cuota inicial incorrecto"));
+                RequestContext.getCurrentInstance().update("msg");
+                setEnableBtnPrint(false);
+                return;
+            }
+            pago = cuotaInicial;
+        }
         formapago.setSubtotal(0);
         float aux = totalFormaPago();
-        setEnableBtnPrint(totalFactura == aux);
+        setEnableBtnPrint(pago == aux);
     }
 
     private float totalFormaPago() {
@@ -1100,15 +1171,28 @@ public class FacturaMB implements Serializable {
     public void determinarValorFormaPago() {
         Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
         int idFormaPago = Integer.valueOf(params.get("idPago"));
+        //si es un separado se valida con respecto a la cuota inicial de lo contrario del total de la compra
+        float pago;
+        if (tipoFactura != 3) {
+            pago = totalFactura;
+        } else {
+            if (cuotaInicial <= 0) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Valor de la cuota inicial incorrecto"));
+                RequestContext.getCurrentInstance().update("msg");
+                setEnableBtnPrint(false);
+                return;
+            }
+            pago = cuotaInicial;
+        }
         float aux = totalFormaPago();
         for (CfgFormapago fpago : listaFormapagos) {
             if (fpago.getIdFormaPago() == idFormaPago && fpago.getSubtotal() == 0) {
-                fpago.setSubtotal(totalFactura - aux);
+                fpago.setSubtotal(pago - aux);
                 break;
             }
         }
         aux = totalFormaPago();
-        setEnableBtnPrint(totalFactura == aux);
+        setEnableBtnPrint(pago == aux);
         RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
         RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
     }
@@ -1118,13 +1202,17 @@ public class FacturaMB implements Serializable {
         if (documentoActual != null) {
             ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
             String ruta = null;
-            switch (tipoImpresion) {
-                case 1:
-                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaTicket.jasper");
-                    break;
-                case 2:
-                    ruta = servletContext.getRealPath("/facturacion/reportes/facturaCarta.jasper");
-                    break;
+            if (!documentoActual.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion().equals("7")) {//todo tipo de facturacion diferente a separado aplica el formato ticket y carta
+                switch (tipoImpresion) {
+                    case 1:
+                        ruta = servletContext.getRealPath("/facturacion/reportes/facturaTicket.jasper");
+                        break;
+                    case 2:
+                        ruta = servletContext.getRealPath("/facturacion/reportes/facturaCarta.jasper");
+                        break;
+                }
+            } else {//solo se aplica el formato carta
+                ruta = servletContext.getRealPath("/facturacion/reportes/separadoCarta.jasper");
             }
 //            setTipoImpresion(2);
             try {
@@ -1159,6 +1247,8 @@ public class FacturaMB implements Serializable {
         facturaReporte.setDetalle(crearListadoDetalle(documentodetalleFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setImpuesto(crearListadoImpuesto(documentoimpuestoFacade.buscarByDocumentoMaster(documento)));
         facturaReporte.setPago(crearListadoPago(docuementopagoFacade.buscarByDocumentoMaster(documento)));
+        FacCarteraCliente cartera = carteraClienteFacade.buscarPorDocumentoMaestro(documento);
+        facturaReporte.setCuotas(crearListadoCuotas(carteraDetalleFacade.buscarPorCartera(cartera)));
         facturas.add(facturaReporte);
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(facturas);
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1182,6 +1272,8 @@ public class FacturaMB implements Serializable {
                 case "6":
                     parametros.put("title", "VENTA No");
                     break;
+                case "7":
+                    parametros.put("title", "SEPARADO");
             }
             parametros.put("empresa", empresa.getNomEmpresa() + " - " + getSedeActual().getNomSede());
             parametros.put("direccion", getSedeActual().getDireccion());
@@ -1249,6 +1341,20 @@ public class FacturaMB implements Serializable {
         return list;
     }
 
+    private List<FacturaCuotasReporte> crearListadoCuotas(List<FacCarteraDetalle> cuotas) {
+        List<FacturaCuotasReporte> list = new ArrayList();
+        int i = 1;
+        for (FacCarteraDetalle cuota : cuotas) {
+            FacturaCuotasReporte cuotaReporte = new FacturaCuotasReporte();
+            cuotaReporte.setNumCuota(i);
+            cuotaReporte.setValor(cuota.getAbono());
+            cuotaReporte.setFecha(cuota.getFacCarteraDetallePK().getFecha());
+            list.add(cuotaReporte);
+            i++;
+        }
+        return list;
+    }
+
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
@@ -1258,6 +1364,7 @@ public class FacturaMB implements Serializable {
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
+        numCuotas = 2;
         totalUSD = 0;
         tipoFactura = 1;
         display = "none";
@@ -1805,5 +1912,21 @@ public class FacturaMB implements Serializable {
 
     public CfgEmpresasede getSedeActual() {
         return sedeActual;
+    }
+
+    public float getCuotaInicial() {
+        return cuotaInicial;
+    }
+
+    public void setCuotaInicial(float cuotaInicial) {
+        this.cuotaInicial = cuotaInicial;
+    }
+
+    public int getNumCuotas() {
+        return numCuotas;
+    }
+
+    public void setNumCuotas(int numCuotas) {
+        this.numCuotas = numCuotas;
     }
 }
