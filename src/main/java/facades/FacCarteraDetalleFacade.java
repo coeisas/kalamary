@@ -5,10 +5,13 @@
  */
 package facades;
 
+import entities.FacCarteraCliente;
 import entities.FacCarteraDetalle;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
+import javax.persistence.Query;
 
 /**
  *
@@ -26,6 +29,16 @@ public class FacCarteraDetalleFacade extends AbstractFacade<FacCarteraDetalle> {
 
     public FacCarteraDetalleFacade() {
         super(FacCarteraDetalle.class);
+    }
+    
+    public List<FacCarteraDetalle> buscarPorCartera(FacCarteraCliente cartera) {
+        try {
+           Query query = em.createQuery("SELECT c FROM FacCarteraDetalle c WHERE c.facCarteraCliente = ?1 ORDER BY c.facCarteraDetallePK.fecha DESC");
+           query.setParameter(1, cartera);
+           return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }        
     }
     
 }

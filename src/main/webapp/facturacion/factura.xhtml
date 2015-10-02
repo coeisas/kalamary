@@ -152,7 +152,7 @@
 
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
             <h:form id="FormBuscarCliente">
-                <p:dataTable value="#{facturaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{facturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                <p:dataTable value="#{facturaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{abonoMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
                     <p:column headerText="Empresa">
                         <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
                     </p:column>
@@ -224,14 +224,16 @@
                     <p:panelGrid class="panelGridSinBorder">
                         <p:row>
                             <p:column>
-                                <p:outputLabel class="labelFormularioObligatorio" value="Saldo Incial:"/>
-                                <p:inputText class="campoFormulario"/>
+                                <p:outputLabel class="labelFormularioObligatorio" value="Cuota Incial:"/>
+                                <p:inputText class="campoFormulario" value="#{facturaMB.cuotaInicial}">
+                                    <p:ajax event="keyup" update="@none"/>
+                                </p:inputText>
                             </p:column>
                         </p:row>
                         <p:row>
                             <p:column>
                                 <p:outputLabel class="labelFormularioObligatorio" value="No cuotas:"/>
-                                <p:inputText class="campoFormulario"/>
+                                <p:spinner min="2"  size="5" value="#{facturaMB.numCuotas}"/>
                             </p:column>
                         </p:row>
                     </p:panelGrid>

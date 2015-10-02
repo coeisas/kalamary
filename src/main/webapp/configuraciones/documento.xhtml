@@ -45,7 +45,7 @@
                             <p:selectOneMenu class="campoFormulario" value="#{documentoMB.aplicacion}">
                                 <p:ajax event="change" listener="#{documentoMB.validarAplicacion}" update="@none"/>
                                 <f:selectItem itemValue="#{null}" itemLabel="..."/>
-                                <f:selectItems value="#{documentoMB.listaAplicacionDocumento}" var="aplicacion" itemLabel="#{aplicacion.nomaplicacion}" itemValue="#{aplicacion.idaplicacion}"/>
+                                <f:selectItems value="#{documentoMB.listaAplicacionDocumento}" var="aplicacion" itemLabel="#{aplicacion.codaplicacion}-#{aplicacion.nomaplicacion}" itemValue="#{aplicacion.idaplicacion}"/>
                             </p:selectOneMenu>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>

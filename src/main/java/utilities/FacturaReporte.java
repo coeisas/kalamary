@@ -22,6 +22,7 @@ public class FacturaReporte extends NumberToLetterConverter {
     private List<FacturaDetalleReporte> detalle;
     private List<FacturaPagoReporte> pago;
     private List<FacturaImpuestoReporte> impuesto;
+    private List<FacturaCuotasReporte> cuotas;
 
     public FacturaReporte() {
 
@@ -110,4 +111,11 @@ public class FacturaReporte extends NumberToLetterConverter {
         this.numFac = numFac;
     }
 
+    public List<FacturaCuotasReporte> getCuotas() {
+        return cuotas;
+    }
+
+    public void setCuotas(List<FacturaCuotasReporte> cuotas) {
+        this.cuotas = cuotas;
+    }   
 }

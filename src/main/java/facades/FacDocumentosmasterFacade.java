@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.Date;
+import org.eclipse.persistence.internal.libraries.asm.tree.TryCatchBlockNode;
 
 /**
  *
@@ -286,6 +287,28 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
                 query.setParameter(5, fechafin);
             }
             return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //se utiliza cuando se busca un documento que referencia a otro. Ejm un recibo de caja puede contener un separado. Una factura puede contener un separado
+    public FacDocumentosmaster buscarPorDocumentoMasterReflexivo(FacDocumentosmaster documentoReflexivo) {
+        try {
+            Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.facDocumentosmaster = ?1");
+            query.setParameter(1, documentoReflexivo);
+            return (FacDocumentosmaster) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //se busca la factura que referencia a un separado
+    public FacDocumentosmaster buscarFacturaSeparado(FacDocumentosmaster separado) {
+        try {
+            Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.facDocumentosmaster = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'");
+            query.setParameter(1, separado);
+            return (FacDocumentosmaster) query.getSingleResult();
         } catch (Exception e) {
             return null;
         }
