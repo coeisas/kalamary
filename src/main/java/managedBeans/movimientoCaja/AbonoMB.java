@@ -74,6 +74,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import java.util.Calendar;
 import utilities.AuxilarMovInventario;
 import utilities.FacturaPagoReporte;
 
@@ -87,7 +88,8 @@ public class AbonoMB implements Serializable {
 
     private String identificacionCliente;
     private String nombreCliente;
-    private int cuotas;
+//    private int cuotas;
+    private Date fechaLimite;
     private float total;
     private float saldo;
     private float abono;
@@ -210,7 +212,7 @@ public class AbonoMB implements Serializable {
 //            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", carteraSeleccionada.getFacDocumentosmaster().determinarNumFactura()));
             total = carteraSeleccionada.getValor();
             saldo = carteraSeleccionada.getSaldo();
-            cuotas = carteraSeleccionada.getTotalcuotas();
+            fechaLimite = carteraSeleccionada.getFechaLimite();
             RequestContext.getCurrentInstance().execute("PF('dlgSeparados').hide()");
             listaDetalleCartera = carteraDetalleFacade.buscarPorCartera(carteraSeleccionada);
             RequestContext.getCurrentInstance().update("IdFormAbono");
@@ -224,7 +226,8 @@ public class AbonoMB implements Serializable {
         carteraSeleccionada = null;
         total = 0;
         saldo = 0;
-        cuotas = 0;
+        fechaLimite = null;
+//        cuotas = 0;
     }
 
     public void actualizarTablaFormaPago() {
@@ -283,7 +286,11 @@ public class AbonoMB implements Serializable {
                 RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').show()");
                 RequestContext.getCurrentInstance().update("FormModalPago");
             } else {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "El separado seleccionado no tiene cuotas pendientes"));
+                if (carteraSeleccionada.getEstado().equals("FINALIZADA")) {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "El separado seleccionado no tiene cuotas pendientes"));
+                } else {
+                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "El separado seleccionado ha caducado"));
+                }
             }
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione el separado a abonar"));
@@ -332,21 +339,22 @@ public class AbonoMB implements Serializable {
         }
         abono = totalFormaPago();
         if (abono <= 0) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El valor del abono no puede ser mayor que cero"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El valor del abono no puede ser menor que cero"));
             return false;
         }
-        int cuotaActual = carteraSeleccionada.getCuotaactual() + 1;
-        if (carteraSeleccionada.getTotalcuotas() == cuotaActual) {
-            if (abono < carteraSeleccionada.getSaldo()) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El abono no es suficiente para cubrir la ultima cuota"));
-                return false;
-            }
+        Calendar calendar = Calendar.getInstance();
+        if (carteraSeleccionada.getFechaLimite() != null) {
+            calendar.setTime(carteraSeleccionada.getFechaLimite());
         }
-        if (abono > carteraSeleccionada.getSaldo()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "El abonado excede al saldo"));
+        calendar.add(Calendar.DATE, 1);
+        Date fechaActual = new Date();
+        if (fechaActual.after(calendar.getTime())) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha excedido la fecha limite"));
+            carteraSeleccionada.setEstado("CADUCADA");
+            carteraClienteFacade.edit(carteraSeleccionada);
             return false;
         }
-        carteraSeleccionada.setCuotaactual(cuotaActual);
+        carteraSeleccionada.setCuotaactual(carteraSeleccionada.getCuotaactual() + 1);
         return ban;
     }
 
@@ -398,6 +406,10 @@ public class AbonoMB implements Serializable {
             documentosmasterFacade.create(documentosmaster);//SE CREA EL RECIBO DE CAJA
 
             //SE ACTUALIZA EL CONCECUTIVO DE RECIBO DE CAJA
+            if (documento.getActDocumento() == documento.getFinDocumento()) {
+                documento.setFinalizado(true);
+                documento.setActivo(false);
+            }
             documentoFacade.edit(documento);
 
             //SE CREA EL NUEVO DETALLE DE LA FACTURA CORRESPONDIENTE AL ABONADO Y REFERENCIA AL RECIBO DE CAJA CREADO
@@ -835,9 +847,6 @@ public class AbonoMB implements Serializable {
         return saldo;
     }
 
-    public int getCuotas() {
-        return cuotas;
-    }
 
     public List<CfgFormapago> getListaFormapagos() {
         return listaFormapagos;
@@ -849,6 +858,10 @@ public class AbonoMB implements Serializable {
 
     public FacDocumentosmaster getReciboReciente() {
         return reciboReciente;
+    }
+
+    public Date getFechaLimite() {
+        return fechaLimite;
     }
 
 }

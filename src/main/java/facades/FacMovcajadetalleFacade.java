@@ -19,6 +19,7 @@ import javax.persistence.Query;
  */
 @Stateless
 public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -30,8 +31,8 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
     public FacMovcajadetalleFacade() {
         super(FacMovcajadetalle.class);
     }
-    
-    public List<FacMovcajadetalle> buscarMovDetallePorMovCaja(FacMovcaja movcaja){
+
+    public List<FacMovcajadetalle> buscarMovDetallePorMovCaja(FacMovcaja movcaja) {
         try {
             Query query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja = ?1");
             query.setParameter(1, movcaja);
@@ -40,5 +41,15 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
             return null;
         }
     }
-    
+
+    public List<FacMovcajadetalle> buscarMovDetallePorMovCajaAndEfectivo(FacMovcaja movcaja) {
+        try {
+            Query query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja = ?1 AND mcd.cfgFormapago.codFormaPago LIKE '1'");
+            query.setParameter(1, movcaja);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

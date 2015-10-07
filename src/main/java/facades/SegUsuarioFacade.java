@@ -102,6 +102,16 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
         }
     }
 
+    public List<SegUsuario> buscarPorEmpresaActivos(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.activo = TRUE");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public SegUsuario buscarPorEmpresaAndDocumento(CfgEmpresa empresa, String documento) {
         try {
             Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.numDoc = ?2");
@@ -123,7 +133,7 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
             return null;
         }
     }
-    
+
     public SegUsuario buscarVendedorByEmpresaAndDocumento(CfgEmpresa empresa, String documento) {
         try {
             Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.numDoc = ?2 AND u.cfgRolIdrol.codrol = '00003'");
@@ -133,5 +143,16 @@ public class SegUsuarioFacade extends AbstractFacade<SegUsuario> {
         } catch (Exception e) {
             return null;
         }
-    }    
+    }
+
+    public SegUsuario buscarUsuarioByEmpresaAndDocumento(CfgEmpresa empresa, String documento) {
+        try {
+            Query query = em.createQuery("SELECT u FROM SegUsuario u WHERE u.cfgempresaidEmpresa = ?1 AND u.numDoc = ?2");
+            query.setParameter(1, empresa);
+            query.setParameter(2, documento);
+            return (SegUsuario) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
