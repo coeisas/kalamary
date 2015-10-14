@@ -1360,13 +1360,14 @@ public class FacturaMB implements Serializable {
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
-//        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
+        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
         listaFormapagos = formapagoFacade.buscarPorEmpresa(getSedeActual().getCfgempresaidEmpresa());
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
 //        numCuotas = 2;
+        observacion = "";
         fechaLimite = new Date();
         totalUSD = 0;
         tipoFactura = 1;
