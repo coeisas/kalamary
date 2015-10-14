@@ -42,5 +42,17 @@ public class CfgFormapagoFacade extends AbstractFacade<CfgFormapago> {
         }
 
     }
+    
+        public CfgFormapago buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
+        try {
+            Query query = em.createQuery("SELECT f FROM CfgFormapago f WHERE f.cfgempresaidEmpresa = ?1 AND f.codFormaPago LIKE ?2");
+            query.setParameter(1, empresa);
+            query.setParameter(2, codigo);
+            return (CfgFormapago) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
 
 }

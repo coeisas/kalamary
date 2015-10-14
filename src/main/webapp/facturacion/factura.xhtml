@@ -218,7 +218,7 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="25%" resizable="false">
+        <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="30%" resizable="false">
             <h:form id="FormModalFactura">
                 <p:panel style="display: #{facturaMB.display}">
                     <p:panelGrid class="panelGridSinBorder">
@@ -232,8 +232,8 @@
                         </p:row>
                         <p:row>
                             <p:column>
-                                <p:outputLabel class="labelFormularioObligatorio" value="No cuotas:"/>
-                                <p:spinner min="2"  size="5" value="#{facturaMB.numCuotas}"/>
+                                <p:outputLabel class="labelFormularioObligatorio" value="Fecha Limite:"/>
+                                <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{facturaMB.fechaLimite}"/>
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -301,11 +301,12 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="50%" resizable="false">
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="60%" resizable="false">
             <h:form id="FormModalVendedor">
                 <p:dataTable value="#{facturaMB.listaVendedor}" var="vendedor" selection="#{facturaMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single" emptyMessage="No hay vendedores registrados">
                     <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
                     <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                    <p:column headerText="Rol">#{vendedor.cfgRolIdrol.nomrol}</p:column>
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Aceptar" actionListener="#{facturaMB.cargarInformacionVendedor}"/>

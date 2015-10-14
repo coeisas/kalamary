@@ -51,7 +51,7 @@
                 disabledSelection="true"
                 style="width: 80%;margin: 0 auto"
                 emptyMessage="No hay abonos registrados">
-                <f:facet name="header">Detalle Separado</f:facet>
+                <f:facet name="header">Detalle Separado #{abonoMB.carteraSeleccionada.facDocumentosmaster.determinarNumFactura()}</f:facet>
                 <p:column headerText="Valor">
                     <h:outputText value="#{detalle.abono}">
                         <f:convertNumber type="currency"/>
@@ -77,8 +77,10 @@
                             <f:convertNumber type="currency"/>
                         </p:inputText>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Cuotas:"/>
-                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.cuotas}"/>
+                        <p:outputLabel class="labelFormulario" value="Fecha Limite:"/>
+                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.fechaLimite}">
+                            <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="dd/MM/yyyy"/>
+                        </p:inputText>
                     </p:column>
                 </p:row>
                 <p:row>

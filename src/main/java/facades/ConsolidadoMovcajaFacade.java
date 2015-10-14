@@ -50,6 +50,7 @@ public class ConsolidadoMovcajaFacade extends AbstractFacade<ConsolidadoMovcaja>
             }
             sql = sql.concat(" GROUP BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago ORDER BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago");
 //            Query query = em.createQuery("SELECT m FROM ConsolidadoMovcaja m WHERE m.cfgEmpresasede = ?1 AND m.facCaja = ?2 AND m.consolidadoMovcajaPK.fecha >= ?3 AND m.consolidadoMovcajaPK.fecha <= ?4 GROUP BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago ORDER BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago");
+            System.out.println(sql);
             Query query = em.createQuery(sql);
             query.setParameter(1, sede);
             if (caja != null) {

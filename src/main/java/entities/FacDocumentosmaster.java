@@ -80,8 +80,8 @@ public class FacDocumentosmaster implements Serializable {
     private List<FacDocuementopago> facDocuementopagoList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacDocumentoimpuesto> facDocumentoimpuestoList;
-    @JoinColumn(name = "cfg_cliente_idCliente", referencedColumnName = "idCliente", nullable = false)
-    @ManyToOne(optional = false)
+    @JoinColumn(name = "cfg_cliente_idCliente", referencedColumnName = "idCliente")
+    @ManyToOne
     private CfgCliente cfgclienteidCliente;
     @JoinColumn(name = "cfg_documento_idDoc", referencedColumnName = "idDoc", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)

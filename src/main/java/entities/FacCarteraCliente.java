@@ -6,6 +6,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -19,6 +20,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -38,7 +41,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacCarteraCliente.findBySaldo", query = "SELECT f FROM FacCarteraCliente f WHERE f.saldo = :saldo"),
     @NamedQuery(name = "FacCarteraCliente.findByTotalcuotas", query = "SELECT f FROM FacCarteraCliente f WHERE f.totalcuotas = :totalcuotas"),
     @NamedQuery(name = "FacCarteraCliente.findByCuotaactual", query = "SELECT f FROM FacCarteraCliente f WHERE f.cuotaactual = :cuotaactual"),
-    @NamedQuery(name = "FacCarteraCliente.findByEstado", query = "SELECT f FROM FacCarteraCliente f WHERE f.estado = :estado")})
+    @NamedQuery(name = "FacCarteraCliente.findByEstado", query = "SELECT f FROM FacCarteraCliente f WHERE f.estado = :estado"),
+    @NamedQuery(name = "FacCarteraCliente.findByFechaLimite", query = "SELECT f FROM FacCarteraCliente f WHERE f.fechaLimite = :fechaLimite")})
 public class FacCarteraCliente implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -49,15 +53,16 @@ public class FacCarteraCliente implements Serializable {
     @Basic(optional = false)
     @Column(name = "saldo", nullable = false)
     private float saldo;
-    @Basic(optional = false)
-    @Column(name = "totalcuotas", nullable = false)
-    private int totalcuotas;
-    @Basic(optional = false)
-    @Column(name = "cuotaactual", nullable = false)
-    private int cuotaactual;
+    @Column(name = "totalcuotas")
+    private Integer totalcuotas;
+    @Column(name = "cuotaactual")
+    private Integer cuotaactual;
     @Basic(optional = false)
     @Column(name = "estado", nullable = false, length = 45)
     private String estado;
+    @Column(name = "fecha_limite")
+    @Temporal(TemporalType.DATE)
+    private Date fechaLimite;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facCarteraCliente")
     private List<FacCarteraDetalle> facCarteraDetalleList;
     @JoinColumn(name = "cfg_cliente_idCliente", referencedColumnName = "idCliente", nullable = false, insertable = false, updatable = false)
@@ -76,12 +81,10 @@ public class FacCarteraCliente implements Serializable {
         this.facCarteraClientePK = facCarteraClientePK;
     }
 
-    public FacCarteraCliente(FacCarteraClientePK facCarteraClientePK, float valor, float saldo, int totalcuotas, int cuotaactual, String estado) {
+    public FacCarteraCliente(FacCarteraClientePK facCarteraClientePK, float valor, float saldo, String estado) {
         this.facCarteraClientePK = facCarteraClientePK;
         this.valor = valor;
         this.saldo = saldo;
-        this.totalcuotas = totalcuotas;
-        this.cuotaactual = cuotaactual;
         this.estado = estado;
     }
 
@@ -113,19 +116,19 @@ public class FacCarteraCliente implements Serializable {
         this.saldo = saldo;
     }
 
-    public int getTotalcuotas() {
+    public Integer getTotalcuotas() {
         return totalcuotas;
     }
 
-    public void setTotalcuotas(int totalcuotas) {
+    public void setTotalcuotas(Integer totalcuotas) {
         this.totalcuotas = totalcuotas;
     }
 
-    public int getCuotaactual() {
+    public Integer getCuotaactual() {
         return cuotaactual;
     }
 
-    public void setCuotaactual(int cuotaactual) {
+    public void setCuotaactual(Integer cuotaactual) {
         this.cuotaactual = cuotaactual;
     }
 
@@ -135,6 +138,14 @@ public class FacCarteraCliente implements Serializable {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Date getFechaLimite() {
+        return fechaLimite;
+    }
+
+    public void setFechaLimite(Date fechaLimite) {
+        this.fechaLimite = fechaLimite;
     }
 
     @XmlTransient

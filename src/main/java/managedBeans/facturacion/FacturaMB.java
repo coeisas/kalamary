@@ -129,7 +129,8 @@ public class FacturaMB implements Serializable {
     private float totalUSD;
     private float utilidad;
     private float cuotaInicial;
-    private int numCuotas;
+//    private int numCuotas;
+    private Date fechaLimite;
     private String observacion;
     private SegUsuario vendedorSeleccionado;
     private LazyDataModel<CfgProducto> listaProducto;
@@ -252,7 +253,8 @@ public class FacturaMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeActual = sesionMB.getSedeActual();
         empresaActual = sesionMB.getEmpresaActual();
-        numCuotas = 2;
+//        numCuotas = 2;
+        fechaLimite = new Date();
         display = "none";
         if (empresaActual != null) {
             actualizarListadoClientes();
@@ -295,7 +297,7 @@ public class FacturaMB implements Serializable {
 
     public void cargarListaVendedores() {
         if (empresaActual != null) {
-            listaVendedor = usuarioFacade.buscarVendedoresByEmpresa(empresaActual);
+            listaVendedor = usuarioFacade.buscarPorEmpresaActivos(empresaActual);
         } else {
             listaVendedor = new ArrayList();
         }
@@ -720,6 +722,16 @@ public class FacturaMB implements Serializable {
         if (!validarCampos(documento)) {
             return;
         }
+        if (tipoFactura == 3) {//en separados se valida la fecha limite
+            if (fechaLimite == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Fecha limite necesaria"));
+                return;
+            }
+            if (fechaLimite.before(new Date())) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Revice la fecha limite"));
+                return;
+            }
+        }
         CfgDocumento documentoMovInventario = documentoFacade.buscarDocumentoInventarioSalidaBySede(getSedeActual());
         if (documentoMovInventario == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a movimiento de inventario de salida"));
@@ -893,7 +905,8 @@ public class FacturaMB implements Serializable {
             carteraCliente.setFacCarteraClientePK(new FacCarteraClientePK(clienteSeleccionado.getIdCliente(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento()));
             carteraCliente.setCfgCliente(documento.getCfgclienteidCliente());
             carteraCliente.setFacDocumentosmaster(documento);
-            carteraCliente.setTotalcuotas(numCuotas);
+//            carteraCliente.setTotalcuotas(numCuotas);
+            carteraCliente.setFechaLimite(fechaLimite);
             carteraCliente.setCuotaactual(1);//corresponde a la inicial
             carteraCliente.setEstado("PENDIENTE");//cuando se termine de pagar todas la cuotas pasara A FINALIZADA
             float totalSeparado = documento.getTotal();
@@ -1358,13 +1371,15 @@ public class FacturaMB implements Serializable {
     private void limpiarFormulario() {
         listaDetalle.clear();
         clienteSeleccionado = clienteFacade.buscarClienteDefault(getSedeActual().getCfgempresaidEmpresa());
-//        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
+        setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
         listaFormapagos = formapagoFacade.buscarPorEmpresa(getSedeActual().getCfgempresaidEmpresa());
         cargarInformacionCliente();
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
-        numCuotas = 2;
+//        numCuotas = 2;
+        observacion = "";
+        fechaLimite = new Date();
         totalUSD = 0;
         tipoFactura = 1;
         display = "none";
@@ -1922,11 +1937,18 @@ public class FacturaMB implements Serializable {
         this.cuotaInicial = cuotaInicial;
     }
 
-    public int getNumCuotas() {
-        return numCuotas;
+//    public int getNumCuotas() {
+//        return numCuotas;
+//    }
+//
+//    public void setNumCuotas(int numCuotas) {
+//        this.numCuotas = numCuotas;
+//    }
+    public Date getFechaLimite() {
+        return fechaLimite;
     }
 
-    public void setNumCuotas(int numCuotas) {
-        this.numCuotas = numCuotas;
+    public void setFechaLimite(Date fechaLimite) {
+        this.fechaLimite = fechaLimite;
     }
 }

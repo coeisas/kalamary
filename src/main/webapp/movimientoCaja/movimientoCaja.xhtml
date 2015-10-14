@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../templates/layout.xhtml">   
+    <ui:define name="title">Movimiento Caja</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormMovimientoCaja">            
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row><p:column>Movimiento Caja</p:column></p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel value="Movimiento:" class="labelFormularioObligatorio" />
+                        <p:selectOneMenu value="#{movimientoCajaMB.idMovimientoCaja}">
+                            <p:ajax event="change" listener="#{movimientoCajaMB.validarConcecutivo}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{movimientoCajaMB.tiposMovimientoCaja}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel value="Usuario:" class="labelFormularioObligatorio"/>
+                        <p:inputText id="IdIdentificacionUsuario" class="campoFormulario" value="#{movimientoCajaMB.identificacionUsuario}">
+                            <p:ajax event="blur" listener="#{movimientoCajaMB.buscarUsuario}" update="@none"/>
+                        </p:inputText>
+                        <p:watermark for="IdIdentificacionUsuario" value="Identificacion usuario"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Usuario" actionListener="#{movimientoCajaMB.cargarUsuarios}"/>
+                        <p:outputLabel id="IdNombreCliente" class="labelFormularioInformativa" value="#{movimientoCajaMB.nombreUsuario}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel value="Valor:" class="labelFormularioObligatorio"/>
+                        <p:inputText class="campoFormulario" value="#{movimientoCajaMB.valor}">
+                        </p:inputText>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:inputTextarea id="IdConcepto" value="#{movimientoCajaMB.concepto}" style="width: 99%"/>
+                        <p:watermark for="IdConcepto" value="Concepto"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-disk" actionListener="#{movimientoCajaMB.guardarMovimiento}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog widgetVar="dlgUsuario" header="BUSCAR USUARIO" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarUsuario">
+                <p:dataTable value="#{movimientoCajaMB.listaUsuarios}" var="usuario" selectionMode="single" selection="#{movimientoCajaMB.usuarioMovimiento}" rows="10" rowKey="#{usuario.idUsuario}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificion">
+                        <h:outputText value="#{usuario.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{usuario.nombreCompleto()}"/>
+                    </p:column>
+                    <p:column headerText="Rol">
+                        <h:outputText value="#{usuario.cfgRolIdrol.nomrol}"/>
+                    </p:column>
+                    <p:column headerText="Sede">
+                        <h:outputText value="#{usuario.cfgempresasedeidSede.nomSede}"/>
+                    </p:column>                    
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{movimientoCajaMB.cargarInformacionUsuario}"/>
+            </h:form>                                
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+
