@@ -148,8 +148,8 @@
                 <p:dataTable value="#{cotizacionMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{cotizacionMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
                     <p:ajax event="rowSelect" listener="#{cotizacionMB.insertarItemProducto}" update="@none" />
                     <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
-                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
-                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto}</p:column>
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
                     <p:column headerText="Precio">
                         <h:outputText value="#{producto.precio}">

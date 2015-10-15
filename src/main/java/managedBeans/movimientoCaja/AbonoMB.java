@@ -401,6 +401,7 @@ public class AbonoMB implements Serializable {
             documentosmaster.setFecCrea(new Date());
             documentosmaster.setSegusuarioidUsuario(usuarioActual);
             documentosmaster.setTotal(abono);
+            documentosmaster.setObservaciones("ABONO A " + carteraSeleccionada.getFacDocumentosmaster().determinarNumFactura());
             //AQUI SE RELACIONA EL RECIBO DE CAJA CON EL SEPARADO QUE ESTA EMBEBIDO EN LA CARTERA SELECCIONADA
             documentosmaster.setFacDocumentosmaster(carteraSeleccionada.getFacDocumentosmaster());
             documentosmasterFacade.create(documentosmaster);//SE CREA EL RECIBO DE CAJA
@@ -526,7 +527,7 @@ public class AbonoMB implements Serializable {
             }
             parametros.put("telefono", telefono);
             parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
-            parametros.put("accion","RECIBÍ DE:");
+            parametros.put("accion", "RECIBÍ DE:");
             parametros.put("SUBREPORT_DIR", rutaReportes);
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
@@ -847,7 +848,6 @@ public class AbonoMB implements Serializable {
     public float getSaldo() {
         return saldo;
     }
-
 
     public List<CfgFormapago> getListaFormapagos() {
         return listaFormapagos;
