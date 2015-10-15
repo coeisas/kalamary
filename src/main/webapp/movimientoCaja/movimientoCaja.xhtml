@@ -27,13 +27,21 @@
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel value="Usuario:" class="labelFormularioObligatorio"/>
-                        <p:inputText id="IdIdentificacionUsuario" class="campoFormulario" value="#{movimientoCajaMB.identificacionUsuario}">
-                            <p:ajax event="blur" listener="#{movimientoCajaMB.buscarUsuario}" update="@none"/>
+                        <p:selectOneRadio value="#{movimientoCajaMB.idProtagonista}">
+                            <p:ajax event="valueChange" listener="#{movimientoCajaMB.actualizarLabelProtagonista}" update="@none"/>
+                            <f:selectItems value="#{movimientoCajaMB.protagonistas}"/>
+                        </p:selectOneRadio>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel id="IdProtagonista" value="#{movimientoCajaMB.labelProtagonista}" class="labelFormularioObligatorio"/>
+                        <p:inputText id="IdIdentificacionProtagonista" class="campoFormulario" value="#{movimientoCajaMB.identificacionProtagonista}">
+                            <p:ajax event="blur" listener="#{movimientoCajaMB.buscarProtagonista}" update="@none"/>
                         </p:inputText>
-                        <p:watermark for="IdIdentificacionUsuario" value="Identificacion usuario"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Usuario" actionListener="#{movimientoCajaMB.cargarUsuarios}"/>
-                        <p:outputLabel id="IdNombreCliente" class="labelFormularioInformativa" value="#{movimientoCajaMB.nombreUsuario}"/>
+                        <p:watermark for="IdIdentificacionProtagonista" value="Identificacion"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar" actionListener="#{movimientoCajaMB.cargarProtagonistas}"/>
+                        <p:outputLabel id="IdNombreProtagonista" class="labelFormularioInformativa" value="#{movimientoCajaMB.nombreProtagonista}"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -51,7 +59,8 @@
                 </p:row>
                 <p:row>
                     <p:column style="text-align: center">
-                        <p:commandButton icon="ui-icon-disk" actionListener="#{movimientoCajaMB.guardarMovimiento}"/>
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{movimientoCajaMB.guardarMovimiento}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-print" value="Recibo" actionListener="#{movimientoCajaMB.imprimirRecibo}"/>
                     </p:column>
                 </p:row>
             </p:panelGrid>
@@ -74,8 +83,46 @@
                     </p:column>                    
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{movimientoCajaMB.cargarInformacionUsuario}"/>
+                <p:commandButton value="Aceptar" actionListener="#{movimientoCajaMB.cargarInformacionProtagonista}"/>
             </h:form>                                
+        </p:dialog>
+
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{movimientoCajaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{movimientoCajaMB.clienteMovimiento}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Empresa">
+                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Identificacion">
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{movimientoCajaMB.cargarInformacionProtagonista}"/>
+                </div>
+            </h:form>            
+        </p:dialog>
+
+        <p:dialog widgetVar="dlgResult" modal="true" header="CONFIRMAR IMPRESION" resizable="false" width="25%">
+            <h:form id="IdFormConfirmacion">
+                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel class="labelFormulario" value="Recibo Caja:"/>
+                            <p:outputLabel class="labelFormularioInformativa" value="#{movimientoCajaMB.numReciboCaja}"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column style="text-align: center">
+                            <p:commandButton icon="ui-icon-circle-check" value="&nbsp;" actionListener="#{movimientoCajaMB.generarRC}" ajax="false" onclick="this.form.target = '_blank'"/>
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+            </h:form>
         </p:dialog>
     </ui:define>
 </ui:composition>

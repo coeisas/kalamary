@@ -14,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -34,34 +35,28 @@ public class ConsolidadoMovcajaFacade extends AbstractFacade<ConsolidadoMovcaja>
         super(ConsolidadoMovcaja.class);
     }
 
-//    USADO PARA EL INFORME DE MOVIMIENTO DE CAJAS
-    public List<ConsolidadoMovcaja> buscarPorSedeAndCaja(CfgEmpresasede sede, FacCaja caja, Date fechaInicial, Date FechaFinal) {
+    //    USADO PARA EL INFORME DE MOVIMIENTO DE CAJAS
+    public List<ConsolidadoMovcaja> buscarPorSedeAndCaja(CfgEmpresasede sede, FacCaja caja, Date fechaInicial, Date fechaFinal) {
         try {
-//            SELECT * FROM consolidado_movcaja  GROUP BY cfg_empresasede_idSede, fac_caja_idCaja, fecha, cfg_formapago_idFormaPago ORDER BY cfg_empresasede_idSede, fac_caja_idCaja, fecha, cfg_formapago_idFormaPago
-            String sql = "SELECT m FROM ConsolidadoMovcaja m WHERE m.cfgEmpresasede = ?1";
+            String auxDate;
+//            SELECT * FROM `consolidado_movcaja` WHERE cfg_empresasede_idSede = 3 AND fac_caja_idCaja = 1 AND fecha >= '2015-10-14' AND fecha <= '2015-10-14'
+            String consulta = "SELECT * FROM consolidado_movcaja WHERE cfg_empresasede_idSede = " + sede.getIdSede();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             if (caja != null) {
-                sql = sql.concat(" AND m.facCaja = ?2");
+                consulta = consulta.concat(" AND fac_caja_idCaja = " + caja.getIdCaja());
+
             }
             if (fechaInicial != null) {
-                sql = sql.concat(" AND m.consolidadoMovcajaPK.fecha >= ?3");
+                auxDate = sdf.format(fechaInicial);
+                consulta = consulta.concat(" AND fecha >= '" + auxDate + "'");
             }
-            if (FechaFinal != null) {
-                sql = sql.concat(" AND m.consolidadoMovcajaPK.fecha <= ?4");
+            if (fechaFinal != null) {
+                auxDate = sdf.format(fechaFinal);
+                consulta = consulta.concat(" AND fecha <= '" + auxDate + "'");
             }
-            sql = sql.concat(" GROUP BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago ORDER BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago");
-//            Query query = em.createQuery("SELECT m FROM ConsolidadoMovcaja m WHERE m.cfgEmpresasede = ?1 AND m.facCaja = ?2 AND m.consolidadoMovcajaPK.fecha >= ?3 AND m.consolidadoMovcajaPK.fecha <= ?4 GROUP BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago ORDER BY m.cfgEmpresasede, m.facCaja, m.consolidadoMovcajaPK.fecha, m.cfgFormapago");
-            System.out.println(sql);
-            Query query = em.createQuery(sql);
-            query.setParameter(1, sede);
-            if (caja != null) {
-                query.setParameter(2, caja);
-            }
-            if (fechaInicial != null) {
-                query.setParameter(3, fechaInicial);
-            }
-            if (FechaFinal != null) {
-                query.setParameter(4, FechaFinal);
-            }
+            consulta = consulta.concat(" GROUP BY cfg_empresasede_idSede, fac_caja_idCaja, fecha, cfg_formapago_idFormaPago ORDER BY cfg_empresasede_idSede, fac_caja_idCaja, fecha, cfg_formapago_idFormaPago");
+//            System.out.println(consulta);
+            Query query = em.createNativeQuery(consulta, ConsolidadoMovcaja.class);
             return query.getResultList();
         } catch (Exception e) {
             return null;

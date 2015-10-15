@@ -499,7 +499,7 @@ public class AbonoMB implements Serializable {
         reciboCajaReporte.setCiudad(sedeActual.getCfgMunicipio().getNomMunicipio());
         reciboCajaReporte.setFecha(reciboReciente.getFecCrea());
         reciboCajaReporte.setValor(reciboReciente.getTotal());
-        reciboCajaReporte.setCliente(reciboReciente.getCfgclienteidCliente().nombreCompleto());
+        reciboCajaReporte.setProtagonista(reciboReciente.getCfgclienteidCliente().nombreCompleto());
         String separado = reciboReciente.getFacDocumentosmaster().determinarNumFactura();
         FacCarteraCliente facCarteraCliente = carteraClienteFacade.buscarPorDocumentoMaestro(reciboReciente.getFacDocumentosmaster());
         String pendiente = String.valueOf(facCarteraCliente.getSaldo());
@@ -526,6 +526,7 @@ public class AbonoMB implements Serializable {
             }
             parametros.put("telefono", telefono);
             parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            parametros.put("accion","RECIBÍ DE:");
             parametros.put("SUBREPORT_DIR", rutaReportes);
             JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
             JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
