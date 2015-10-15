@@ -18,7 +18,7 @@ public class ReciboCajaReporte extends NumberToLetterConverter {
     private String ciudad;
     private Date fecha;
     private float valor;
-    private String cliente;
+    private String protagonista;
     private String concepto;
     private String valorNominal;
     private List<FacturaPagoReporte> formaPago;
@@ -60,12 +60,12 @@ public class ReciboCajaReporte extends NumberToLetterConverter {
         this.valor = valor;
     }
 
-    public String getCliente() {
-        return cliente;
+    public String getProtagonista() {
+        return protagonista;
     }
 
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
+    public void setProtagonista(String protagonista) {
+        this.protagonista = protagonista;
     }
 
     public String getConcepto() {

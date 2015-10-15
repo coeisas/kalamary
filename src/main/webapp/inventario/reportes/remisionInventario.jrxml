@@ -87,7 +87,7 @@
 	</pageHeader>
 	<detail>
 		<band height="62" splitType="Stretch">
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="68" y="0" width="325" height="20" uuid="8873e2bb-f9fa-4711-b92d-e1276db6af46"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression><![CDATA[$F{direccion}]]></textFieldExpression>
@@ -99,7 +99,7 @@
 				</textElement>
 				<text><![CDATA[DIRECCION]]></text>
 			</staticText>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="119" y="20" width="274" height="20" uuid="f110706c-2197-41fc-904f-09b3ff8e4ebc"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression><![CDATA[$F{transportadora}]]></textFieldExpression>
@@ -111,7 +111,7 @@
 				</textElement>
 				<text><![CDATA[TRANSPORTADORA]]></text>
 			</staticText>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="78" y="39" width="494" height="20" uuid="7f548113-9ed3-468d-972b-075676186e40"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression><![CDATA[$F{conductor}]]></textFieldExpression>
@@ -123,7 +123,7 @@
 				</textElement>
 				<text><![CDATA[CONDUCTOR]]></text>
 			</staticText>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="451" y="0" width="121" height="20" uuid="f884c5f7-3c2c-463f-bdbf-aadd3c322deb"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression><![CDATA[$F{ciudad}]]></textFieldExpression>
@@ -135,7 +135,7 @@
 				</textElement>
 				<text><![CDATA[CIUDAD]]></text>
 			</staticText>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="451" y="21" width="121" height="19" uuid="2ad618b7-c30f-4465-9a53-613ea051660e"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression><![CDATA[$F{placa}]]></textFieldExpression>
@@ -179,7 +179,7 @@
 			<rectangle radius="10">
 				<reportElement x="0" y="0" width="393" height="44" uuid="1b42cfa8-6ea6-4df2-aea4-215b8c3d8aa0"/>
 			</rectangle>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="0" y="22" width="393" height="20" uuid="85ad7e7d-8e0c-40a9-a6eb-cd1c909dd2bd"/>
 				<textFieldExpression><![CDATA[$F{observacion}]]></textFieldExpression>
 			</textField>
@@ -199,11 +199,11 @@
 			<rectangle radius="10">
 				<reportElement x="402" y="0" width="170" height="44" uuid="c3290db1-3725-4cbd-a07d-e120459b270c"/>
 			</rectangle>
-			<textField isStretchWithOverflow="true">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement x="0" y="71" width="159" height="20" uuid="4932a793-d83d-4949-8256-b58819f69ff8"/>
 				<textFieldExpression><![CDATA[$F{despachador}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField isBlankWhenNull="true">
 				<reportElement x="474" y="22" width="96" height="20" uuid="b5ecdc15-9023-407e-b94d-418306ec107f"/>
 				<textFieldExpression><![CDATA[$F{peso}]]></textFieldExpression>
 			</textField>

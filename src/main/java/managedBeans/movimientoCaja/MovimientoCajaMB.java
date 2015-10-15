@@ -5,6 +5,7 @@
  */
 package managedBeans.movimientoCaja;
 
+import entities.CfgCliente;
 import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
@@ -18,6 +19,7 @@ import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
 import entities.FacMovcajadetallePK;
 import entities.SegUsuario;
+import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.FacCajaFacade;
@@ -26,19 +28,36 @@ import facades.FacDocumentosmasterFacade;
 import facades.FacMovcajaFacade;
 import facades.FacMovcajadetalleFacade;
 import facades.SegUsuarioFacade;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.model.SelectItem;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import managedBeans.seguridad.SesionMB;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.primefaces.context.RequestContext;
+import org.primefaces.model.LazyDataModel;
+import utilities.FacturaPagoReporte;
+import utilities.LazyClienteDataModel;
+import utilities.ReciboCajaReporte;
 
 /**
  *
@@ -50,24 +69,34 @@ public class MovimientoCajaMB implements Serializable {
 
     private int idMovimientoCaja;
     private SegUsuario usuarioEntrega;
-    private String identificacionUsuario;
+    private int idProtagonista;
+    private String identificacionProtagonista;
     private float valor;
     private String concepto;
 
-    private String nombreUsuario;
+    private FacDocumentosmaster reciboReciente;
+    private String numReciboCaja;
+
+    private String nombreProtagonista;
+    private String labelProtagonista;
 
     private List<SegUsuario> listaUsuarios;
+    private LazyDataModel<CfgCliente> listaClientes;
     private List<SelectItem> tiposMovimientoCaja;
+    private List<SelectItem> protagonistas;
 
     private SegUsuario usuarioActual;//usuario que genera el movimiento
     private FacCaja cajaUsuario;
     private FacMovcaja movimientoCajaMaster;//contiene informacion del maestro del movimiento. Se crea uno cada vez que se habre caja. cuando se cierra se habilita
     private SegUsuario usuarioMovimiento;//usuario protagonista del movimiento. Ingresa o recibe dinero
+    private CfgCliente clienteMovimiento;//cliente protagonista del movimiento. Ingresa o recibe dinero
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
 
     @EJB
     SegUsuarioFacade usuarioFacade;
+    @EJB
+    CfgClienteFacade clienteFacade;
     @EJB
     FacCajaFacade cajaFacade;
     @EJB
@@ -98,41 +127,83 @@ public class MovimientoCajaMB implements Serializable {
         tiposMovimientoCaja.add(selectItem);
         selectItem = new SelectItem(2, "EGRESO");
         tiposMovimientoCaja.add(selectItem);
+        protagonistas = new ArrayList();
+        selectItem = new SelectItem(1, "USUARIO");
+        protagonistas.add(selectItem);
+        selectItem = new SelectItem(2, "CLIENTE");
+        protagonistas.add(selectItem);
+        idProtagonista = 1;
+        labelProtagonista = "Usuario:";
         if (usuarioActual != null) {
             cajaUsuario = usuarioActual.getFaccajaidCaja();
         }
     }
 
-    public void cargarUsuarios() {
+    public void actualizarLabelProtagonista() {
+        if (idProtagonista == 1) {
+            labelProtagonista = "Usuario:";
+            clienteMovimiento = null;
+        } else {
+            labelProtagonista = "Cliente:";
+            usuarioMovimiento = null;
+        }
+        cargarInformacionProtagonista();
+        RequestContext.getCurrentInstance().update("IdFormMovimientoCaja:IdProtagonista");
+    }
+
+    public void cargarProtagonistas() {
         if (empresaActual != null) {
-            listaUsuarios = usuarioFacade.buscarPorEmpresaActivos(empresaActual);
-            RequestContext.getCurrentInstance().update("FormBuscarUsuario");
-            RequestContext.getCurrentInstance().execute("PF('dlgUsuario').show()");
+            if (idProtagonista == 1) {
+                listaUsuarios = usuarioFacade.buscarPorEmpresaActivos(empresaActual);
+                RequestContext.getCurrentInstance().update("FormBuscarUsuario");
+                RequestContext.getCurrentInstance().execute("PF('dlgUsuario').show()");
+            } else {
+                cargarClientes();
+            }
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la empresa"));
         }
     }
 
-    public void buscarUsuario() {
+    public void cargarClientes() {
         if (empresaActual != null) {
-            if (!identificacionUsuario.isEmpty()) {
-                usuarioMovimiento = usuarioFacade.buscarUsuarioByEmpresaAndDocumento(empresaActual, identificacionUsuario);
+            listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
+            RequestContext.getCurrentInstance().update("FormBuscarCliente");
+            RequestContext.getCurrentInstance().execute("PF('dlgCliente').show()");
+        }
+    }
+
+    public void buscarProtagonista() {
+        if (empresaActual != null) {
+            if (!identificacionProtagonista.trim().isEmpty()) {
+                if (idProtagonista == 1) {
+                    usuarioMovimiento = usuarioFacade.buscarUsuarioByEmpresaAndDocumento(empresaActual, identificacionProtagonista);
+                } else {
+                    clienteMovimiento = clienteFacade.buscarPorIdentificacionAndIdEmpresa(identificacionProtagonista, empresaActual);
+                }
             }
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha cargado la informacion de la empresa. Reinicie sesion"));
         }
-        cargarInformacionUsuario();
+        cargarInformacionProtagonista();
 
     }
 
-    public void cargarInformacionUsuario() {
+    public void cargarInformacionProtagonista() {
         if (usuarioMovimiento != null) {
-            nombreUsuario = usuarioMovimiento.nombreCompleto();
-            identificacionUsuario = usuarioMovimiento.getNumDoc();
+            nombreProtagonista = usuarioMovimiento.nombreCompleto();
+            identificacionProtagonista = usuarioMovimiento.getNumDoc();
             RequestContext.getCurrentInstance().execute("PF('dlgUsuario').hide()");
+        } else if (clienteMovimiento != null) {
+            nombreProtagonista = clienteMovimiento.nombreCompleto();
+            identificacionProtagonista = clienteMovimiento.getNumDoc();
+            RequestContext.getCurrentInstance().execute("PF('dlgCliente').hide()");
         } else {
-            nombreUsuario = null;
+            nombreProtagonista = null;
+            identificacionProtagonista = null;
         }
-        RequestContext.getCurrentInstance().update("IdFormMovimientoCaja:IdNombreCliente");
-        RequestContext.getCurrentInstance().update("IdFormMovimientoCaja:IdIdentificacionUsuario");
+        RequestContext.getCurrentInstance().update("IdFormMovimientoCaja:IdNombreProtagonista");
+        RequestContext.getCurrentInstance().update("IdFormMovimientoCaja:IdIdentificacionProtagonista");
     }
 
     public void validarConcecutivo() {
@@ -187,6 +258,10 @@ public class MovimientoCajaMB implements Serializable {
         }
         if (idMovimientoCaja == 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine el tipo de movimiento"));
+            return false;
+        }
+        if (clienteMovimiento == null && usuarioMovimiento == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Es necesario elegir un usuario o un cliente"));
             return false;
         }
         if (valor <= 0) {
@@ -260,7 +335,12 @@ public class MovimientoCajaMB implements Serializable {
             documentoMaster.setCfgempresasedeidSede(sedeActual);
             documentoMaster.setFecCrea(new Date());
             documentoMaster.setSegusuarioidUsuario(usuarioActual);
-            documentoMaster.setSegusuarioidUsuario1(usuarioMovimiento);
+            //el protagonista del movimiento puede ser un usuario o un cliente
+            if (usuarioMovimiento == null) {
+                documentoMaster.setCfgclienteidCliente(clienteMovimiento);
+            } else {
+                documentoMaster.setSegusuarioidUsuario1(usuarioMovimiento);
+            }
             documentoMaster.setObservaciones(concepto);
             documentoMaster.setTotal(valor);
             documentosmasterFacade.create(documentoMaster);//SE CREA EL RECIBO PARA EL TIPO DE MOVMIENTO DE CAJA SELECCIONADO
@@ -272,10 +352,9 @@ public class MovimientoCajaMB implements Serializable {
             }
             documentoFacade.edit(documento);
 
-            
             //LA FORMA DE PAGO QUE SE APLICA ES EN EFECTIVO
             CfgFormapago formapago = formapagoFacade.buscarPorEmpresaAndCodigo(empresaActual, "1");
-            
+
             //SE CREA LA FORMA DE PAGO DEL RECIBO DE CAJA. 
             List<FacDocuementopago> listaPagos = new ArrayList();
             FacDocuementopago docuementopago = new FacDocuementopago();
@@ -285,10 +364,10 @@ public class MovimientoCajaMB implements Serializable {
             docuementopago.setValorPago(valor);
             docuementopagoFacade.create(docuementopago);
             listaPagos.add(docuementopago);
-            
+
             documentoMaster.setFacDocuementopagoList(listaPagos);
             documentosmasterFacade.edit(documentoMaster);
-            
+
             //SE CREA EL MOVIMIENTO DE CAJA
             FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
             movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentoMaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentoMaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getIdFormaPago()));
@@ -303,6 +382,7 @@ public class MovimientoCajaMB implements Serializable {
             }
             movcajadetalleFacade.create(movcajadetalle);
             limpiar();
+            reciboReciente = documentoMaster;
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Movimiento de caja creado " + documentoMaster.determinarNumFactura()));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Movimiento de caja no registrado"));
@@ -312,11 +392,90 @@ public class MovimientoCajaMB implements Serializable {
     private void limpiar() {
         concepto = null;
         usuarioMovimiento = null;
+        clienteMovimiento = null;
         valor = 0;
-        nombreUsuario = null;
-        identificacionUsuario = null;
+        nombreProtagonista = null;
+        idProtagonista = 1;
+        labelProtagonista = "Usuario:";
+        identificacionProtagonista = null;
         RequestContext.getCurrentInstance().update("IdFormMovimientoCaja");
         RequestContext.getCurrentInstance().update("FormBuscarUsuario");
+    }
+
+    public void imprimirRecibo() {
+        if (reciboReciente != null) {
+            numReciboCaja = reciboReciente.determinarNumFactura();
+            RequestContext.getCurrentInstance().update("IdFormConfirmacion");
+            RequestContext.getCurrentInstance().execute("PF('dlgResult').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha encontrado un recibo de caja creado recientemente"));
+        }
+    }
+
+    public void generarRC() throws IOException, JRException {
+        ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+        String ruta = servletContext.getRealPath("/movimientoCaja/reportes/reciboCaja.jasper");
+        byte[] bites = sedeActual.getLogo();
+        if (bites == null) {
+            bites = sedeActual.getCfgempresaidEmpresa().getLogo();
+        }
+        List<ReciboCajaReporte> listaReciboCaja = new ArrayList();
+        ReciboCajaReporte reciboCajaReporte = new ReciboCajaReporte();
+        reciboCajaReporte.setConcecutivo(reciboReciente.determinarNumFactura());
+        reciboCajaReporte.setCiudad(sedeActual.getCfgMunicipio().getNomMunicipio());
+        reciboCajaReporte.setFecha(reciboReciente.getFecCrea());
+        reciboCajaReporte.setValor(reciboReciente.getTotal());
+        //el protagonista de un movimiento de caja puede ser un usuario del sistema o un cliente. No sera un valor null
+        if (reciboReciente.getCfgclienteidCliente() != null) {
+            reciboCajaReporte.setProtagonista(reciboReciente.getCfgclienteidCliente().nombreCompleto());
+        } else {
+            reciboCajaReporte.setProtagonista(reciboReciente.getSegusuarioidUsuario1().nombreCompleto());
+        }
+        reciboCajaReporte.setConcepto(reciboReciente.getObservaciones());
+        reciboCajaReporte.setFormaPago(crearListadoPago(reciboReciente.getFacDocuementopagoList()));
+        listaReciboCaja.add(reciboCajaReporte);
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(listaReciboCaja);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse httpServletResponse = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        try (ServletOutputStream servletOutputStream = httpServletResponse.getOutputStream()) {
+            httpServletResponse.setContentType("application/pdf");
+            servletContext = (ServletContext) facesContext.getExternalContext().getContext();
+            String rutaReportes = servletContext.getRealPath("/movimientoCaja/reportes/");//ubicacion para los subreportes
+            Map<String, Object> parametros = new HashMap<>();
+            if (bites != null) {
+                InputStream logo = new ByteArrayInputStream(bites);
+                parametros.put("logo", logo);
+            }
+            parametros.put("empresa", empresaActual.getNomEmpresa() + " - " + sedeActual.getNomSede());
+            parametros.put("direccion", sedeActual.getDireccion());
+            String telefono = sedeActual.getTel1();
+            if (sedeActual.getTel2() != null && !sedeActual.getTel2().isEmpty()) {
+                telefono = telefono + "-".concat(sedeActual.getTel2());
+            }
+            parametros.put("telefono", telefono);
+            parametros.put("ubicacion", sedeActual.getCfgMunicipio().getNomMunicipio() + " " + sedeActual.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+            CfgDocumento consecutivoUsuado = reciboReciente.getCfgDocumento();
+            if (consecutivoUsuado.getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion().equals("2")) {
+                parametros.put("accion", "RECIBÍ DE:");
+            } else {
+                parametros.put("accion", "ENTREGUÉ A:");
+            }
+            parametros.put("SUBREPORT_DIR", rutaReportes);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, beanCollectionDataSource);
+            JasperExportManager.exportReportToPdfStream(jasperPrint, servletOutputStream);
+            FacesContext.getCurrentInstance().responseComplete();
+        }
+    }
+
+    private List<FacturaPagoReporte> crearListadoPago(List<FacDocuementopago> pagos) {
+        List<FacturaPagoReporte> list = new ArrayList();
+        for (FacDocuementopago pago : pagos) {
+            FacturaPagoReporte facturaPagoReporte = new FacturaPagoReporte();
+            facturaPagoReporte.setFormaPago(pago.getCfgFormapago().getNomFormaPago());
+            facturaPagoReporte.setValorPago(pago.getValorPago());
+            list.add(facturaPagoReporte);
+        }
+        return list;
     }
 
     public SegUsuario getUsuarioEntrega() {
@@ -355,16 +514,16 @@ public class MovimientoCajaMB implements Serializable {
         this.usuarioMovimiento = usuarioMovimiento;
     }
 
-    public String getIdentificacionUsuario() {
-        return identificacionUsuario;
+    public String getIdentificacionProtagonista() {
+        return identificacionProtagonista;
     }
 
-    public void setIdentificacionUsuario(String identificacionUsuario) {
-        this.identificacionUsuario = identificacionUsuario;
+    public void setIdentificacionProtagonista(String identificacionProtagonista) {
+        this.identificacionProtagonista = identificacionProtagonista;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getNombreProtagonista() {
+        return nombreProtagonista;
     }
 
     public int getIdMovimientoCaja() {
@@ -377,6 +536,38 @@ public class MovimientoCajaMB implements Serializable {
 
     public List<SelectItem> getTiposMovimientoCaja() {
         return tiposMovimientoCaja;
+    }
+
+    public String getNumReciboCaja() {
+        return numReciboCaja;
+    }
+
+    public CfgCliente getClienteMovimiento() {
+        return clienteMovimiento;
+    }
+
+    public void setClienteMovimiento(CfgCliente clienteMovimiento) {
+        this.clienteMovimiento = clienteMovimiento;
+    }
+
+    public LazyDataModel<CfgCliente> getListaClientes() {
+        return listaClientes;
+    }
+
+    public int getIdProtagonista() {
+        return idProtagonista;
+    }
+
+    public void setIdProtagonista(int idProtagonista) {
+        this.idProtagonista = idProtagonista;
+    }
+
+    public List<SelectItem> getProtagonistas() {
+        return protagonistas;
+    }
+
+    public String getLabelProtagonista() {
+        return labelProtagonista;
     }
 
 }

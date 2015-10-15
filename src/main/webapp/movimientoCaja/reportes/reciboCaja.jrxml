@@ -2,18 +2,19 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="396" pageHeight="612" columnWidth="356" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="09d1b754-4bf0-4bae-9839-69e6cf03683f">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="83"/>
+	<property name="ireport.y" value="39"/>
 	<parameter name="logo" class="java.io.InputStream"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String"/>
 	<parameter name="empresa" class="java.lang.String"/>
 	<parameter name="direccion" class="java.lang.String"/>
 	<parameter name="ubicacion" class="java.lang.String"/>
 	<parameter name="telefono" class="java.lang.String"/>
+	<parameter name="accion" class="java.lang.String"/>
 	<field name="concecutivo" class="java.lang.String"/>
 	<field name="ciudad" class="java.lang.String"/>
 	<field name="fecha" class="java.util.Date"/>
 	<field name="valor" class="java.lang.Float"/>
-	<field name="cliente" class="java.lang.String"/>
+	<field name="protagonista" class="java.lang.String"/>
 	<field name="concepto" class="java.lang.String"/>
 	<field name="valorNominal" class="java.lang.String"/>
 	<field name="formaPago" class="java.util.List"/>
@@ -113,7 +114,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["RECIBÍ DE: "+$F{cliente}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{accion}+" "+$F{protagonista}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="7" y="29" width="100" height="10" uuid="7872a9b4-3155-4830-ada8-a5251194bf5d"/>
