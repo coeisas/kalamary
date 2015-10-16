@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"              
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Precios</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormPrecios">
+            <p:panelGrid style="margin: 0 auto;width: 90%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Consultar Precios</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Cod Producto:"/>
+                        <p:inputText id="IdCodigoProducto" class="campoFormulario" value="#{consutarPrecioMB.codigoProducto}">
+                            <p:ajax event="blur" listener="#{consutarPrecioMB.buscarProducto}" update="@none"/>
+                        </p:inputText>
+                        <p:watermark for="IdCodigoProducto" value="Codigo Producto"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Producto" actionListener="#{consutarPrecioMB.cargarModalProductos}"/>
+                        <p:outputLabel class="labelFormularioInformativa" value="#{consutarPrecioMB.nombreProducto}"/>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Precio:"/>
+                        <h:inputText class="campoFormulario cajaH" readonly="true" value="#{consutarPrecioMB.precioProducto}">
+                            <f:convertNumber type="currency"/>
+                        </h:inputText>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{consutarPrecioMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{consutarPrecioMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Precio">
+                        <h:outputText value="#{producto.precio}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Disponibilidad">#{producto.unidadesDisponibles(consutarPrecioMB.sedeActual)}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{consutarPrecioMB.cargarInformacionProducto}"/>
+                </div>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>
+

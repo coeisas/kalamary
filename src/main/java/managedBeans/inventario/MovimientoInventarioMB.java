@@ -502,7 +502,11 @@ public class MovimientoInventarioMB implements Serializable {
             return;
         }
         if (documento.getActDocumento() == 0) {
-            documento.setActDocumento(documento.getIniDocumento());
+            if (documento.getIniDocumento() > 0) {
+                documento.setActDocumento(documento.getIniDocumento());
+            } else {
+                documento.setActDocumento(documento.getIniDocumento() + 1);
+            }
         } else {
             documento.setActDocumento(documento.getActDocumento() + 1);
         }
@@ -733,7 +737,7 @@ public class MovimientoInventarioMB implements Serializable {
             detalleReporte.setCodigo(movimientoDetalle.getCfgProducto().getCodProducto());
             detalleReporte.setCantidad(movimientoDetalle.getCantidad());
             detalleReporte.setProducto(movimientoDetalle.getCfgProducto().getNomProducto());
-            lista.add(detalleReporte);                   
+            lista.add(detalleReporte);
         }
         return lista;
     }

@@ -227,11 +227,11 @@ public class DocumentoMB implements Serializable {
         if (!aplicacionValidada) {
             return false;
         }
-        if (rangoInicial < 0) {
+        if (rangoInicial <= 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "rango inicial no valido"));
             return false;
         }
-        if (rangoFinal < 0) {
+        if (rangoFinal <= 0) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "rango final no valido"));
             return false;
         }
