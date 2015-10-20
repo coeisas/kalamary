@@ -50,7 +50,7 @@
                     #{itemCotizacion.cfgProducto.nomProducto}
                 </p:column>
                 <p:column headerText="Inventario">
-                    #{itemFactura.cfgProducto.unidadesDisponibles(facturaMB.sedeActual)}
+                    #{itemCotizacion.cfgProducto.unidadesDisponibles(cotizacionMB.sedeActual)}
                 </p:column>
                 <p:column headerText="Cantidad">
                     <p:cellEditor>
@@ -188,27 +188,25 @@
                 <p:dataTable value="#{cotizacionMB.listaVendedor}" var="vendedor" selection="#{cotizacionMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single">
                     <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
                     <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                    <p:column headerText="Rol">#{vendedor.cfgRolIdrol.nomrol}</p:column>
                 </p:dataTable>
                 <p:separator/>
                 <p:commandButton value="Aceptar" actionListener="#{cotizacionMB.cargarInformacionVendedor}"/>
             </h:form>
         </p:dialog>
 
-        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="70%" resizable="false">
+        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="75%" resizable="false">
             <h:form id="FormModalCliente">
-                <p:panelGrid class="panelGridSinBorder" style="width: 98%;">
+                <p:panelGrid style="width: 98%;">
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{cotizacionMB.numIdentificacion}">
-                                <p:ajax event="blur" listener="#{cotizacionMB.buscarClienteModal}" update="@none"/>
-                            </p:inputText>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{cotizacionMB.idIdentificacion}" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            <p:outputLabel class="labelFormularioObligatorio" value="Pais:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{cotizacionMB.idPais}" filter="true" filterMatchMode="contains">
+                                <p:ajax event="change" listener="#{cotizacionMB.validacionPais}" update="@none"/>
+                                <f:selectItems value="#{aplicacionMB.listaPaises}" var="pais" itemValue="#{pais.codPais}" itemLabel="#{pais.nomPais}"/>
                             </p:selectOneMenu>
                         </p:column>
+
                         <p:column rowspan="5">
                             <div style="text-align: center">
                                 <p:panel rendered="#{cotizacionMB.clienteSeleccionado != null}">
@@ -223,6 +221,20 @@
                     </p:row>
 
                     <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{cotizacionMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{cotizacionMB.buscarClienteModal}" update="@none"/>
+                            </p:inputText>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{cotizacionMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+
+                    <p:row rendered="#{cotizacionMB.mostrarDepartamentoMunicipio}">
                         <p:column>
                             <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
                             <p:selectOneMenu id="IdSelectDepartamentos" value="#{cotizacionMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">

@@ -100,10 +100,13 @@ public class CfgCliente implements Serializable {
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
     @JoinColumns({
-        @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio", nullable = false),
-        @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento", nullable = false)})
-    @ManyToOne(optional = false)
+        @JoinColumn(name = "cfg_municipio_idMunicipio", referencedColumnName = "idMunicipio"),
+        @JoinColumn(name = "cfg_municipio_cfg_departamento_idDepartamento", referencedColumnName = "cfg_departamento_idDepartamento")})
+    @ManyToOne
     private CfgMunicipio cfgMunicipio;
+    @JoinColumn(name = "cfg_pais_codPais", referencedColumnName = "codPais")
+    @ManyToOne
+    private CfgPais cfgpaiscodPais;
     @JoinColumn(name = "cfg_tipoempresa_id", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private CfgTipoempresa cfgTipoempresaId;
@@ -269,6 +272,14 @@ public class CfgCliente implements Serializable {
 
     public void setCfgMunicipio(CfgMunicipio cfgMunicipio) {
         this.cfgMunicipio = cfgMunicipio;
+    }
+
+    public CfgPais getCfgpaiscodPais() {
+        return cfgpaiscodPais;
+    }
+
+    public void setCfgpaiscodPais(CfgPais cfgpaiscodPais) {
+        this.cfgpaiscodPais = cfgpaiscodPais;
     }
 
     public CfgTipoempresa getCfgTipoempresaId() {

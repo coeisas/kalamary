@@ -20,16 +20,10 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}">
-                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
-                            </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
-                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            <p:outputLabel class="labelFormularioObligatorio" value="Pais:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idPais}" filter="true" filterMatchMode="contains">
+                                <p:ajax event="change" listener="#{clienteMB.validacionPais}" update="@none"/>
+                                <f:selectItems value="#{aplicacionMB.listaPaises}" var="pais" itemValue="#{pais.codPais}" itemLabel="#{pais.nomPais}"/>
                             </p:selectOneMenu>
                         </p:column>
                         <p:column rowspan="5">
@@ -44,8 +38,22 @@
                             </div>
                         </p:column>                        
                     </p:row>
-
                     <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{clienteMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{clienteMB.buscarCliente}" update="@none"/>
+                            </p:inputText>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{clienteMB.cargarClientes}"/>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{clienteMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+                    <p:row id="IdFilaRenderizable" rendered="#{clienteMB.mostrarDepartamentoMunicipio}">
                         <p:column>
                             <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
                             <p:selectOneMenu id="IdSelectDepartamentos" value="#{clienteMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">

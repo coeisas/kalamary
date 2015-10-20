@@ -37,7 +37,7 @@
                 <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
                     <p:ajax event="blur" listener="#{facturaMB.buscarCliente}" update="@none"/> 
                 </p:inputText>
-                <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" onclick="PF('dlgCliente').show()"/>
+                <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" actionListener="#{facturaMB.cargarModalClientes}"/>
                 <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
                 <p:commandButton icon="ui-icon-script" title="Cargar Cotizacion" class="campoFormulario" actionListener="#{facturaMB.cargarCotizaciones}"/>
                 <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
@@ -152,7 +152,7 @@
 
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
             <h:form id="FormBuscarCliente">
-                <p:dataTable value="#{facturaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{abonoMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                <p:dataTable value="#{facturaMB.listaClientes}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{facturaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
                     <p:column headerText="Empresa">
                         <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
                     </p:column>
@@ -313,19 +313,15 @@
             </h:form>
         </p:dialog>
 
-        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="70%" resizable="false">
+        <p:dialog header="CREAR CLIENTE" widgetVar="dlgCrearCliente" modal="true" width="75%" resizable="false">
             <h:form id="FormModalCliente">
-                <p:panelGrid class="panelGridSinBorder" style="width: 98%;">
+                <p:panelGrid style="width: 98%;">
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{facturaMB.numIdentificacion}">
-                                <p:ajax event="blur" listener="#{facturaMB.buscarClienteModal}" update="@none"/>
-                            </p:inputText>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{facturaMB.idIdentificacion}" filter="true" filterMatchMode="contains">
-                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
-                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            <p:outputLabel class="labelFormularioObligatorio" value="Pais:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{facturaMB.idPais}" filter="true" filterMatchMode="contains">
+                                <p:ajax event="change" listener="#{facturaMB.validacionPais}" update="@none"/>
+                                <f:selectItems value="#{aplicacionMB.listaPaises}" var="pais" itemValue="#{pais.codPais}" itemLabel="#{pais.nomPais}"/>
                             </p:selectOneMenu>
                         </p:column>
                         <p:column rowspan="5">
@@ -342,6 +338,20 @@
                     </p:row>
 
                     <p:row>
+                        <p:column>
+                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{facturaMB.numIdentificacion}">
+                                <p:ajax event="blur" listener="#{facturaMB.buscarClienteModal}" update="@none"/>
+                            </p:inputText>
+                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu class="campoFormulario" value="#{facturaMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
+
+                    <p:row rendered="#{facturaMB.mostrarDepartamentoMunicipio}">
                         <p:column>
                             <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
                             <p:selectOneMenu id="IdSelectDepartamentos" value="#{facturaMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">

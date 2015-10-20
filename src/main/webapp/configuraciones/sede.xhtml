@@ -21,11 +21,11 @@
                         </f:facet>
                         <p:row>
                             <p:column>
-                                <p:outputLabel for="idCodigoSede" value="Sede:" class="labelFormularioObligatorio"/>
+                                <p:outputLabel for="idCodigoSede" value="Cod. Sede:" class="labelFormularioObligatorio"/>
                                 <p:inputText id="idCodigoSede" value="#{sedeMB.codSede}" class="campoFormulario" >
                                     <p:ajax event="blur" listener="#{sedeMB.buscarSede}" update="@none"/>
                                 </p:inputText>                                
-                                <p:commandButton icon="ui-icon-search" onclick="PF('dlgSede').show()" class="campoFormulario"/>
+                                <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{sedeMB.cargarModalSedes}"/>
                             </p:column>
                         </p:row>
                         <p:row>

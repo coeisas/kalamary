@@ -19,13 +19,9 @@ import javax.validation.constraints.Size;
 @Embeddable
 public class CfgMunicipioPK implements Serializable {
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 3)
     @Column(name = "idMunicipio", nullable = false, length = 3)
     private String idMunicipio;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 2)
     @Column(name = "cfg_departamento_idDepartamento", nullable = false, length = 2)
     private String cfgdepartamentoidDepartamento;
 

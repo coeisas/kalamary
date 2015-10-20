@@ -49,6 +49,7 @@ import facades.CfgKitproductodetalleFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
+import facades.CfgPaisFacade;
 import facades.CfgProductoFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
@@ -165,6 +166,7 @@ public class FacturaMB implements Serializable {
 //--------------------------------------------------------
 //-------------PROPIEDADES CLIENTE NUEVO
 //--------------------------------------------------------
+    private String idPais;
     private String idDepartamento;
     private String idMunicipio;
     private int idIdentificacion;
@@ -182,6 +184,7 @@ public class FacturaMB implements Serializable {
     private String tarjetaMembresia;
     private float cupoCredito;
     private StreamedContent image;
+    private boolean mostrarDepartamentoMunicipio;
 
     private CfgCliente clienteSeleccionadoModal;
 
@@ -235,6 +238,8 @@ public class FacturaMB implements Serializable {
     FacCarteraClienteFacade carteraClienteFacade;
     @EJB
     FacCarteraDetalleFacade carteraDetalleFacade;
+    @EJB
+    CfgPaisFacade paisFacade;
 
     public FacturaMB() {
 
@@ -280,6 +285,17 @@ public class FacturaMB implements Serializable {
             if (cajaUsuario != null) {
                 movimientoCajaMaster = movcajamaestroFacade.buscarMovimientoCaja(cajaUsuario);
             }
+        }
+        idPais = "343";
+        mostrarDepartamentoMunicipio = true;
+    }
+
+    public void cargarModalClientes() {
+        if (empresaActual != null) {
+            actualizarListadoClientes();
+            RequestContext.getCurrentInstance().execute("PF('dlgCliente').show()");
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion de la empresa. Reinicie sesion"));
         }
     }
 
@@ -437,7 +453,7 @@ public class FacturaMB implements Serializable {
     }
 
     private void actualizarListadoClientes() {
-        if (getSedeActual() != null) {
+        if (empresaActual != null) {
             listaClientes = new LazyClienteDataModel(clienteFacade, empresaActual);
         }
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
@@ -1393,6 +1409,16 @@ public class FacturaMB implements Serializable {
 //    METODOS PARA CREAR CLIENTE
 //------------------------------------    
 
+    //cuando se selecciona Colombia se muestraran los departamentos y municipios
+    public void validacionPais() {
+        if (idPais.equals("343")) {
+            mostrarDepartamentoMunicipio = true;
+        } else {
+            mostrarDepartamentoMunicipio = false;
+        }
+        RequestContext.getCurrentInstance().update("FormModalCliente");
+    }
+
     public void buscarClienteModal() {
         if (getSedeActual() != null) {
             if (numIdentificacion != null && !numIdentificacion.trim().isEmpty()) {
@@ -1423,9 +1449,15 @@ public class FacturaMB implements Serializable {
 
     public void cargarInformacionClienteModal() {
         if (getClienteSeleccionadoModal() != null) {
-            setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
-            setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
-            setIdMunicipio(clienteSeleccionadoModal.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            setIdPais(clienteSeleccionadoModal.getCfgpaiscodPais().getCodPais());
+            if (idPais.equals("343")) {
+                mostrarDepartamentoMunicipio = true;
+                setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
+                setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
+                setIdMunicipio(clienteSeleccionadoModal.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            } else {
+                mostrarDepartamentoMunicipio = false;
+            }
             setIdIdentificacion(clienteSeleccionadoModal.getCfgTipoidentificacionId().getId());
             setIdTipoCliente(clienteSeleccionadoModal.getCfgTipoempresaId().getId());
             setNumIdentificacion(clienteSeleccionadoModal.getNumDoc());
@@ -1473,12 +1505,14 @@ public class FacturaMB implements Serializable {
         setIdMunicipio(null);
         setIdIdentificacion(0);
         setFechaNacimiento(null);
+        idPais = "343";
+        mostrarDepartamentoMunicipio = true;
 //        opcion = "creacion";
     }
 
     public void accion() {
         if (clienteSeleccionadoModal != null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No es posible modificar al cliente."));
+            modificarCliente();
         } else {
             crearCliente();
         }
@@ -1526,11 +1560,15 @@ public class FacturaMB implements Serializable {
             return;
         }
         try {
-            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
-            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             CfgCliente cliente = new CfgCliente();
 //            cliente.setCodigoCliente(codigoCliente);
+            cliente.setCfgpaiscodPais(paisFacade.find(idPais));
             cliente.setCfgMunicipio(municipio);
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
@@ -1566,8 +1604,52 @@ public class FacturaMB implements Serializable {
         }
     }
 
+    private void modificarCliente() {
+        if (!validarCamposFormulario()) {
+            return;
+        }
+        try {
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
+            CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
+            clienteSeleccionadoModal.setApellido1(primerApellido.trim().toUpperCase());
+            clienteSeleccionadoModal.setApellido2(segundoApellido.trim().toUpperCase());
+            clienteSeleccionadoModal.setCfgMunicipio(municipio);
+            clienteSeleccionadoModal.setCfgpaiscodPais(paisFacade.find(idPais));
+            clienteSeleccionadoModal.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
+            clienteSeleccionadoModal.setCfgTipoempresaId(tipocliente);
+            clienteSeleccionadoModal.setCfgempresaidEmpresa(empresaActual);
+            clienteSeleccionadoModal.setDirCliente(direccion.trim().toUpperCase());
+            if (file != null) {
+                clienteSeleccionadoModal.setFoto(file.getContents());
+            }
+            clienteSeleccionadoModal.setMail(mail.trim().toUpperCase());
+            clienteSeleccionadoModal.setNom1Cliente(primerNombre.trim().toUpperCase());
+            clienteSeleccionadoModal.setNom2Cliente(segundoNombre.trim().toUpperCase());
+            clienteSeleccionadoModal.setCupoCredito(cupoCredito);
+            clienteSeleccionadoModal.setTarjetaMembresia(tarjetaMembresia);
+            clienteSeleccionadoModal.setNumDoc(numIdentificacion.trim());
+            clienteSeleccionadoModal.setFecNacimiento(fechaNacimiento);
+            clienteSeleccionadoModal.setTel1(telefono.trim());
+            clienteFacade.edit(clienteSeleccionadoModal);
+            limpiarFormularioModal();
+            setNumIdentificacion(null);
+            listaMunicipios.clear();
+            setClienteSeleccionadoModal(null);
+            RequestContext.getCurrentInstance().update("FormBuscarCliente");
+            RequestContext.getCurrentInstance().execute("PF('dlgCrearCliente').hide()");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Cliente modificado"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cliente no modificado"));
+        }
+    }
+
     public void cancelar() {
         clienteSeleccionadoModal = null;
+        cargarInformacionClienteModal();
 //        empresaSeleccionada = null;
         listaMunicipios.clear();
 //        setCodEmpresa(null);
@@ -1950,5 +2032,17 @@ public class FacturaMB implements Serializable {
 
     public void setFechaLimite(Date fechaLimite) {
         this.fechaLimite = fechaLimite;
+    }
+
+    public String getIdPais() {
+        return idPais;
+    }
+
+    public void setIdPais(String idPais) {
+        this.idPais = idPais;
+    }
+
+    public boolean isMostrarDepartamentoMunicipio() {
+        return mostrarDepartamentoMunicipio;
     }
 }

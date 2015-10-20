@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(name = "cfg_municipio", catalog = "kalamarypos", schema = "")
 @XmlRootElement
 @NamedQueries({
-    @NamedQuery(name = "CfgMunicipio.findAll", query = "SELECT c FROM CfgMunicipio c"),
+   @NamedQuery(name = "CfgMunicipio.findAll", query = "SELECT c FROM CfgMunicipio c"),
     @NamedQuery(name = "CfgMunicipio.findByIdMunicipio", query = "SELECT c FROM CfgMunicipio c WHERE c.cfgMunicipioPK.idMunicipio = :idMunicipio"),
     @NamedQuery(name = "CfgMunicipio.findByCfgdepartamentoidDepartamento", query = "SELECT c FROM CfgMunicipio c WHERE c.cfgMunicipioPK.cfgdepartamentoidDepartamento = :cfgdepartamentoidDepartamento"),
     @NamedQuery(name = "CfgMunicipio.findByNomMunicipio", query = "SELECT c FROM CfgMunicipio c WHERE c.nomMunicipio = :nomMunicipio"),
@@ -45,8 +45,6 @@ public class CfgMunicipio implements Serializable {
     @EmbeddedId
     protected CfgMunicipioPK cfgMunicipioPK;
     @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 100)
     @Column(name = "nomMunicipio", nullable = false, length = 100)
     private String nomMunicipio;
     @Column(name = "fecCrea")
@@ -54,7 +52,7 @@ public class CfgMunicipio implements Serializable {
     private Date fecCrea;
     @Column(name = "usrCrea")
     private Integer usrCrea;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgMunicipio")
+    @OneToMany(mappedBy = "cfgMunicipio")
     private List<CfgCliente> cfgClienteList;
     @JoinColumn(name = "cfg_departamento_idDepartamento", referencedColumnName = "idDepartamento", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)

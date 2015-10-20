@@ -650,6 +650,8 @@ public class AbonoMB implements Serializable {
             for (AuxilarMovInventario auxilarMovInventario : listaAuxiliarInventario) {
                 InvConsolidado inventarioConsolidado = consolidadoInventarioFacade.buscarBySedeAndProducto(sedeActual, auxilarMovInventario.getProducto());
                 inventarioConsolidado.setExistencia(inventarioConsolidado.getExistencia() - auxilarMovInventario.getCantidad());
+                inventarioConsolidado.setFechaUltSalida(new Date());
+                inventarioConsolidado.setSalidas(inventarioConsolidado.getSalidas() + auxilarMovInventario.getCantidad());
                 consolidadoInventarioFacade.edit(inventarioConsolidado);
             }
 

@@ -30,6 +30,7 @@ import facades.CfgImpuestoFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
+import facades.CfgPaisFacade;
 import facades.CfgProductoFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
@@ -129,6 +130,7 @@ public class CotizacionMB implements Serializable {
 //--------------------------------------------------------
 //-------------PROPIEDADES CLIENTE NUEVO
 //--------------------------------------------------------
+    private String idPais;
     private String idDepartamento;
     private String idMunicipio;
     private int idIdentificacion;
@@ -146,6 +148,7 @@ public class CotizacionMB implements Serializable {
     private String tarjetaMembresia;
     private float cupoCredito;
     private StreamedContent image;
+    private boolean mostrarDepartamentoMunicipio;
 
     private CfgCliente clienteSeleccionadoModal;
 
@@ -193,6 +196,8 @@ public class CotizacionMB implements Serializable {
     CfgMovInventarioDetalleFacade movInventarioDetalleFacade;
     @EJB
     CfgMovInventarioMaestroFacade movInventarioMaestroFacade;
+    @EJB
+    CfgPaisFacade paisFacade;
 
     public CotizacionMB() {
 
@@ -228,6 +233,8 @@ public class CotizacionMB implements Serializable {
                 cargarInformacionVendedor();
             }
         }
+        idPais = "343";
+        mostrarDepartamentoMunicipio = true;
     }
 
     public void buscarCliente() {
@@ -244,7 +251,7 @@ public class CotizacionMB implements Serializable {
 
     public void cargarListaVendedores() {
         if (empresaActual != null) {
-            listaVendedor = usuarioFacade.buscarVendedoresByEmpresa(empresaActual);
+            listaVendedor = usuarioFacade.buscarPorEmpresaActivos(empresaActual);
         } else {
             listaVendedor = new ArrayList();
         }
@@ -633,7 +640,11 @@ public class CotizacionMB implements Serializable {
             CfgCliente cliente = documento.getCfgclienteidCliente();
             parametros.put("dircli", cliente.getDirCliente());
             parametros.put("telcli", cliente.getTel1());
-            parametros.put("ciudadcli", cliente.getCfgMunicipio().getNomMunicipio());
+            if (cliente.getCfgpaiscodPais().getCodPais().equals("343")) {
+                parametros.put("ciudadcli", cliente.getCfgMunicipio().getNomMunicipio());
+            } else {
+                parametros.put("ciudadcli", cliente.getCfgpaiscodPais().getNomPais());
+            }
             parametros.put("emailcli", cliente.getMail());
             parametros.put("ubicacion", getSedeActual().getCfgMunicipio().getNomMunicipio() + " " + getSedeActual().getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
             parametros.put("usuario", usuarioActual.nombreCompleto());
@@ -706,6 +717,16 @@ public class CotizacionMB implements Serializable {
         }
     }
 
+    //cuando se selecciona Colombia se muestraran los departamentos y municipios
+    public void validacionPais() {
+        if (idPais.equals("343")) {
+            mostrarDepartamentoMunicipio = true;
+        } else {
+            mostrarDepartamentoMunicipio = false;
+        }
+        RequestContext.getCurrentInstance().update("FormModalCliente");
+    }
+
     public void actualizarMunicipios() {
         listaMunicipios.clear();
         if (idDepartamento != null) {
@@ -723,9 +744,15 @@ public class CotizacionMB implements Serializable {
 
     public void cargarInformacionClienteModal() {
         if (getClienteSeleccionadoModal() != null) {
-            setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
-            setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
-            setIdMunicipio(clienteSeleccionadoModal.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            setIdPais(clienteSeleccionadoModal.getCfgpaiscodPais().getCodPais());
+            if (idPais.equals("343")) {
+                mostrarDepartamentoMunicipio = true;
+                setIdDepartamento(clienteSeleccionadoModal.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
+                setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
+                setIdMunicipio(clienteSeleccionadoModal.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            } else {
+                mostrarDepartamentoMunicipio = false;
+            }
             setIdIdentificacion(clienteSeleccionadoModal.getCfgTipoidentificacionId().getId());
             setIdTipoCliente(clienteSeleccionadoModal.getCfgTipoempresaId().getId());
             setNumIdentificacion(clienteSeleccionadoModal.getNumDoc());
@@ -773,6 +800,8 @@ public class CotizacionMB implements Serializable {
         setIdMunicipio(null);
         setIdIdentificacion(0);
         setFechaNacimiento(null);
+        setIdPais("343");
+        mostrarDepartamentoMunicipio = true;
 //        opcion = "creacion";
     }
 
@@ -826,12 +855,16 @@ public class CotizacionMB implements Serializable {
             return;
         }
         try {
-            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
-            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             CfgCliente cliente = new CfgCliente();
 //            cliente.setCodigoCliente(codigoCliente);
             cliente.setCfgMunicipio(municipio);
+            cliente.setCfgpaiscodPais(paisFacade.find(idPais));
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
             cliente.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
@@ -871,12 +904,16 @@ public class CotizacionMB implements Serializable {
             return;
         }
         try {
-            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
-            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             clienteSeleccionadoModal.setApellido1(primerApellido.trim().toUpperCase());
             clienteSeleccionadoModal.setApellido2(segundoApellido.trim().toUpperCase());
             clienteSeleccionadoModal.setCfgMunicipio(municipio);
+            clienteSeleccionadoModal.setCfgpaiscodPais(paisFacade.find(idPais));
             clienteSeleccionadoModal.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
             clienteSeleccionadoModal.setCfgTipoempresaId(tipocliente);
             clienteSeleccionadoModal.setCfgempresaidEmpresa(empresaActual);
@@ -1235,6 +1272,18 @@ public class CotizacionMB implements Serializable {
 
     public CfgEmpresasede getSedeActual() {
         return sedeActual;
+    }
+
+    public String getIdPais() {
+        return idPais;
+    }
+
+    public void setIdPais(String idPais) {
+        this.idPais = idPais;
+    }
+
+    public boolean isMostrarDepartamentoMunicipio() {
+        return mostrarDepartamentoMunicipio;
     }
 
 }

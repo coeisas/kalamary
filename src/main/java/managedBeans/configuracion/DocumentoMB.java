@@ -87,6 +87,7 @@ public class DocumentoMB implements Serializable {
         usuarioActual = sesionMB.getUsuarioActual();
         sedeSeleccionada = sesionMB.getSedeActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
+        rangoInicial = 1;
         activo = true;
     }
 
@@ -153,7 +154,7 @@ public class DocumentoMB implements Serializable {
         setAbreviatura(null);
         setPrefijo(null);
         setActivo(true);
-        setRangoInicial(0);
+        setRangoInicial(1);
         setRangoFinal(0);
         setNumActual(0);
         setResDian(null);

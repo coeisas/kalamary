@@ -7,6 +7,7 @@ package managedBeans.seguridad;
 
 import entities.CfgDepartamento;
 import entities.CfgEmpresa;
+import entities.CfgPais;
 import entities.CfgRol;
 import entities.CfgTipodocempresa;
 import entities.CfgTipoempresa;
@@ -14,6 +15,7 @@ import entities.CfgTipoidentificacion;
 import entities.SegUsuario;
 import facades.CfgDepartamentoFacade;
 import facades.CfgEmpresaFacade;
+import facades.CfgPaisFacade;
 import facades.CfgRolFacade;
 import facades.CfgTipodocempresaFacade;
 import facades.CfgTipoempresaFacade;
@@ -39,6 +41,7 @@ public class AplicacionMB implements Serializable {
     private List<SegUsuario> listaUsuariosActivos;
     private List<HttpSession> listaSesiones;
 
+    private List<CfgPais> listaPaises;
     private List<CfgDepartamento> listaDepartementos;
     private List<CfgTipodocempresa> listaTipodocempresa;
     private List<CfgTipoempresa> listaTipoEmpresa;
@@ -63,6 +66,9 @@ public class AplicacionMB implements Serializable {
 
     @EJB
     CfgRolFacade rolFacade;
+    
+    @EJB
+    CfgPaisFacade paisFacade;
 
     @PostConstruct
     private void init() {
@@ -74,6 +80,7 @@ public class AplicacionMB implements Serializable {
         setListaTipoEmpresa(tipoempresaFacade.findAll());
         setListaEmpresas(empresaFacade.findAll());
         setListaRoles(rolFacade.buscarRolVisibles());
+        listaPaises = paisFacade.findAll();
         setListaUsuariosActivos((List<SegUsuario>) new ArrayList());
         for (int i = 1; i <= 6; i++) {
             String img = "idx" + i + ".jpg";
@@ -196,6 +203,10 @@ public class AplicacionMB implements Serializable {
 
     public void setListaSesiones(List<HttpSession> listaSesiones) {
         this.listaSesiones = listaSesiones;
+    }
+
+    public List<CfgPais> getListaPaises() {
+        return listaPaises;
     }
 
 }

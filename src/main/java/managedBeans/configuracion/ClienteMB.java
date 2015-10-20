@@ -14,6 +14,7 @@ import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgMunicipioFacade;
+import facades.CfgPaisFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
 import java.io.ByteArrayInputStream;
@@ -46,6 +47,7 @@ import utilities.LazyClienteDataModel;
 @SessionScoped
 public class ClienteMB implements Serializable {
 
+    private String idPais;
     private String idDepartamento;
     private String idMunicipio;
     private int idIdentificacion;
@@ -72,6 +74,8 @@ public class ClienteMB implements Serializable {
     private SegUsuario usuarioActual;
     private SesionMB sesionMB;
 
+    private boolean mostrarDepartamentoMunicipio;
+
     @EJB
     CfgClienteFacade clienteFacade;
 
@@ -86,6 +90,9 @@ public class ClienteMB implements Serializable {
 
     @EJB
     CfgTipoempresaFacade tipoClienteFacade;
+
+    @EJB
+    CfgPaisFacade paisFacade;
 
     public ClienteMB() {
     }
@@ -105,7 +112,8 @@ public class ClienteMB implements Serializable {
 //        }
         opcion = "creacion";
         listaMunicipios = new ArrayList();
-
+        idPais = "343";
+        mostrarDepartamentoMunicipio = true;
     }
 
     public void cargarClientes() {
@@ -121,9 +129,15 @@ public class ClienteMB implements Serializable {
     public void cargarInformacionCliente() {
         if (getClienteSeleccionado() != null) {
             opcion = "modificacion";
-            setIdDepartamento(clienteSeleccionado.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
-            setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
-            setIdMunicipio(clienteSeleccionado.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            setIdPais(clienteSeleccionado.getCfgpaiscodPais().getCodPais());
+            if (idPais.equals("343")) {
+                mostrarDepartamentoMunicipio = true;
+                setIdDepartamento(clienteSeleccionado.getCfgMunicipio().getCfgDepartamento().getIdDepartamento());
+                setListaMunicipios(municipioFacade.buscarPorDepartamento(idDepartamento));
+                setIdMunicipio(clienteSeleccionado.getCfgMunicipio().getCfgMunicipioPK().getIdMunicipio());
+            } else {
+                mostrarDepartamentoMunicipio = false;
+            }
             setIdIdentificacion(clienteSeleccionado.getCfgTipoidentificacionId().getId());
             setIdTipoCliente(clienteSeleccionado.getCfgTipoempresaId().getId());
             setNumIdentificacion(clienteSeleccionado.getNumDoc());
@@ -171,6 +185,8 @@ public class ClienteMB implements Serializable {
         setIdMunicipio(null);
         setIdIdentificacion(0);
         setFechaNacimiento(null);
+        idPais = "343";
+        mostrarDepartamentoMunicipio = true;
         opcion = "creacion";
     }
 
@@ -185,6 +201,16 @@ public class ClienteMB implements Serializable {
             cargarInformacionCliente();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
+    }
+
+    //cuando se selecciona Colombia se muestraran los departamentos y municipios
+    public void validacionPais() {
+        if (idPais.equals("343")) {
+            mostrarDepartamentoMunicipio = true;
+        } else {
+            mostrarDepartamentoMunicipio = false;
+        }
+        RequestContext.getCurrentInstance().update("IdFormCliente");
     }
 
     public void actualizarMunicipios() {
@@ -218,11 +244,15 @@ public class ClienteMB implements Serializable {
             return;
         }
         try {
-            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
-            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             CfgCliente cliente = new CfgCliente();
 //            cliente.setCodigoCliente(codigoCliente);
+            cliente.setCfgpaiscodPais(paisFacade.find(idPais));
             cliente.setCfgMunicipio(municipio);
             cliente.setApellido1(primerApellido.trim().toUpperCase());
             cliente.setApellido2(segundoApellido.trim().toUpperCase());
@@ -259,11 +289,15 @@ public class ClienteMB implements Serializable {
             return;
         }
         try {
-            CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
-            CfgMunicipio municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            CfgMunicipio municipio = null;
+            if (idPais.equals("343")) {
+                CfgMunicipioPK cfgMunicipioPK = new CfgMunicipioPK(idMunicipio, idDepartamento);
+                municipio = municipioFacade.buscarPorMunicipioPK(cfgMunicipioPK);
+            }
             CfgTipoempresa tipocliente = tipoClienteFacade.find(idTipoCliente);
             clienteSeleccionado.setApellido1(primerApellido.trim().toUpperCase());
             clienteSeleccionado.setApellido2(segundoApellido.trim().toUpperCase());
+            clienteSeleccionado.setCfgpaiscodPais(paisFacade.find(idPais));
             clienteSeleccionado.setCfgMunicipio(municipio);
             clienteSeleccionado.setCfgTipoidentificacionId(tipoidentificacionFacade.find(idIdentificacion));
             clienteSeleccionado.setCfgTipoempresaId(tipocliente);
@@ -516,6 +550,18 @@ public class ClienteMB implements Serializable {
 
     public void setIdTipoCliente(int idTipoCliente) {
         this.idTipoCliente = idTipoCliente;
+    }
+
+    public String getIdPais() {
+        return idPais;
+    }
+
+    public void setIdPais(String idPais) {
+        this.idPais = idPais;
+    }
+
+    public boolean isMostrarDepartamentoMunicipio() {
+        return mostrarDepartamentoMunicipio;
     }
 
 }
