@@ -888,7 +888,7 @@ public class FacturaMB implements Serializable {
             }
             limpiarFormulario();
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura creada"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura " + documentosmaster.determinarNumFactura() + " creada"));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
         }
@@ -1095,7 +1095,7 @@ public class FacturaMB implements Serializable {
             invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
             inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se actualizo el inventario en el inventario"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha registrado el movimiento de salida para esta factura solo se desconto las unidades en inventario"));
         }
     }
 

@@ -557,7 +557,7 @@ public class CotizacionMB implements Serializable {
             }
             documentoActual = documentosmaster;
             limpiarFormulario();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Cotizacion creada"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Cotizacion " + documentosmaster.determinarNumFactura() + " creada"));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Cotizacion no creada"));
         }

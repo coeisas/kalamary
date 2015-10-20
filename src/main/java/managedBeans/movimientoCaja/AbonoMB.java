@@ -12,6 +12,8 @@ import entities.CfgEmpresasede;
 import entities.CfgFormapago;
 import entities.CfgKitproductodetalle;
 import entities.CfgKitproductomaestro;
+import entities.CfgMovInventarioDetalle;
+import entities.CfgMovInventarioMaestro;
 import entities.CfgProducto;
 import entities.FacCaja;
 import entities.FacCarteraCliente;
@@ -29,11 +31,17 @@ import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
 import entities.FacMovcajadetallePK;
 import entities.InvConsolidado;
+import entities.InvMovimiento;
+import entities.InvMovimientoDetalle;
+import entities.InvMovimientoDetallePK;
+import entities.InvMovimientoPK;
 import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.CfgKitproductodetalleFacade;
+import facades.CfgMovInventarioDetalleFacade;
+import facades.CfgMovInventarioMaestroFacade;
 import facades.FacCajaFacade;
 import facades.FacCarteraClienteFacade;
 import facades.FacCarteraDetalleFacade;
@@ -44,6 +52,8 @@ import facades.FacDocumentosmasterFacade;
 import facades.FacMovcajaFacade;
 import facades.FacMovcajadetalleFacade;
 import facades.InvConsolidadoFacade;
+import facades.InvMovimientoDetalleFacade;
+import facades.InvMovimientoFacade;
 import facades.SegUsuarioFacade;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -142,6 +152,14 @@ public class AbonoMB implements Serializable {
     InvConsolidadoFacade consolidadoInventarioFacade;
     @EJB
     CfgKitproductodetalleFacade kitDetalleFacade;
+    @EJB
+    CfgMovInventarioMaestroFacade movInventarioMaestroFacade;
+    @EJB
+    CfgMovInventarioDetalleFacade movInventarioDetalleFacade;
+    @EJB
+    InvMovimientoFacade inventarioMovimientoMaestroFacade;
+    @EJB
+    InvMovimientoDetalleFacade inventarioMovimientoDetalleFacade;
 
     public AbonoMB() {
     }
@@ -646,7 +664,7 @@ public class AbonoMB implements Serializable {
 
             documentoFacade.edit(documentoConcecutivoFactura);
 
-            //ACTULIZAR INVENTARIO
+            //ACTULIZAR INVENTARIO CONSOLIDADO
             for (AuxilarMovInventario auxilarMovInventario : listaAuxiliarInventario) {
                 InvConsolidado inventarioConsolidado = consolidadoInventarioFacade.buscarBySedeAndProducto(sedeActual, auxilarMovInventario.getProducto());
                 inventarioConsolidado.setExistencia(inventarioConsolidado.getExistencia() - auxilarMovInventario.getCantidad());
@@ -654,11 +672,79 @@ public class AbonoMB implements Serializable {
                 inventarioConsolidado.setSalidas(inventarioConsolidado.getSalidas() + auxilarMovInventario.getCantidad());
                 consolidadoInventarioFacade.edit(inventarioConsolidado);
             }
+            
+            //SE CREA UN MOVIMIENTO DE INVENTARIO PARA LA FACTURA
+            //ban sera true cuando el detalle incluya al menos un kit O un producto que no sea un servicio
+            boolean ban = false;
+            for (FacDocumentodetalle fd : listaDetalleFactura) {
+                if (!fd.getCfgProducto().getEsServicio() || fd.getCfgProducto().getEsKit()) {
+                    ban = true;
+                    break;
+                }
+            }
+            //si ban = true. se creara un movimiento de salida en el inventario.
+            if (ban) {
+                crearMovimientoInventario(listaDetalleFactura, factura);
+            }
 
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Factura " + factura.determinarNumFactura() + " creada"));
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Factura no creada"));
+        }
+    }
+
+    private void crearMovimientoInventario(List<FacDocumentodetalle> listaDetalle, FacDocumentosmaster documentosmaster) {
+//        BUSCA EL DOCUMENTO APLICADO AL MOVIMIENTO DE INVENTARIO DE SALIDA
+        CfgDocumento documento = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
+        if (documento.getActDocumento() == 0) {
+            documento.setActDocumento(documento.getIniDocumento());
+        } else {
+            documento.setActDocumento(documento.getActDocumento() + 1);
+        }
+        CfgMovInventarioMaestro movInventarioMaestro = movInventarioMaestroFacade.buscarMovimientoSalida();
+        CfgMovInventarioDetalle movInventarioDetalle = movInventarioDetalleFacade.buscarSalidaVentaByMaestro(movInventarioMaestro);
+        try {
+//            CREACION DEL MAESTRO MOVIMIENTO 
+            InvMovimiento invMovimientoMaestro = new InvMovimiento();
+            invMovimientoMaestro.setInvMovimientoPK(new InvMovimientoPK(documento.getIdDoc(), documento.getActDocumento()));
+            invMovimientoMaestro.setCfgDocumento(documento);
+            invMovimientoMaestro.setCfgempresasedeidSede(sedeActual);
+            invMovimientoMaestro.setCfgmovinventariodetalleidMovInventarioDetalle(movInventarioDetalle);
+            invMovimientoMaestro.setDescuento(documentosmaster.getDescuento());
+            invMovimientoMaestro.setFacDocumentosmaster(documentosmaster);
+            invMovimientoMaestro.setFecha(new Date());
+//            invMovimientoMaestro.setIva(totalIva);
+            invMovimientoMaestro.setSegusuarioidUsuario(usuarioActual);
+            invMovimientoMaestro.setSubtotal(documentosmaster.getSubtotal());
+            invMovimientoMaestro.setTotal(documentosmaster.getTotal());
+            inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
+            if (documento.getActDocumento() >= documento.getFinDocumento()) {//dependiendo de la situacion se finaliza el documento aplicado al movimiento de salida
+                documento.setFinalizado(true);
+            }
+            documentoFacade.edit(documento);
+            List<InvMovimientoDetalle> listaItemsInventarioMovimiento = new ArrayList();
+//            CREACION DEL DETALLE MOVIMIENTO
+            for (FacDocumentodetalle detalleFactura : listaDetalle) {
+                if (!detalleFactura.getCfgProducto().getEsServicio()) {//si el producto no es un servicio se incluye en el detalle del movimiento de salida
+                    InvMovimientoDetalle detalle = new InvMovimientoDetalle();
+                    detalle.setInvMovimientoDetallePK(new InvMovimientoDetallePK(invMovimientoMaestro.getInvMovimientoPK().getCfgdocumentoidDoc(), invMovimientoMaestro.getInvMovimientoPK().getNumDoc(), detalleFactura.getCfgProducto().getIdProducto()));
+                    detalle.setInvMovimiento(invMovimientoMaestro);
+                    detalle.setCantidad(detalleFactura.getCantidad());
+                    detalle.setCfgProducto(detalleFactura.getCfgProducto());
+                    detalle.setCostoAdquisicion(detalleFactura.getValorUnitario());
+                    detalle.setDescuento(detalleFactura.getDescuento());
+                    detalle.setCostoFinal(detalleFactura.getValorTotal());
+                    inventarioMovimientoDetalleFacade.create(detalle);
+                    listaItemsInventarioMovimiento.add(detalle);
+                }
+            }
+
+//            SE INCLUYE EL DETALLE DEL MOVIMIENTO AL MAESTRO
+            invMovimientoMaestro.setInvMovimientoDetalleList(listaItemsInventarioMovimiento);
+            inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se ha registrado el movimiento de salida para esta factura solo se desconto las unidades en inventario. Compruebe que exista un documento vigente para salida de inventario"));
         }
     }
 
