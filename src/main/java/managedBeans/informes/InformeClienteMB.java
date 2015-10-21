@@ -165,10 +165,12 @@ public class InformeClienteMB implements Serializable {
             informeCliente.setDocumento(cliente.getCfgTipoidentificacionId().getAbreviatura() + " " + cliente.getNumDoc());
             informeCliente.setNombre(cliente.nombreCompleto());
             informeCliente.setDireccion(cliente.getDirCliente());
-            if (cliente.getCfgpaiscodPais().getCodPais().equals("343")) {
-                informeCliente.setUbicacion(cliente.getCfgMunicipio().getNomMunicipio() + " " + cliente.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
-            } else {
-                informeCliente.setUbicacion(cliente.getCfgpaiscodPais().getNomPais());
+            if (cliente.getCfgpaiscodPais() != null) {
+                if (cliente.getCfgpaiscodPais().getCodPais().equals("343")) {
+                    informeCliente.setUbicacion(cliente.getCfgMunicipio().getNomMunicipio() + " " + cliente.getCfgMunicipio().getCfgDepartamento().getNomDepartamento());
+                } else {
+                    informeCliente.setUbicacion(cliente.getCfgpaiscodPais().getNomPais());
+                }
             }
             informeCliente.setTelefono(cliente.getTel1());
             informeCliente.setCorreo(cliente.getMail());

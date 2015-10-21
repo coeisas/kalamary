@@ -92,7 +92,7 @@ public class SedeMB implements Serializable {
         if (empresaSeleccionada != null) {
             listaSedes = sedeFacade.buscarSedesPorEmpresa(empresaSeleccionada.getIdEmpresa());
             RequestContext.getCurrentInstance().update("FormModalSede");
-            RequestContext.getCurrentInstance().execute("dlgSede");
+            RequestContext.getCurrentInstance().execute("PF('dlgSede').show()");
         } else {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene informacion de la empresa. Pruebe reiniciando sesion"));
         }

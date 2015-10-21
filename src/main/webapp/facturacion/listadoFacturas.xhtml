@@ -72,7 +72,7 @@
                 <p:column width="5%">
                     <p:commandButton icon="ui-icon-cancel" actionListener="#{listadoFacturaMB.anularDocumento}" disabled="#{factura.estado eq 'ANULADA'}" >
                         <f:attribute name="factura" value="#{factura}" />
-                        <p:confirm header="Confirmación" message="Esta seguro de querer cancelar esta factura?" icon="ui-icon-alert" />
+                        <p:confirm header="Confirmación" message="Esta seguro de querer anular esta factura?" icon="ui-icon-alert" />
                     </p:commandButton>
                 </p:column>
                 <p:column headerText="Num Factura">
