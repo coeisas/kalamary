@@ -52,4 +52,14 @@ public class CfgMovInventarioDetalleFacade extends AbstractFacade<CfgMovInventar
         }
     }
 
+    public CfgMovInventarioDetalle buscarAjustePositivoByMaestro(CfgMovInventarioMaestro movInventarioMaestro) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgMovInventarioDetalle d WHERE d.cfgmovinventariomaestroidMovInventarioMaestro = ?1 AND d.codMovInvetarioDetalle LIKE '2'");
+            query.setParameter(1, movInventarioMaestro);
+            return (CfgMovInventarioDetalle) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }

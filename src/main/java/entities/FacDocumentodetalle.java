@@ -31,12 +31,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FacDocumentodetalle.findByCantidad", query = "SELECT f FROM FacDocumentodetalle f WHERE f.cantidad = :cantidad"),
     @NamedQuery(name = "FacDocumentodetalle.findByValorUnitario", query = "SELECT f FROM FacDocumentodetalle f WHERE f.valorUnitario = :valorUnitario"),
     @NamedQuery(name = "FacDocumentodetalle.findByValorTotal", query = "SELECT f FROM FacDocumentodetalle f WHERE f.valorTotal = :valorTotal"),
+    @NamedQuery(name = "FacDocumentodetalle.findByTipoDescuento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.tipoDescuento = :tipoDescuento"),
     @NamedQuery(name = "FacDocumentodetalle.findByDescuento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.descuento = :descuento"),
     @NamedQuery(name = "FacDocumentodetalle.findByCfgproductoidProducto", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.cfgproductoidProducto = :cfgproductoidProducto"),
     @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
     @NamedQuery(name = "FacDocumentodetalle.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacDocumentodetalle f WHERE f.facDocumentodetallePK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento")})
 public class FacDocumentodetalle implements Serializable {
-
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentodetallePK facDocumentodetallePK;
@@ -49,6 +49,8 @@ public class FacDocumentodetalle implements Serializable {
     @Basic(optional = false)
     @Column(name = "valorTotal", nullable = false)
     private float valorTotal;
+    @Column(name = "tipoDescuento")
+    private Integer tipoDescuento;//1: porcentaje 2:valor 
     @Basic(optional = false)
     @Column(name = "descuento", nullable = false)
     private int descuento;
@@ -118,6 +120,14 @@ public class FacDocumentodetalle implements Serializable {
         this.valorTotal = valorTotal;
     }
 
+    public Integer getTipoDescuento() {
+        return tipoDescuento;
+    }
+
+    public void setTipoDescuento(Integer tipoDescuento) {
+        this.tipoDescuento = tipoDescuento;
+    }
+
     public int getDescuento() {
         return descuento;
     }
@@ -165,7 +175,7 @@ public class FacDocumentodetalle implements Serializable {
     public void setCantidadPosible(int cantidadPosible) {
         this.cantidadPosible = cantidadPosible;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

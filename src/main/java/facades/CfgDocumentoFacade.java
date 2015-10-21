@@ -134,6 +134,16 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
             return null;
         }
     }
+    
+    public CfgDocumento buscarDocumentoInventarioEntradaBySede(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '3' AND d.finalizado = FALSE AND d.activo = TRUE");
+            query.setParameter(1, sede);
+            return (CfgDocumento) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 
     public CfgDocumento buscarDocumentoDeMovInventarioBySede(CfgEmpresasede sede, String codMov) {
         try {

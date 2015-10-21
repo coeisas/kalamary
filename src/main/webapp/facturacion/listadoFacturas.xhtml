@@ -72,6 +72,7 @@
                 <p:column width="5%">
                     <p:commandButton icon="ui-icon-cancel" actionListener="#{listadoFacturaMB.anularDocumento}" disabled="#{factura.estado eq 'ANULADA'}" >
                         <f:attribute name="factura" value="#{factura}" />
+                        <p:confirm header="Confirmación" message="Esta seguro de querer cancelar esta factura?" icon="ui-icon-alert" />
                     </p:commandButton>
                 </p:column>
                 <p:column headerText="Num Factura">
@@ -89,6 +90,10 @@
                     #{factura.formasPagoString()}
                 </p:column>
             </p:dataTable>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
         </h:form>
         <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
             <h:form id="FormBuscarCliente">

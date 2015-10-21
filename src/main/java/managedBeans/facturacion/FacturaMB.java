@@ -149,6 +149,7 @@ public class FacturaMB implements Serializable {
     private String display;//style para ocultar o no la informacion adicional de separados: cuota inicial y numero de cuotas
 
     private List<SelectItem> listaTipoFactura;//los tipos de factura son: normal y remision.
+    private List<SelectItem> listaTipoDescuento;//los tipos de descuento son: porcentaje y valor
     private int tipoFactura;
 
     private int tipoImpresion;
@@ -277,6 +278,11 @@ public class FacturaMB implements Serializable {
             aux = new SelectItem(3, "SEPARADO");
             listaTipoFactura.add(aux);
             tipoFactura = 1;
+            listaTipoDescuento = new ArrayList();
+            aux = new SelectItem(1, "PORCENTAJE");
+            listaTipoDescuento.add(aux);
+            aux = new SelectItem(2, "VALOR");
+            listaTipoDescuento.add(aux);
         } else {
             listaImpuestos = new ArrayList();
         }
@@ -401,8 +407,9 @@ public class FacturaMB implements Serializable {
             cargarInformacionVendedor();
             for (FacDocumentodetalle detalle : lista) {
                 CfgProducto producto = detalle.getCfgProducto();
-                if (!producto.getEsServicio()) {
-                    InvConsolidado consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), producto);
+                InvConsolidado consolidado;
+                if (!producto.getEsServicio() && !producto.getEsKit()) {
+                    consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), producto);
                     if (consolidado == null) {//el producto no esta en el inventario
                         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + producto.getNomProducto() + " en el inventario"));
                         return;
@@ -413,13 +420,68 @@ public class FacturaMB implements Serializable {
                     }
                     //se determina como cantidad posible el total de las existencias en el inventario
                     detalle.setCantidadPosible(consolidado.getExistencia());
+                } else if (producto.getEsKit()) {//si el producto es un kit. se busca existencia de cada elemento en el inventario
+                    int cantidadPosibleKit = 0;
+                    CfgKitproductomaestro kitproductomaestro = producto.getCfgkitproductomaestroidKit();
+                    List<CfgKitproductodetalle> itemsKit = kitproductomaestro.getCfgKitproductodetalleList();
+                    if (itemsKit.isEmpty()) {
+                        itemsKit = kitproductodetalleFacade.buscarByMaestro(kitproductomaestro);
+                    }
+                    boolean ban = true;
+                    int aux;
+                    int totalCantidadItemKit = 0;
+                    //se recorre cada item del kit buscando su existencia en inventario
+                    for (CfgKitproductodetalle detallekit : itemsKit) {
+                        CfgProducto productokit = detallekit.getCfgProducto();
+                        if (!productokit.getEsServicio()) {//si el item actual no es un servicio se tiene encuenta la existencia en el inventario                    
+                            consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productokit);
+                            if (consolidado == null) {//el producto no esta en el inventario
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + productokit.getNomProducto() + " en el inventario"));
+                                ban = false;
+                                break;
+                            }
+                            if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + productokit.getNomProducto()));
+                                ban = false;
+                                break;
+                            }
+                            totalCantidadItemKit = consolidado.getExistencia();
+                            aux = totalCantidadItemKit / (int) detallekit.getCant();
+                            if (aux == 0) {//se debe satisfacer completamente la cantidad requerida de un elemento del kit
+                                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias suficientes de " + productokit.getNomProducto()));
+                                ban = false;
+                                break;
+                            }
+                            if (cantidadPosibleKit == 0) {
+                                cantidadPosibleKit = aux;
+                            } else if (cantidadPosibleKit > aux) {
+                                cantidadPosibleKit = aux;
+                            }
+                        }
+                    }
+                    if (!ban) {
+                        return;
+                    }
+                    detalle.setCantidadPosible(cantidadPosibleKit);
                 }
                 //el valor del documento master no es el definitivo
                 detalle.setFacDocumentodetallePK(new FacDocumentodetallePK(producto.getIdProducto(), 1, 1));
                 detalle.setPrecioOriginal(detalle.getValorUnitario());
-                float descuento = detalle.getDescuento() * detalle.getValorTotal() / (float) 100;
-                descuento = Redondear(descuento, 0);
-                detalle.setValorDescuento(descuento);
+                detalle.setTipoDescuento(detalle.getTipoDescuento());
+                //se determina el descuento para el producto actual 
+                if (detalle.getTipoDescuento() != null) {
+                    //si es un porcentaje
+                    if (detalle.getTipoDescuento() == 1) {
+                        float porcentaje = detalle.getDescuento() / (float) 100;
+                        float descuento = porcentaje * detalle.getValorTotal();
+                        descuento = Redondear(descuento, 0);
+                        detalle.setValorDescuento(descuento);
+                    } else {
+                        detalle.setValorDescuento(detalle.getDescuento());
+                    }
+                } else {
+                    detalle.setValorDescuento(0);
+                }
                 listaDetalle.add(detalle);
             }
             calcularSubtotal();
@@ -551,6 +613,13 @@ public class FacturaMB implements Serializable {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La cantidad insertada excede las existencias del producto"));
                     return;
                 }
+                //se determina el nuevo descuento para el producto actual si es un porcentaje
+                if (facdetalle.getTipoDescuento() != null && facdetalle.getTipoDescuento() == 1) {
+                    float porcentaje = facdetalle.getDescuento() / (float) 100;
+                    float descuento = porcentaje * facdetalle.getValorTotal();
+                    descuento = Redondear(descuento, 0);
+                    facdetalle.setValorDescuento(descuento);
+                }
                 subtotal -= facdetalle.getValorTotal();
                 facdetalle.setCantidad(facdetalle.getCantidad() + 1);
                 facdetalle.setValorTotal(facdetalle.getCantidad() * facdetalle.getValorUnitario());
@@ -605,8 +674,18 @@ public class FacturaMB implements Serializable {
             }
         }
         listaDetalle.get(index).setValorTotal(listaDetalle.get(index).getCantidad() * listaDetalle.get(index).getValorUnitario());
-        float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
-        float descuento = porcentaje * listaDetalle.get(index).getValorTotal();
+        float descuento = 0;
+        //se determina el valor del descuento
+        if (listaDetalle.get(index).getTipoDescuento() != null) {
+            if (listaDetalle.get(index).getTipoDescuento() == 1) {
+                float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
+                descuento = porcentaje * listaDetalle.get(index).getValorTotal();
+            } else {
+                descuento = listaDetalle.get(index).getDescuento();
+            }
+        } else {
+            listaDetalle.get(index).setDescuento(0);
+        }
         descuento = Redondear(descuento, 0);
         listaDetalle.get(index).setValorDescuento(descuento);
         subtotal += listaDetalle.get(index).getValorTotal();
@@ -1341,6 +1420,11 @@ public class FacturaMB implements Serializable {
             facturaDetalleReporte.setNomProducto(detalle.getCfgProducto().getNomProducto());
             facturaDetalleReporte.setValorUnitario(detalle.getValorUnitario());
             facturaDetalleReporte.setValorTotal(detalle.getValorTotal());
+            String presentacion = "";
+            if (detalle.getTipoDescuento() != null && detalle.getTipoDescuento() == 1) {
+                presentacion = "%";
+            }
+            facturaDetalleReporte.setPresentacionDescuento(presentacion);
             facturaDetalleReporte.setDescuento(detalle.getDescuento());
             list.add(facturaDetalleReporte);
         }
@@ -2044,5 +2128,9 @@ public class FacturaMB implements Serializable {
 
     public boolean isMostrarDepartamentoMunicipio() {
         return mostrarDepartamentoMunicipio;
+    }
+
+    public List<SelectItem> getListaTipoDescuento() {
+        return listaTipoDescuento;
     }
 }

@@ -62,14 +62,14 @@
                 id="IdTableItemFactura"
                 value="#{facturaMB.listaDetalle}"
                 var="itemFactura"
-                style="width: 85%;margin-top: .5em;margin: 0 auto"
+                style="width: 95%;margin-top: .5em;margin: 0 auto"
                 rows="15"
                 rowKey="#{itemFactura.facDocumentodetallePK}"
                 editable="true" editMode="cell"
                 emptyMessage="No se han insertado items a la factura">
                 <p:ajax event="cellEdit" listener="#{facturaMB.onCellEdit}" oncomplete="update()" update="@none"/>
                 <f:facet name="header">Items Factura</f:facet>
-                <p:column headerText="Producto" width="45%">
+                <p:column headerText="Producto" width="40%">
                     #{itemFactura.cfgProducto.nomProducto}
                 </p:column>
                 <p:column headerText="Inventario">
@@ -85,13 +85,24 @@
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{itemFactura.valorUnitario}">
-                                <f:convertNumber type="currency"/>
+                                <f:convertNumber type="currency" maxFractionDigits="0"/>
                             </h:outputText> 
                         </f:facet>
                         <f:facet name="input"><h:inputText value="#{itemFactura.valorUnitario}"/></f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column headerText="%Descuento">
+                <p:column headerText="Tipo Descuento">
+                    <p:cellEditor>
+                        <f:facet name="output"><h:outputLabel value="#{itemFactura.tipoDescuento eq null ? '...' : itemFactura.tipoDescuento eq 1 ?'PORCENTAJE':'VALOR'}"/></f:facet>
+                        <f:facet name="input">
+                            <h:selectOneMenu value="#{itemFactura.tipoDescuento}" style="width:100%">
+                                <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{facturaMB.listaTipoDescuento}" var="tipoDescuento" itemLabel="#{tipoDescuento.label}" itemValue="#{tipoDescuento.value}" />
+                            </h:selectOneMenu>                            
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Descuento">
                     <p:cellEditor>
                         <f:facet name="output"><h:outputText value="#{itemFactura.descuento}"/></f:facet>
                         <f:facet name="input"><p:spinner value="#{itemFactura.descuento}" min="0" size="5"/></f:facet>
@@ -99,7 +110,7 @@
                 </p:column>
                 <p:column headerText="Total">
                     <h:outputText value="#{itemFactura.valorTotal}">
-                        <f:convertNumber type="currency"/>
+                        <f:convertNumber type="currency" maxFractionDigits="0"/>
                     </h:outputText>
                 </p:column>                
                 <p:column width="6%" style="text-align: center">
@@ -108,7 +119,7 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
-            <p:panel id="IdSubTotal" style="width: 85%;margin: 0 auto;padding: 0;border: none">
+            <p:panel id="IdSubTotal" style="width: 95%;margin: 0 auto;padding: 0;border: none">
                 <div class="divContent">
                     <p:panelGrid columns="2">
                         <p:outputLabel class="label" value="SUBTOTAL:"/>

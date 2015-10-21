@@ -35,7 +35,7 @@
                         <p:column>
                             <p:outputLabel class="labelFormulario" value="Costo:"/>
                             <h:inputText class="cajaH" style="float: left;width: 100px" value="#{kitMB.costo}" readonly="true">
-                                <f:convertNumber type="currency"/>
+                                <f:convertNumber type="currency" maxFractionDigits="0"/>
                             </h:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
@@ -45,7 +45,7 @@
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Precio:"/>
                             <h:inputText id="IdPrecioKit" class="cajaH" style="float: left;width: 100px" value="#{kitMB.precio}" readonly="true">
-                                <f:convertNumber type="currency"/>
+                                <f:convertNumber type="currency" maxFractionDigits="0"/>
                             </h:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
                             <p:outputLabel class="labelFormulario" value="Activo:"/>
@@ -80,12 +80,12 @@
                     </p:column>
                     <p:column headerText="Vlr Unit">
                         <h:outputText value="#{itemKit.precioUnitario}">
-                            <f:convertNumber type="currency"/>
+                            <f:convertNumber type="currency" maxFractionDigits="0"/>
                         </h:outputText>
                     </p:column>
                     <p:column headerText="Vlr Total">
                         <h:outputText value="#{itemKit.precioTotal}">
-                            <f:convertNumber type="currency"/>
+                            <f:convertNumber type="currency" maxFractionDigits="0"/>
                         </h:outputText>
                     </p:column>
                     <p:column width="6%">

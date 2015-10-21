@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="590" leftMargin="8" rightMargin="14" topMargin="14" bottomMargin="14" uuid="d46ec925-ba03-4a7e-8cbe-b6de0f47c15c">
 	<property name="ireport.zoom" value="5.0"/>
-	<property name="ireport.x" value="2259"/>
+	<property name="ireport.x" value="2077"/>
 	<property name="ireport.y" value="0"/>
 	<style name="fondo" mode="Opaque" backcolor="#D9D9D9">
 		<box>
@@ -15,6 +15,7 @@
 	<field name="descuento" class="java.lang.Float"/>
 	<field name="nomProducto" class="java.lang.String"/>
 	<field name="codProducto" class="java.lang.String"/>
+	<field name="presentacionDescuento" class="java.lang.String"/>
 	<columnHeader>
 		<band height="21">
 			<rectangle>
@@ -46,7 +47,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font isBold="true"/>
 				</textElement>
-				<text><![CDATA[ %DESC]]></text>
+				<text><![CDATA[DESC]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="1" width="68" height="20" uuid="859ed205-0e6b-4089-a366-30c60c8d68d3"/>
@@ -95,9 +96,9 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="407" y="0" width="52" height="12" uuid="a4591c8f-7342-4e5f-a614-0bfd86a57684"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+			<textField pattern="#,##0">
+				<reportElement x="407" y="0" width="45" height="12" uuid="a4591c8f-7342-4e5f-a614-0bfd86a57684"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{descuento}]]></textFieldExpression>
@@ -122,6 +123,13 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{nomProducto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="452" y="0" width="6" height="12" uuid="0f9a7db4-2c57-431a-a7d4-5eb70d9a74d4"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{presentacionDescuento}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

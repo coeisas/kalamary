@@ -10,6 +10,8 @@ import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgImpuesto;
+import entities.CfgKitproductodetalle;
+import entities.CfgKitproductomaestro;
 import entities.CfgMunicipio;
 import entities.CfgMunicipioPK;
 import entities.CfgProducto;
@@ -27,6 +29,7 @@ import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.CfgImpuestoFacade;
+import facades.CfgKitproductodetalleFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
@@ -88,6 +91,7 @@ import utilities.FacturaReporte;
 import utilities.LazyClienteDataModel;
 import utilities.LazyProductosModel;
 import java.util.Calendar;
+import javax.faces.model.SelectItem;
 
 /**
  *
@@ -114,6 +118,8 @@ public class CotizacionMB implements Serializable {
     private List<SegUsuario> listaVendedor;
     private String documentoVendedor;
     private String nombreVendedor;
+
+    private List<SelectItem> listaTipoDescuento;
 
     private String numCotizacion;
     private int tipoImpresion;
@@ -179,6 +185,8 @@ public class CotizacionMB implements Serializable {
     @EJB
     FacMovcajadetalleFacade movcajadetalleFacade;
     @EJB
+    CfgKitproductodetalleFacade kitproductodetalleFacade;    
+    @EJB
     CfgMunicipioFacade municipioFacade;
     @EJB
     CfgTipoidentificacionFacade tipoidentificacionFacade;
@@ -224,6 +232,11 @@ public class CotizacionMB implements Serializable {
             setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
             setListaImpuestos(impuestoFacade.buscarImpuestosPorEmpresa(empresaActual));
             cargarInformacionCliente();
+            listaTipoDescuento = new ArrayList();
+            SelectItem aux = new SelectItem(1, "PORCENTAJE");
+            listaTipoDescuento.add(aux);
+            aux = new SelectItem(2, "VALOR");
+            listaTipoDescuento.add(aux);
         } else {
             listaImpuestos = new ArrayList();
         }
@@ -328,7 +341,7 @@ public class CotizacionMB implements Serializable {
         }
         if (productoSeleccionado != null) {
             InvConsolidado consolidado = null;
-            if (!productoSeleccionado.getEsServicio()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario
+            if (!productoSeleccionado.getEsServicio() && !productoSeleccionado.getEsKit()) {//si el producto seleccionado no es un servicio se tiene encuenta la existencia en el inventario ni un kit
                 consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productoSeleccionado);
                 if (consolidado == null) {//el producto no esta en el inventario
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
@@ -339,13 +352,58 @@ public class CotizacionMB implements Serializable {
                     return;
                 }
             }
+            int cantidadPosibleKit = 0;
+            if (productoSeleccionado.getEsKit()) {//si el producto es un kit. se busca existencia de cada elemento en el inventario
+                CfgKitproductomaestro kitproductomaestro = productoSeleccionado.getCfgkitproductomaestroidKit();
+                List<CfgKitproductodetalle> itemsKit = kitproductomaestro.getCfgKitproductodetalleList();
+                if (itemsKit.isEmpty()) {
+                    itemsKit = kitproductodetalleFacade.buscarByMaestro(kitproductomaestro);
+                }
+                boolean ban = true;
+                int aux;
+                int totalCantidadItemKit = 0;
+                //se recorre cada item del kit buscando su existencia en inventario
+                for (CfgKitproductodetalle detallekit : itemsKit) {
+                    CfgProducto productokit = detallekit.getCfgProducto();
+                    if (!productokit.getEsServicio()) {//si el item actual no es un servicio se tiene encuenta la existencia en el inventario                    
+                        consolidado = invConsolidadoFacade.buscarBySedeAndProducto(getSedeActual(), productokit);
+                        if (consolidado == null) {//el producto no esta en el inventario
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de " + productokit.getNomProducto() + " en el inventario"));
+                            ban = false;
+                            break;
+                        }
+                        if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de " + productokit.getNomProducto()));
+                            ban = false;
+                            break;
+                        }
+                        totalCantidadItemKit = consolidado.getExistencia();
+                        aux = totalCantidadItemKit / (int) detallekit.getCant();
+                        if (aux == 0) {//se debe satisfacer completamente la cantidad requerida de un elemento del kit
+                            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias suficientes de " + productokit.getNomProducto()));
+                            ban = false;
+                            break;
+                        }
+                        if (cantidadPosibleKit == 0) {
+                            cantidadPosibleKit = aux;
+                        } else if (cantidadPosibleKit > aux) {
+                            cantidadPosibleKit = aux;
+                        }
+                    }
+                }
+                if (!ban) {
+                    return;
+                }
+            }
             FacDocumentodetalle facdetalle = obtenerItemEnLista(productoSeleccionado);
             if (facdetalle == null) {
                 facdetalle = new FacDocumentodetalle();
                 facdetalle.setCfgProducto(productoSeleccionado);
-                if (consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
+                if (!productoSeleccionado.getEsKit() && consolidado != null) {//se permite un consolidad nulo cuando el producto seleccionado corresponde a un servicio
                     //se determina como cantidad posible el total de las existencias en el inventario
                     facdetalle.setCantidadPosible(consolidado.getExistencia());
+                } else if (productoSeleccionado.getEsKit()) {
+                    facdetalle.setCantidadPosible(cantidadPosibleKit);
                 }
                 //el valor del documento master no es el definitivo
                 facdetalle.setFacDocumentodetallePK(new FacDocumentodetallePK(productoSeleccionado.getIdProducto(), 1, 1));
@@ -366,9 +424,16 @@ public class CotizacionMB implements Serializable {
                 subtotal -= facdetalle.getValorTotal();
                 facdetalle.setCantidad(facdetalle.getCantidad() + 1);
                 facdetalle.setValorTotal(facdetalle.getCantidad() * facdetalle.getValorUnitario());
+                //se determina el nuevo descuento para el producto actual si es un porcentaje
+                if (facdetalle.getTipoDescuento() != null && facdetalle.getTipoDescuento() == 1) {
+                    float porcentaje = facdetalle.getDescuento() / (float) 100;
+                    float descuento = porcentaje * facdetalle.getValorTotal();
+                    descuento = Redondear(descuento, 0);
+                    facdetalle.setValorDescuento(descuento);
+                }
             }
             subtotal += facdetalle.getValorTotal();
-            calcularTotalDescuento();
+            calcularTotalDescuento();//total descuento de la cotizacion
             calcularImpuesto();
             calcularTotalFactura();
             calcularTotalUSD();
@@ -417,8 +482,18 @@ public class CotizacionMB implements Serializable {
             }
         }
         listaDetalle.get(index).setValorTotal(listaDetalle.get(index).getCantidad() * listaDetalle.get(index).getValorUnitario());
-        float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
-        float descuento = porcentaje * listaDetalle.get(index).getValorTotal();
+        float descuento = 0;
+        //se determina el valor del descuento
+        if (listaDetalle.get(index).getTipoDescuento() != null) {
+            if (listaDetalle.get(index).getTipoDescuento() == 1) {//si es porcentaje se determina acorde al valorTotal del item (valorUnitario * cantidad) 
+                float porcentaje = listaDetalle.get(index).getDescuento() / (float) 100;
+                descuento = porcentaje * listaDetalle.get(index).getValorTotal();
+            } else {
+                descuento = listaDetalle.get(index).getDescuento();
+            }
+        } else {
+            listaDetalle.get(index).setDescuento(0);
+        }
         descuento = Redondear(descuento, 0);
         listaDetalle.get(index).setValorDescuento(descuento);
         subtotal += listaDetalle.get(index).getValorTotal();
@@ -668,6 +743,11 @@ public class CotizacionMB implements Serializable {
             facturaDetalleReporte.setNomProducto(detalle.getCfgProducto().getNomProducto());
             facturaDetalleReporte.setValorUnitario(detalle.getValorUnitario());
             facturaDetalleReporte.setValorTotal(detalle.getValorTotal());
+            String presentacion = "";
+            if (detalle.getTipoDescuento() != null && detalle.getTipoDescuento() == 1) {
+                presentacion = "%";
+            }
+            facturaDetalleReporte.setPresentacionDescuento(presentacion);
             facturaDetalleReporte.setDescuento(detalle.getDescuento());
             list.add(facturaDetalleReporte);
         }
@@ -1284,6 +1364,10 @@ public class CotizacionMB implements Serializable {
 
     public boolean isMostrarDepartamentoMunicipio() {
         return mostrarDepartamentoMunicipio;
+    }
+
+    public List<SelectItem> getListaTipoDescuento() {
+        return listaTipoDescuento;
     }
 
 }

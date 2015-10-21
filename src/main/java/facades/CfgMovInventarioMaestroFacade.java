@@ -40,4 +40,13 @@ public class CfgMovInventarioMaestroFacade extends AbstractFacade<CfgMovInventar
             return null;
         }
     }
+    
+    public CfgMovInventarioMaestro buscarMovimientoEntrada() {
+        try {
+            Query query = em.createQuery("SELECT m FROM CfgMovInventarioMaestro m WHERE m.codMovInvetario LIKE '1'");
+            return (CfgMovInventarioMaestro) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }    
 }
