@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    template="../templates/layout.xhtml">
+    <ui:define name="title">Lista Precios</ui:define>
+    <ui:define name="content">   
+        <p:growl id="msg" showDetail="true"/>
+        <h:form id="IdFormListaPrecios">
+            <p:remoteCommand name="update" actionListener="#{listaPrecioMB.updateTabla}"/>
+            <p:panelGrid style="width: 100%;margin: 0 auto">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>
+                            Lista Precios
+                        </p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Categoria:"/>
+                        <p:selectOneMenu id="IdCategoria" class="campoFormulario" value="#{listaPrecioMB.idCategoria}">
+                            <p:ajax event="change" listener="#{listaPrecioMB.cargarReferencia}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{listaPrecioMB.listaCategoria}" var="categoria" itemLabel="#{categoria.nombreCategoria}" itemValue="#{categoria.idCategoria}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel class="labelFormulario" value="Referencia:"/>                        
+                        <p:selectOneMenu id="IdReferencia" class="campoFormulario" value="#{listaPrecioMB.idReferencia}">
+                            <p:ajax event="change" listener="#{listaPrecioMB.cargarMarca}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{listaPrecioMB.listaReferencia}" var="referencia" itemLabel="#{referencia.nombreReferencia}" itemValue="#{referencia.idReferencia}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel class="labelFormulario" value="Marca:"/>
+                        <p:selectOneMenu id="IdMarca" class="campoFormulario" value="#{listaPrecioMB.idMarca}">
+                            <p:ajax event="change" listener="#{listaPrecioMB.cargarProducto}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{listaPrecioMB.listaMarca}" var="marca" itemLabel="#{marca.nombreMarca}" itemValue="#{marca.idMarca}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar" actionListener="#{listaPrecioMB.limpiarFormulario}"/> 
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <p:dataTable id="IdTableProducto" 
+                         value="#{listaPrecioMB.listaProducto}" 
+                         var="producto" 
+                         emptyMessage="No hay productos registrados" rows="20" 
+                         paginator="true" paginatorPosition="bottom" 
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" 
+                         currentPageReportTemplate="Mostrando {startRecord}-{endRecord} de {totalRecords}"
+                         rowKey="#{producto.idProducto}" 
+                         disabledSelection="true"
+                         editable="true" editMode="cell">
+                <p:ajax event="cellEdit" listener="#{listaPrecioMB.onCellEdit}" oncomplete="update()" update="@none"/>
+                <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
+                <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
+                <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                <p:column headerText="Precio">
+                    <p:cellEditor>
+                        <f:facet name="input"><h:inputText value="#{producto.precio}" /></f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.precio}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText>
+                        </f:facet>
+                    </p:cellEditor>
+                </p:column>
+            </p:dataTable>            
+        </h:form>
+    </ui:define>
+</ui:composition>
+

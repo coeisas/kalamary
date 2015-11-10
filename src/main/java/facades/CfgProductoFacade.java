@@ -58,6 +58,46 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
         }
     }
 
+    public List<CfgProducto> buscarPorEmpresaTodos(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<CfgProducto> buscarPorEmpresaCategoriaReferenciaAndMarca(CfgEmpresa empresa, CfgCategoriaproducto categoria, CfgReferenciaproducto referencia, CfgMarcaproducto marca) {
+        try {
+            String consulta = "SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1";
+//            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgmarcaproductoidMarca = ?2 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia = ?3 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria = ?4");
+            if (marca != null) {
+                consulta += " AND p.cfgmarcaproductoidMarca = ?2";
+            }
+            if (referencia != null) {
+                consulta += " AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia = ?3";
+            }
+            if (categoria != null) {
+                consulta += " AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria = ?4";
+            }
+            Query query = em.createQuery(consulta);
+            query.setParameter(1, empresa);
+            if (marca != null) {
+                query.setParameter(2, marca);
+            }
+            if (referencia != null) {
+                query.setParameter(3, referencia);
+            }
+            if (categoria != null) {
+                query.setParameter(4, categoria);
+            }
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public CfgProducto buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
         try {
             Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.codProducto = ?2");
