@@ -57,7 +57,7 @@
 					<textElement verticalAlignment="Middle">
 						<font size="8"/>
 					</textElement>
-					<text><![CDATA[EXISTENCIAS]]></text>
+					<text><![CDATA[EXISTENCIA]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="340" y="22" width="50" height="20" uuid="82cd9b78-6ccf-4562-b55c-62e779885d7d"/>
@@ -110,7 +110,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="20" isBold="true"/>
 				</textElement>
-				<text><![CDATA[INFORME INVENTARIO]]></text>
+				<text><![CDATA[INFORME INVENTARIO - CONSOLIDADO]]></text>
 			</staticText>
 		</band>
 	</title>

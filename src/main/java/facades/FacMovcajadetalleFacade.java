@@ -5,8 +5,12 @@
  */
 package facades;
 
+import entities.CfgCliente;
+import entities.CfgEmpresasede;
 import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
+import entities.SegUsuario;
+import java.util.Date;
 import javax.ejb.Stateless;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -52,4 +56,41 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
         }
     }
 
+    public List<FacMovcajadetalle> buscarMovDetalleParaInforme(CfgEmpresasede sede, Date fechaInicial, Date fechaFinal, CfgCliente cliente, SegUsuario usuario) {
+        try {
+            Query query;
+            String consulta = "SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja.faccajaidCaja.cfgempresasedeidSede = ?1";
+            if (fechaInicial != null) {
+                consulta = consulta.concat(" AND mcd.fecha >= ?2");
+            }
+            if (fechaFinal != null) {
+                consulta = consulta.concat(" AND mcd.fecha <= ?3");
+            }
+            if (cliente != null) {
+                consulta = consulta.concat(" AND mcd.facDocumentosmaster.cfgclienteidCliente = ?4");
+            }
+            if(usuario != null){
+                consulta = consulta.concat(" AND (mcd.facDocumentosmaster.segusuarioidUsuario1 = ?5 AND mcd.facDocumentosmaster.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion IN ('2', '9'))");
+            }
+            consulta = consulta.concat(" ORDER BY mcd.fecha");
+            query = em.createQuery(consulta);
+//            query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja.faccajaidCaja.cfgempresasedeidSede = ?1 AND mcd.fecha >= ?2 AND mcd.fecha <= ?3 AND mcd.facDocumentosmaster.cfgclienteidCliente = ?4 AND (mcd.facDocumentosmaster.segusuarioidUsuario1 = ?5 AND mcd.facDocumentosmaster.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion IN ('2', '9')) ORDER BY mcd.fecha");
+            query.setParameter(1, sede);
+            if (fechaInicial != null) {
+                query.setParameter(2, fechaInicial);
+            }
+            if (fechaFinal != null) {
+                query.setParameter(3, fechaFinal);
+            }
+            if (cliente != null) {
+                query.setParameter(4, cliente);
+            }
+            if(usuario != null){
+                query.setParameter(5, usuario);
+            }            
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

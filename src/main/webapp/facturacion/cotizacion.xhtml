@@ -141,7 +141,7 @@
                     <p:column headerText="Empresa">
                         <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
                     </p:column>
-                    <p:column headerText="Identificacion">
+                    <p:column headerText="Identificacion" filterBy="#{cliente.numDoc}" filterStyle="width:98%">
                         <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
                     </p:column>
                     <p:column headerText="Nombre">

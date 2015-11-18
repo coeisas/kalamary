@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c81251f-ab3e-4fdb-a01f-033ed48f9871">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="logo" class="java.io.InputStream"/>
+	<field name="fechaMovimiento" class="java.util.Date"/>
+	<field name="codigoProducto" class="java.lang.String"/>
+	<field name="descripcion" class="java.lang.String"/>
+	<field name="cantidad" class="java.lang.Integer"/>
+	<field name="tipoMovimiento" class="java.lang.String"/>
+	<field name="numDocumento" class="java.lang.String"/>
+	<field name="factura" class="java.lang.String"/>
+	<field name="movimiento" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="752" height="50" uuid="f31bde63-cb95-4e92-afba-307aa6c62071"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="50" uuid="e1ac3ce5-1482-46a6-9898-ba9d77d710b5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INFORME INVENTARIO - DETALLADO]]></text>
+			</staticText>
+			<image>
+				<reportElement x="8" y="1" width="100" height="48" uuid="ff617d1b-fa8a-427e-8dd3-a3648c809571"/>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="11" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="62" height="20" uuid="68f2c1e6-4424-4fde-aa31-afb7366e2a18"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="0" width="75" height="20" uuid="f714f12e-dd71-4adf-9ae7-a1660c4814ea"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cod Producto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="147" y="0" width="156" height="20" uuid="d6a1f7c1-fdfb-46a7-9e1a-f2111a76ac0e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="308" y="0" width="51" height="20" uuid="d2ce52cd-462c-4a0e-9b43-409c79e40328"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="364" y="0" width="203" height="20" uuid="a6fa29a7-d0a3-4f54-8c1c-8d3006ecb0a8"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tipo Movimiento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="572" y="0" width="86" height="20" uuid="288119e6-6a39-47ae-8b5d-6ce02e98c2a8"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[No Movimiento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="663" y="0" width="86" height="20" uuid="30eb4e15-e03f-416a-afff-c5f1b0ac71d2"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Factura]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="20" width="752" height="1" uuid="ae9dc5a4-2e18-4d64-bf63-e759cb276fe1"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="0" width="62" height="20" uuid="1e6c5474-d825-477f-817c-e6e91a34fe36"/>
+				<textFieldExpression><![CDATA[$F{fechaMovimiento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="67" y="0" width="75" height="20" uuid="9d957cbd-ebcb-4a74-9c01-09601a90b75a"/>
+				<textFieldExpression><![CDATA[$F{codigoProducto}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="147" y="0" width="156" height="20" uuid="a271af62-2925-46aa-9a22-1590a55d9602"/>
+				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="308" y="0" width="51" height="20" uuid="b230cfbc-4607-4e35-a0f1-2b54447a81fd"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="572" y="0" width="86" height="20" uuid="c88d9873-c312-4f43-afab-fc9226fdf550"/>
+				<textFieldExpression><![CDATA[$F{numDocumento}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="663" y="0" width="86" height="20" uuid="b9e5b1e8-43f5-47be-8dcb-883e8fcf7ace"/>
+				<textFieldExpression><![CDATA[$F{factura}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="364" y="0" width="203" height="20" uuid="5860c7e4-f533-4de6-ab40-51ec2ff4e038"/>
+				<textFieldExpression><![CDATA[$F{movimiento}+" - "+$F{tipoMovimiento}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="23">
+			<textField>
+				<reportElement x="319" y="3" width="80" height="20" uuid="88e9e0dd-fee8-41c1-8d6e-b2f3613be42c"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Página "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="399" y="3" width="40" height="20" uuid="5655ef9a-c734-4b54-bb5c-d24d121303c7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

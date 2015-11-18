@@ -4,6 +4,14 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui">
+    <style>
+        .ui-slidemenu-wrapper {
+            height: 250px !important;
+        }
+        .ui-slidemenu-content {
+            height: 230px !important;
+        }
+    </style>
     <h:form id="IdFormMenu">
         <p:slideMenu style="width: 95%" backLabel="Regresar">
             <p:submenu label="Facturacion">
@@ -46,11 +54,14 @@
                 </p:submenu>
             </p:submenu>
             <p:submenu label="Informes"  style="height: auto" expanded="false">
-                <p:menuitem icon="ui-icon-gear" value="Informe Facturacion" outcome="/informes/informeFacturacion.xhtml" />
-                <p:menuitem icon="ui-icon-pin-w" value="Informe Movimiento Caja" outcome="/informes/informeMovimientoCaja.xhtml" />
-                <p:menuitem icon="ui-icon-star" value="Informe Cliente" outcome="/informes/informeClientes.xhtml" />
-                <p:menuitem icon="ui-icon-star" value="Informe Inventario" outcome="/informes/informeInventario.xhtml" />
-                <p:menuitem icon="ui-icon-star" value="Informe Producto" outcome="/informes/informeProductos.xhtml" />
+                <p:menuitem icon="ui-icon-script" value="Informe Facturacion" outcome="/informes/informeFacturacion.xhtml" />
+                <p:menuitem icon="ui-icon-clipboard" value="Informe Separado" outcome="/informes/informeSeparado.xhtml" />
+                <p:menuitem icon="ui-icon-pin-w" value="Informe Caja - Consolidado" outcome="/informes/informeMovimientoCaja.xhtml" />
+                <p:menuitem icon="ui-icon-pin-w" value="Informe Caja - Detallado" outcome="/informes/informeDetalladoCaja.xhtml" />
+                <p:menuitem icon="ui-icon-contact" value="Informe Cliente" outcome="/informes/informeClientes.xhtml" />            
+                <p:menuitem icon="ui-icon-star" value="Informe Inventario - Consolidado" outcome="/informes/informeInventario.xhtml" />
+                <p:menuitem icon="ui-icon-star" value="Informe Inventario - Detallado" outcome="/informes/informeMovInventario.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Producto" outcome="/informes/informeProductos.xhtml" />
             </p:submenu>
         </p:slideMenu>
     </h:form>              

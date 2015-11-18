@@ -25,14 +25,14 @@
     font-size: .9em;
     //background-color: #ece3a5;
     /*padding: 5px;*/
-    width: 14%;
+    width: 19%;
     height: 100%;
 }
 
 #content {
     display: inline-block;
     font-size: .9em;
-    width: 83%;
+    width: 78%;
     vertical-align: top;
 }
 

@@ -60,10 +60,22 @@ public class LazyClienteDataModel extends LazyDataModel<CfgCliente> {
 
     private List<CfgCliente> loadClientes(int first, int pageSize, Map<String, Object> filters) {
         List<CfgCliente> data = new ArrayList();
-        if (filters.isEmpty()) {
-            data = clienteFacade.lazyCliente(empresa, first, pageSize);
+//        if (filters.isEmpty()) {
+//            data = clienteFacade.lazyCliente(empresa, first, pageSize);
+//        } else {
+        String numDoc = null;
+        String cliente = null;
+        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+            String filterProperty = entry.getKey();
+            switch (filterProperty) {
+                case "numDoc":
+                    numDoc = entry.getValue().toString().trim();
+                    break;
+            }
         }
-        this.setRowCount(clienteFacade.totaClientesByEmpresa(empresa));
+//        }
+        data = clienteFacade.lazyCliente(empresa, numDoc, first, pageSize);
+        this.setRowCount(clienteFacade.totaClientesByEmpresaLazy(empresa, numDoc));
         return data;
     }
 

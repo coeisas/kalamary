@@ -1,0 +1,102 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Informe Detallado Caja</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormInformeDetalladoCaja">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="3">Informe Detallado Caja</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Inicial:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeDetalladoCajaMB.fechaInicial}"/>                        
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeDetalladoCajaMB.fechaFinal}"/>                        
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column colspan="2">
+                        <p:selectOneRadio value="#{informeDetalladoCajaMB.idProtagonista}">
+                            <p:ajax event="valueChange" listener="#{informeDetalladoCajaMB.actualizarLabelProtagonista}" update="@none"/>
+                            <f:selectItems value="#{informeDetalladoCajaMB.protagonistas}"/>
+                        </p:selectOneRadio>
+                    </p:column>
+                </p:row>                
+                <p:row>
+                    <p:column colspan="2">
+                        <p:outputLabel  id="IdProtagonista" class="labelFormulario" value="#{informeDetalladoCajaMB.labelProtagonista}"/>
+                        <p:inputText id="IdIdentificacionProtagonista" class="campoFormulario" value="#{informeDetalladoCajaMB.identificacionProtagonista}">
+                            <p:ajax event="blur" listener="#{informeDetalladoCajaMB.buscarProtagonista}" update="@none"/>
+                        </p:inputText>
+                        <p:watermark for="IdIdentificacionProtagonista" value="Identificacion"/>
+                        <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{informeDetalladoCajaMB.cargarProtagonistas}"/>
+                        <p:outputLabel id="IdNombreProtagonista" class="labelFormularioInformativa" value="#{informeDetalladoCajaMB.nombreProtagonista}"/>
+                    </p:column>                    
+                </p:row>
+                <p:row>
+                    <p:column colspan="2" style="text-align: center">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" onclick="this.form.target = '_blank'" ajax="false" actionListener="#{informeDetalladoCajaMB.generarReporte}"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeDetalladoCajaMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>            
+        </h:form>
+        
+        <p:dialog widgetVar="dlgCliente" header="BUSCAR CLIENTE" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarCliente">
+                <p:dataTable value="#{informeDetalladoCajaMB.listaCliente}" emptyMessage="No se encontraron clientes" var="cliente" selectionMode="single" lazy="true" selection="#{informeDetalladoCajaMB.clienteSeleccionado}" rows="10" rowKey="#{cliente.idCliente}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Empresa">
+                        <h:outputText value="#{cliente.cfgempresaidEmpresa.nomEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Identificacion" filterBy="#{cliente.numDoc}" filterStyle="width:98%" >
+                        <h:outputText value="#{cliente.cfgTipoidentificacionId.abreviatura} - #{cliente.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Nombre">
+                        <h:outputText value="#{cliente.nombreCompleto()}"/>
+                    </p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{informeDetalladoCajaMB.cargarInformacionProtagonista}" />&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{informeDetalladoCajaMB.deseleccionarCliente}"/>
+                </div>
+            </h:form>                                
+        </p:dialog>   
+        
+        <p:dialog widgetVar="dlgUsuario" header="BUSCAR USUARIO" modal="true" resizable="false" width="50%">
+            <h:form id="FormBuscarUsuario">
+                <p:dataTable value="#{informeDetalladoCajaMB.listaUsuario}" var="usuario" selectionMode="single" selection="#{informeDetalladoCajaMB.usuarioSeleccionado}" rows="10" rowKey="#{usuario.idUsuario}" paginator="true" paginatorPosition="bottom">
+                    <p:column headerText="Identificion">
+                        <h:outputText value="#{usuario.numDoc}"/>
+                    </p:column>
+                    <p:column headerText="Usuario">
+                        <h:outputText value="#{usuario.nombreCompleto()}"/>
+                    </p:column>
+                    <p:column headerText="Rol">
+                        <h:outputText value="#{usuario.cfgRolIdrol.nomrol}"/>
+                    </p:column>
+                    <p:column headerText="Sede">
+                        <h:outputText value="#{usuario.cfgempresasedeidSede.nomSede}"/>
+                    </p:column>                    
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{informeDetalladoCajaMB.cargarInformacionProtagonista}"/>&nbsp;
+                <p:commandButton value="Cancelar" actionListener="#{informeDetalladoCajaMB.deseleccionarUsuario}"/>
+            </h:form>                                
+        </p:dialog>        
+    </ui:define>
+</ui:composition>
+
+

@@ -277,7 +277,12 @@ public class FacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(3, "SEPARADO");
             listaTipoFactura.add(aux);
-            tipoFactura = 1;
+            //OJO - LA EMPRESA TECHNOSPORT USA POR DEFECTO LA ESPECIAL
+            if (empresaActual.getIdEmpresa() == 3) {
+                tipoFactura = 2;
+            } else {
+                tipoFactura = 1;
+            }
             listaTipoDescuento = new ArrayList();
             aux = new SelectItem(1, "PORCENTAJE");
             listaTipoDescuento.add(aux);
@@ -1481,7 +1486,12 @@ public class FacturaMB implements Serializable {
         observacion = "";
         fechaLimite = new Date();
         totalUSD = 0;
-        tipoFactura = 1;
+        //OJO - LA EMPRESA TECHNOSPORT USA POR DEFECTO LA ESPECIAL
+        if (empresaActual.getIdEmpresa() == 3) {
+            tipoFactura = 2;
+        } else {
+            tipoFactura = 1;
+        }
         display = "none";
         cotizacionSeleccionada = null;
         setEnableBtnPrint(false);

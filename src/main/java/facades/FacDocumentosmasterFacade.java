@@ -17,7 +17,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.Date;
-import org.eclipse.persistence.internal.libraries.asm.tree.TryCatchBlockNode;
 
 /**
  *
@@ -309,6 +308,44 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             Query query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.facDocumentosmaster = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'");
             query.setParameter(1, separado);
             return (FacDocumentosmaster) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public List<FacDocumentosmaster> buscarSeparados(CfgEmpresasede sede, Date fechaIncial, Date fechaFinal, CfgCliente cliente, int numSeparado) {
+        try {
+            Query query;
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '7'";
+//            query = em.createQuery("SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '7' AND d.fecCrea >= ?2 AND d.fecCrea <= ?3 AND d.cfgclienteidCliente = ?4 AND d.facDocumentosmasterPK.numDocumento = ?5 ORDER BY d.fecCrea, d.facDocumentosmasterPK");
+            if (fechaIncial != null) {
+                consulta = consulta.concat(" AND d.fecCrea >= ?2");
+            }
+            if (fechaFinal != null) {
+                consulta = consulta.concat(" AND d.fecCrea <= ?3");
+            }
+            if (cliente != null) {
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?4");
+            }
+            if(numSeparado > 0){
+                consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?5");
+            }
+            consulta = consulta.concat(" ORDER BY d.fecCrea, d.facDocumentosmasterPK");
+            query = em.createQuery(consulta);
+            query.setParameter(1, sede);
+            if (fechaIncial != null) {
+                query.setParameter(2, fechaIncial);
+            }
+            if (fechaFinal != null) {
+                query.setParameter(3, fechaFinal);
+            }
+            if (cliente != null) {
+                query.setParameter(4, cliente);
+            }
+            if(numSeparado > 0){
+                query.setParameter(5, numSeparado);
+            }
+            return query.getResultList();
         } catch (Exception e) {
             return null;
         }

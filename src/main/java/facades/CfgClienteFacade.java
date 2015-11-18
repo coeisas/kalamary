@@ -96,10 +96,36 @@ public class CfgClienteFacade extends AbstractFacade<CfgCliente> {
         }
     }
 
-    public List<CfgCliente> lazyCliente(CfgEmpresa empresa, int offset, int limit) {
+    public int totaClientesByEmpresaLazy(CfgEmpresa empresa, String identificacion) {
         try {
-            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1");
+            String sql = "SELECT COUNT(c.idCliente) FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1";
+//            Query query = em.createQuery("SELECT COUNT(c.idCliente) FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1");
+            if (identificacion != null && !identificacion.isEmpty()) {
+                sql = sql.concat(" AND c.numDoc LIKE CONCAT(?2, '%')");
+            }
+            Query query = em.createQuery(sql);
             query.setParameter(1, empresa);
+            if (identificacion != null && !identificacion.isEmpty()) {
+                query.setParameter(2, identificacion);
+            }
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public List<CfgCliente> lazyCliente(CfgEmpresa empresa, String identificacion, int offset, int limit) {
+        try {
+            String sql = "SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1";
+            if (identificacion != null && !identificacion.isEmpty()) {
+                sql = sql.concat(" AND c.numDoc LIKE CONCAT(?2, '%')");
+            }
+//            Query query = em.createQuery("SELECT c FROM CfgCliente c WHERE c.cfgempresaidEmpresa = ?1 AND c.numDoc LIKE CONCAT('%', ?2, '%')");
+            Query query = em.createQuery(sql);
+            query.setParameter(1, empresa);
+            if (identificacion != null && !identificacion.isEmpty()) {
+                query.setParameter(2, identificacion);
+            }
             query.setFirstResult(offset);
             query.setMaxResults(limit);
             return query.getResultList();

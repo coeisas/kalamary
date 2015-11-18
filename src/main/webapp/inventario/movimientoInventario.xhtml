@@ -93,6 +93,9 @@
                 rowKey="#{itemsInventario.invMovimientoDetallePK}"
                 style="width: 90%;margin: 0 auto"
                 editable="true" editMode="row"
+                sortOrder="descending"
+                scrollable="true"
+                scrollHeight="300"
                 emptyMessage="No hay elemento insertado">
                 <p:ajax event="rowEdit" listener="#{movimientoInventarioMB.onRowEdit}" update="@none" oncomplete="updateTabla()" />
                 <p:ajax event="rowEditCancel" listener="#{movimientoInventarioMB.onRowCancel}" update="@none" oncomplete="updateTabla()"/>
@@ -181,6 +184,13 @@
                 <p:column style="width:32px">
                     <p:rowEditor />
                 </p:column>
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>
+                            <h:outputText value="Elementos: #{movimientoInventarioMB.listaItemsInventarioMovimiento.size()}"/>
+                        </p:column>
+                    </p:row>
+                </f:facet>
             </p:dataTable>
             <p:panel id="IdSubTotal" style="width: 90%;margin: 0 auto;padding: 0;border: none">
                 <div class="divContent">
