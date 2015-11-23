@@ -29,6 +29,7 @@
 			</staticText>
 			<image>
 				<reportElement x="8" y="1" width="100" height="48" uuid="ff617d1b-fa8a-427e-8dd3-a3648c809571"/>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
 			</image>
 		</band>
 	</title>
