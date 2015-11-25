@@ -20,6 +20,7 @@ public class InformeMovimientoInventario {
     private String tipoMovimiento;
     private String numDocumento;
     private String factura;
+    private String soporte;
 
     public InformeMovimientoInventario() {
     }
@@ -86,6 +87,14 @@ public class InformeMovimientoInventario {
 
     public void setMovimiento(String movimiento) {
         this.movimiento = movimiento;
+    }
+    
+    public String getSoporte() {
+        return soporte;
+    }
+
+    public void setSoporte(String soporte) {
+        this.soporte = soporte;
     }
     
 }

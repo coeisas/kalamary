@@ -58,6 +58,7 @@ public class InformeMovimientoInventarioMB implements Serializable {
     private String codProducto;
     private String nombreProducto;
     private String numMovimiento;
+    private String documentoSoporte;
     private int idMovimiento;
 
     private List<CfgMovInventarioMaestro> listaMovimiento;
@@ -182,7 +183,7 @@ public class InformeMovimientoInventarioMB implements Serializable {
 
     public void generarReporte() throws IOException, JRException {
         int numero = determinarNumMovimiento();
-        List<InvMovimientoDetalle> detalleMovimiento = movimientoDetalleFacade.detalleMovimientoInforme(sedeActual, fechaIncial, fechaFinal, productoSeleccionado, movimientoSeleccionado, numero);
+        List<InvMovimientoDetalle> detalleMovimiento = movimientoDetalleFacade.detalleMovimientoInforme(sedeActual, fechaIncial, fechaFinal, productoSeleccionado, movimientoSeleccionado, numero, documentoSoporte);
         List<InformeMovimientoInventario> lista = generarLista(detalleMovimiento);
         JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(lista);
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -216,6 +217,7 @@ public class InformeMovimientoInventarioMB implements Serializable {
             informeMovimientoInventario.setMovimiento(movimientoDetalle.getInvMovimiento().getCfgmovinventariodetalleidMovInventarioDetalle().getCfgmovinventariomaestroidMovInventarioMaestro().getNombreMovimiento());
             informeMovimientoInventario.setTipoMovimiento(movimientoDetalle.getInvMovimiento().getCfgmovinventariodetalleidMovInventarioDetalle().getNomMovimientoDetalle());
             informeMovimientoInventario.setNumDocumento(movimientoDetalle.getInvMovimiento().determinarNumConcecutivo());
+            informeMovimientoInventario.setSoporte(movimientoDetalle.getInvMovimiento().getDocumentoSoporte());
             FacDocumentosmaster factura = movimientoDetalle.getInvMovimiento().getFacDocumentosmaster();
             if (factura != null) {
                 informeMovimientoInventario.setFactura(factura.determinarNumFactura());
@@ -234,6 +236,7 @@ public class InformeMovimientoInventarioMB implements Serializable {
         fechaFinal = null;
         movimientoSeleccionado = null;
         productoSeleccionado = null;
+        documentoSoporte = null;
         cargarInformacionProducto();
         RequestContext.getCurrentInstance().update("IdFormInformeMovimientoInventario");
     }
@@ -296,5 +299,13 @@ public class InformeMovimientoInventarioMB implements Serializable {
 
     public void setNumMovimiento(String numMovimiento) {
         this.numMovimiento = numMovimiento;
+    }
+
+    public String getDocumentoSoporte() {
+        return documentoSoporte;
+    }
+
+    public void setDocumentoSoporte(String documentoSoporte) {
+        this.documentoSoporte = documentoSoporte;
     }
 }

@@ -12,6 +12,7 @@
 	<field name="numDocumento" class="java.lang.String"/>
 	<field name="factura" class="java.lang.String"/>
 	<field name="movimiento" class="java.lang.String"/>
+	<field name="soporte" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -67,21 +68,21 @@
 				<text><![CDATA[Cantidad]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="364" y="0" width="203" height="20" uuid="a6fa29a7-d0a3-4f54-8c1c-8d3006ecb0a8"/>
+				<reportElement x="364" y="0" width="117" height="20" uuid="a6fa29a7-d0a3-4f54-8c1c-8d3006ecb0a8"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tipo Movimiento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="572" y="0" width="86" height="20" uuid="288119e6-6a39-47ae-8b5d-6ce02e98c2a8"/>
+				<reportElement x="486" y="0" width="86" height="20" uuid="288119e6-6a39-47ae-8b5d-6ce02e98c2a8"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[No Movimiento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="663" y="0" width="86" height="20" uuid="30eb4e15-e03f-416a-afff-c5f1b0ac71d2"/>
+				<reportElement x="668" y="0" width="86" height="20" uuid="30eb4e15-e03f-416a-afff-c5f1b0ac71d2"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
@@ -90,6 +91,13 @@
 			<line>
 				<reportElement x="0" y="20" width="752" height="1" uuid="ae9dc5a4-2e18-4d64-bf63-e759cb276fe1"/>
 			</line>
+			<staticText>
+				<reportElement x="577" y="0" width="86" height="20" uuid="e8cd19a0-b97f-4220-b500-4858ad39195f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Soporte]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -112,16 +120,20 @@
 				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="572" y="0" width="86" height="20" uuid="c88d9873-c312-4f43-afab-fc9226fdf550"/>
+				<reportElement x="486" y="0" width="86" height="20" uuid="c88d9873-c312-4f43-afab-fc9226fdf550"/>
 				<textFieldExpression><![CDATA[$F{numDocumento}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="663" y="0" width="86" height="20" uuid="b9e5b1e8-43f5-47be-8dcb-883e8fcf7ace"/>
+				<reportElement x="668" y="0" width="86" height="20" uuid="b9e5b1e8-43f5-47be-8dcb-883e8fcf7ace"/>
 				<textFieldExpression><![CDATA[$F{factura}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement x="364" y="0" width="203" height="20" uuid="5860c7e4-f533-4de6-ab40-51ec2ff4e038"/>
+				<reportElement x="364" y="0" width="117" height="20" uuid="5860c7e4-f533-4de6-ab40-51ec2ff4e038"/>
 				<textFieldExpression><![CDATA[$F{movimiento}+" - "+$F{tipoMovimiento}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="577" y="0" width="86" height="20" uuid="f478a0df-ceee-454a-997d-9683b2d94ddc"/>
+				<textFieldExpression><![CDATA[$F{soporte}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

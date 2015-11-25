@@ -36,7 +36,7 @@ public class InvMovimientoDetalleFacade extends AbstractFacade<InvMovimientoDeta
         super(InvMovimientoDetalle.class);
     }
 
-    public List<InvMovimientoDetalle> detalleMovimientoInforme(CfgEmpresasede sede, Date fechaIncial, Date fechaFinal, CfgProducto producto, CfgMovInventarioMaestro movimientoMaestro, int concecutivo) {
+    public List<InvMovimientoDetalle> detalleMovimientoInforme(CfgEmpresasede sede, Date fechaIncial, Date fechaFinal, CfgProducto producto, CfgMovInventarioMaestro movimientoMaestro, int concecutivo, String documentoSoporte) {
         try {
             Query query;
             String consulta = "SELECT m FROM InvMovimientoDetalle m WHERE m.invMovimiento.cfgempresasedeidSede = ?1";
@@ -55,8 +55,11 @@ public class InvMovimientoDetalleFacade extends AbstractFacade<InvMovimientoDeta
             if (concecutivo > 0) {
                 consulta = consulta.concat(" AND m.invMovimiento.invMovimientoPK.numDoc = ?6");
             }
+            if (documentoSoporte != null && !documentoSoporte.trim().isEmpty()) {
+                consulta = consulta.concat(" AND m.invMovimiento.documentoSoporte LIKE ?7");
+            }
             consulta = consulta.concat(" ORDER BY m.invMovimiento.fecha, m.invMovimiento.invMovimientoPK");
-//            query = em.createQuery("SELECT m FROM InvMovimientoDetalle m WHERE m.invMovimiento.cfgempresasedeidSede = ?1 AND m.invMovimiento.fecha >= ?2 AND m.invMovimiento.fecha <= ?3 AND m.cfgProducto = ?4 AND m.invMovimiento.cfgmovinventariodetalleidMovInventarioDetalle.cfgmovinventariomaestroidMovInventarioMaestro = ?5 AND m.invMovimiento.invMovimientoPK.numDoc = ?6 ORDER BY m.invMovimiento.fecha, m.invMovimiento.invMovimientoPK");
+//            query = em.createQuery("SELECT m FROM InvMovimientoDetalle m WHERE m.invMovimiento.cfgempresasedeidSede = ?1 AND m.invMovimiento.fecha >= ?2 AND m.invMovimiento.fecha <= ?3 AND m.cfgProducto = ?4 AND m.invMovimiento.cfgmovinventariodetalleidMovInventarioDetalle.cfgmovinventariomaestroidMovInventarioMaestro = ?5 AND m.invMovimiento.invMovimientoPK.numDoc = ?6 AND m.invMovimiento.documentoSoporte LIKE ?7 ORDER BY m.invMovimiento.fecha, m.invMovimiento.invMovimientoPK");
             query = em.createQuery(consulta);
             query.setParameter(1, sede);
             if (fechaIncial != null) {
@@ -74,6 +77,9 @@ public class InvMovimientoDetalleFacade extends AbstractFacade<InvMovimientoDeta
             if (concecutivo > 0) {
                 query.setParameter(6, concecutivo);
             }
+            if (documentoSoporte != null && !documentoSoporte.trim().isEmpty()) {
+                query.setParameter(7, documentoSoporte);
+            }            
             return query.getResultList();
         } catch (Exception e) {
             return null;

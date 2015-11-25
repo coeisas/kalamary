@@ -42,6 +42,12 @@
                 </p:row>
                 <p:row>
                     <p:column colspan="2">
+                        <p:outputLabel class="labelFormulario" value="Doc Soporte:"/>
+                        <p:inputText class="campoFormulario" value="#{informeMovimientoInventarioMB.documentoSoporte}"/>                        
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column colspan="2">
                         <p:outputLabel class="labelFormulario" value="Producto:"/>
                         <p:inputText id="IdCodigoProducto" class="campoFormulario" value="#{informeMovimientoInventarioMB.codProducto}">
                             <p:ajax event="blur" listener="#{informeMovimientoInventarioMB.buscarProducto}" update="@none"/>
