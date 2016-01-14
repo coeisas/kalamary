@@ -21,7 +21,7 @@
         <h:form id="IdFormAbono">
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{abonoMB.actualizarTablaFormaPago}"/>
             <p:remoteCommand name="determinarValorFormaPago" actionListener="#{abonoMB.determinarValorFormaPago}"/>
-            <p:panelGrid style="margin: 0 auto;width: 80%">
+            <p:panelGrid style="margin: 0 auto;width: 90%">
                 <f:facet name="header">
                     <p:row>
                         <p:column>Registrar Abono</p:column>
@@ -49,7 +49,7 @@
                 value="#{abonoMB.listaDetalleCartera}"
                 var="detalle"
                 disabledSelection="true"
-                style="width: 80%;margin: 0 auto"
+                style="width: 90%;margin: 0 auto"
                 emptyMessage="No hay abonos registrados">
                 <f:facet name="header">Detalle Separado #{abonoMB.carteraSeleccionada.facDocumentosmaster.determinarNumFactura()}</f:facet>
                 <p:column headerText="Valor">
@@ -64,7 +64,7 @@
                 </p:column>
             </p:dataTable>
             <br/>
-            <p:panelGrid style="margin: 0 auto;width: 80%">
+            <p:panelGrid style="margin: 0 auto;width: 90%">
                 <p:row>
                     <p:column>
                         <p:outputLabel class="labelFormulario" value="Total:"/>

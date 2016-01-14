@@ -95,6 +95,8 @@ public class InvMovimiento implements Serializable {
     private InvMovimientoInfoadicional invMovimientoInfoadicional;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "invMovimiento")
     private List<InvMovimientoDetalle> invMovimientoDetalleList;
+    @OneToMany(mappedBy = "invMovimiento")
+    private List<CntMovdetalle> cntMovdetalleList;    
 
     public InvMovimiento() {
     }
@@ -248,6 +250,14 @@ public class InvMovimiento implements Serializable {
     public void setInvMovimientoDetalleList(List<InvMovimientoDetalle> invMovimientoDetalleList) {
         this.invMovimientoDetalleList = invMovimientoDetalleList;
     }
+    
+    public List<CntMovdetalle> getCntMovdetalleList() {
+        return cntMovdetalleList;
+    }
+
+    public void setCntMovdetalleList(List<CntMovdetalle> cntMovdetalleList) {
+        this.cntMovdetalleList = cntMovdetalleList;
+    }    
 
     public String determinarNumConcecutivo() {
         int fin = cfgDocumento.getFinDocumento();

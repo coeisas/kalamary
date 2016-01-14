@@ -20,6 +20,7 @@ import javax.persistence.Query;
  */
 @Stateless
 public class FacDocumentoimpuestoFacade extends AbstractFacade<FacDocumentoimpuesto> {
+
     @PersistenceContext(unitName = "com.mycompany_kalamary_war_1.0PU")
     private EntityManager em;
 
@@ -31,8 +32,8 @@ public class FacDocumentoimpuestoFacade extends AbstractFacade<FacDocumentoimpue
     public FacDocumentoimpuestoFacade() {
         super(FacDocumentoimpuesto.class);
     }
-    
-        public List<FacDocumentoimpuesto> buscarByDocumentoMaster(FacDocumentosmaster documentosmaster){
+
+    public List<FacDocumentoimpuesto> buscarByDocumentoMaster(FacDocumentosmaster documentosmaster) {
         try {
             Query query = em.createQuery("SELECT i FROM FacDocumentoimpuesto i WHERE i.facDocumentosmaster = ?1");
             query.setParameter(1, documentosmaster);
@@ -41,5 +42,5 @@ public class FacDocumentoimpuestoFacade extends AbstractFacade<FacDocumentoimpue
             return new ArrayList();
         }
     }
-    
+
 }

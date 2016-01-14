@@ -62,10 +62,6 @@ body {
     text-align: left;
 }
 
-.ui-selectonemenu-filter-container {//ajusta la caja de filtrado de las listas desplegables
-    width: 98% !important;
-}
-
 .cajaH{
     border-radius: .45em; width: 180px;padding: 0 .25em;font-style: italic;height: 19px
 }

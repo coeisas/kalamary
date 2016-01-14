@@ -13,12 +13,15 @@ import entities.CfgFormapago;
 import entities.CfgImpuesto;
 import entities.CfgKitproductodetalle;
 import entities.CfgKitproductomaestro;
+import entities.CfgMovCta;
 import entities.CfgMovInventarioDetalle;
 import entities.CfgMovInventarioMaestro;
 import entities.CfgMunicipio;
 import entities.CfgMunicipioPK;
 import entities.CfgProducto;
 import entities.CfgTipoempresa;
+import entities.CntMovdetalle;
+import entities.CntPuc;
 import entities.InvConsolidado;
 import entities.FacCaja;
 import entities.FacCarteraCliente;
@@ -46,6 +49,7 @@ import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
 import facades.CfgImpuestoFacade;
 import facades.CfgKitproductodetalleFacade;
+import facades.CfgMovCtaFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgMunicipioFacade;
@@ -53,6 +57,7 @@ import facades.CfgPaisFacade;
 import facades.CfgProductoFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
+import facades.CntMovdetalleFacade;
 import facades.FacCarteraClienteFacade;
 import facades.FacCarteraDetalleFacade;
 import facades.FacDocuementopagoFacade;
@@ -152,6 +157,7 @@ public class FacturaMB implements Serializable {
     private List<SelectItem> listaTipoDescuento;//los tipos de descuento son: porcentaje y valor
     private int tipoFactura;
 
+    private String codigoInterno;
     private int tipoImpresion;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
@@ -241,6 +247,10 @@ public class FacturaMB implements Serializable {
     FacCarteraDetalleFacade carteraDetalleFacade;
     @EJB
     CfgPaisFacade paisFacade;
+    @EJB
+    CfgMovCtaFacade cfgMovCtaFacade;
+    @EJB
+    CntMovdetalleFacade cntMovdetalleFacade;
 
     public FacturaMB() {
 
@@ -526,6 +536,20 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
 
+    
+    public void buscarProductoPorCodigoInterno() {
+        if (codigoInterno != null && !codigoInterno.isEmpty()) {
+            productoSeleccionado = productoFacade.buscarPorCodigoInterno(sedeActual.getCfgempresaidEmpresa().getIdEmpresa(), codigoInterno);
+            if (productoSeleccionado != null) {
+                insertarItemProducto();
+                codigoInterno = null;
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no encontrado"));
+            }
+        }
+
+    }
+
     public void deseleccionarCliente() {
         clienteSeleccionado = null;
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
@@ -727,6 +751,15 @@ public class FacturaMB implements Serializable {
             aux = Redondear(aux, 0);
             impuesto.setTotalImpuesto(aux);
         }
+    }
+
+    //calcula el impuesto para el moduclo de contabilidad cnt_movdetalle
+    private float calcularImpuestoCntMovDetalle(List<FacDocumentoimpuesto> lista) {
+        float aux = 0;
+        for (FacDocumentoimpuesto impuesto : lista) {
+            aux += impuesto.getValorImpuesto();
+        }
+        return aux;
     }
 
     private void calcularTotalUtilidad() {
@@ -970,6 +1003,8 @@ public class FacturaMB implements Serializable {
 //                se crea cartera del cliente por el separado, en movimiento caja se registra el pago de la cuota inicial
                 generarMovimientoAlternativo(documentosmaster);
             }
+            //CARGA DE CNT_MOV DETALLE
+            cargaCntMovDetalle(documentosmaster);
             limpiarFormulario();
             RequestContext.getCurrentInstance().execute("PF('dlgFormaPago').hide()");
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Factura " + documentosmaster.determinarNumFactura() + " creada"));
@@ -1183,6 +1218,72 @@ public class FacturaMB implements Serializable {
         }
     }
 
+    private void cargaCntMovDetalle(FacDocumentosmaster documentoMaster) {
+        //EL TIPO DE MOVIMIENTO ES LA APLICACION DEL DOCUMENTO ACTUAL.
+        int idTipoMovimiento = documentoMaster.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getIdaplicacion();
+        //LAS FACTURAS DESDE EL ENFOQUE CONTABLE SOLO MANEJAN LA FORMA DE PAGO -> EFECTIVO (1)
+        int idFormaPago = 1;
+        //LOS VALORES: SUBTOTAL, DESCUENTO, IMPUESTO, TOTAL PUEDEN IR A DIFERENTES CUENTAS SEGUN LA CONFIGURACION EXISTENTE EN cfg_mov_cta
+        List<CfgMovCta> listaCfgMovCta = cfgMovCtaFacade.buscarPorTipoMovimientoAndFormaPago(sedeActual.getIdSede(), idTipoMovimiento, idFormaPago);
+        for (CfgMovCta cmc : listaCfgMovCta) {
+            CntPuc cntPuc = cmc.getCntpuccodigoCuenta();
+            if (cntPuc != null && cmc.getAplica() != 0) {//SI SE ASIGNO UNA CUENTA PUC AL VALOR ACTUAL DE LA ITERACION Y SI TIENE ASIGANDO UNA APLICACION DIFERENTE A 0 (DEBE, HABER)
+                try {
+                    CntMovdetalle cntMovdetalle = new CntMovdetalle();
+                    cntMovdetalle.setCfgempresasedeidSede(sedeActual);
+                    cntMovdetalle.setFecha(new Date());
+                    cntMovdetalle.setFacDocumentosmaster(documentoMaster);
+                    cntMovdetalle.setInvMovimiento(null);//NO ES MOVIMIENTO DE INVENTARIO
+                    //COMO ES UNA FACTURA EL TERCERO ES EL CLIENTE
+                    String tercero = documentoMaster.getCfgclienteidCliente().nombreCompleto();
+                    if (tercero.length() > 150) {
+                        tercero = tercero.substring(0, 149);
+                    }
+                    cntMovdetalle.setTercero(tercero);
+                    cntMovdetalle.setCntpuccodigoCuenta(cntPuc);
+                    cntMovdetalle.setDetalle(documentoMaster.getObservaciones());
+                    float valor = 0;
+                    switch (cmc.getCntDetalle().getIdcntDetalle()) {
+                        case 1://SUBTOTAL
+                            valor = documentoMaster.getSubtotal();
+                            break;
+                        case 2://DESCUENTO
+                            valor = documentoMaster.getDescuento();
+                            break;
+                        case 3://IMPUESTO
+                            List<FacDocumentoimpuesto> listaImpuesto = documentoimpuestoFacade.buscarByDocumentoMaster(documentoMaster);
+                            valor = calcularImpuestoCntMovDetalle(listaImpuesto);
+                            break;
+                        case 4://TOTAL
+                            if (documentoMaster.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getCodaplicacion().equals("7")) { //SI ES UN SEPARADO
+                                valor = documentoMaster.getSubtotal();
+                            } else {
+                                valor = documentoMaster.getTotal();
+                            }
+                            break;
+                    }
+                    int ban = cmc.getAplica();
+                    float debito = 0;//debe
+                    float credito = 0;//haber
+                    if (ban == 1) {
+                        debito = valor;
+                    } else {
+                        credito = valor;
+                    }
+                    cntMovdetalle.setDebito(debito);
+                    cntMovdetalle.setCredito(credito);
+                    float total = debito - credito;
+                    cntMovdetalle.setTotal(total);
+                    cntMovdetalleFacade.create(cntMovdetalle);
+                } catch (Exception e) {
+//                    System.out.println(e);
+                    Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+
+        }
+    }
+
     public void facturacion() {
         if (cajaUsuario == null) {
             //se vuelve a buscar la caja del usario. Por si el usuario la creo en el transcurso de la sesion
@@ -1308,6 +1409,12 @@ public class FacturaMB implements Serializable {
         setEnableBtnPrint(pago == aux);
         RequestContext.getCurrentInstance().update("FormModalFactura:IdTableFormaPago");
         RequestContext.getCurrentInstance().update("FormModalFactura:IdBtnPrint");
+    }
+
+    public void determinarCodigoInterno() {
+        Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+        codigoInterno = params.get("codigoInterno");
+        buscarProductoPorCodigoInterno();
     }
 
     public void generarPDF() {
@@ -2142,5 +2249,13 @@ public class FacturaMB implements Serializable {
 
     public List<SelectItem> getListaTipoDescuento() {
         return listaTipoDescuento;
+    }
+
+    public String getCodigoInterno() {
+        return codigoInterno;
+    }
+
+    public void setCodigoInterno(String codigoInterno) {
+        this.codigoInterno = codigoInterno;
     }
 }

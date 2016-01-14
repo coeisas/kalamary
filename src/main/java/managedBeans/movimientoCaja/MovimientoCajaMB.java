@@ -10,9 +10,13 @@ import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgFormapago;
+import entities.CfgMovCta;
+import entities.CntMovdetalle;
+import entities.CntPuc;
 import entities.FacCaja;
 import entities.FacDocuementopago;
 import entities.FacDocuementopagoPK;
+import entities.FacDocumentoimpuesto;
 import entities.FacDocumentosmaster;
 import entities.FacDocumentosmasterPK;
 import entities.FacMovcaja;
@@ -22,8 +26,11 @@ import entities.SegUsuario;
 import facades.CfgClienteFacade;
 import facades.CfgDocumentoFacade;
 import facades.CfgFormapagoFacade;
+import facades.CfgMovCtaFacade;
+import facades.CntMovdetalleFacade;
 import facades.FacCajaFacade;
 import facades.FacDocuementopagoFacade;
+import facades.FacDocumentoimpuestoFacade;
 import facades.FacDocumentosmasterFacade;
 import facades.FacMovcajaFacade;
 import facades.FacMovcajadetalleFacade;
@@ -39,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.model.SelectItem;
@@ -47,6 +56,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import managedBeans.facturacion.FacturaMB;
 import managedBeans.seguridad.SesionMB;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -111,6 +121,12 @@ public class MovimientoCajaMB implements Serializable {
     CfgFormapagoFacade formapagoFacade;
     @EJB
     FacDocuementopagoFacade docuementopagoFacade;
+    @EJB
+    CfgMovCtaFacade cfgMovCtaFacade;
+    @EJB
+    FacDocumentoimpuestoFacade documentoimpuestoFacade;
+    @EJB
+    CntMovdetalleFacade cntMovdetalleFacade;
 
     public MovimientoCajaMB() {
     }
@@ -383,6 +399,8 @@ public class MovimientoCajaMB implements Serializable {
             movcajadetalleFacade.create(movcajadetalle);
             limpiar();
             reciboReciente = documentoMaster;
+            //CARGA DE cnt_mov_detalle CORRESPONDIENTE AL RECIBO DE CAJA (INGRESO O EGRESO)
+            cargaCntMovDetalle(documentoMaster);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Movimiento de caja creado " + documentoMaster.determinarNumFactura()));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Movimiento de caja no registrado"));
@@ -400,6 +418,82 @@ public class MovimientoCajaMB implements Serializable {
         identificacionProtagonista = null;
         RequestContext.getCurrentInstance().update("IdFormMovimientoCaja");
         RequestContext.getCurrentInstance().update("FormBuscarUsuario");
+    }
+
+    private void cargaCntMovDetalle(FacDocumentosmaster documentoMaster) {
+        //EL TIPO DE MOVIMIENTO ES LA APLICACION DEL DOCUMENTO ACTUAL.
+        int idTipoMovimiento = documentoMaster.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getIdaplicacion();
+        //LA FORMA DE PAGO EN LOS RECIBO DE CAJA INGRESO O EGRESO SE REDUCEN A EFECTIVO(1)
+        int idFormaPago = 1;
+        //LOS VALORES: SUBTOTAL, DESCUENTO, IMPUESTO, TOTAL PUEDEN IR A DIFERENTES CUENTAS SEGUN LA CONFIGURACION EXISTENTE EN cfg_mov_cta
+        List<CfgMovCta> listaCfgMovCta = cfgMovCtaFacade.buscarPorTipoMovimientoAndFormaPago(sedeActual.getIdSede(), idTipoMovimiento, idFormaPago);
+        for (CfgMovCta cmc : listaCfgMovCta) {
+            CntPuc cntPuc = cmc.getCntpuccodigoCuenta();
+            if (cntPuc != null && cmc.getAplica() != 0) {//SI SE ASIGNO UNA CUENTA PUC AL VALOR ACTUAL DE LA ITERACION Y SI TIENE ASIGANDO UNA APLICACION DIFERENTE A 0 (DEBE, HABER)
+                try {
+                    CntMovdetalle cntMovdetalle = new CntMovdetalle();
+                    cntMovdetalle.setCfgempresasedeidSede(sedeActual);
+                    cntMovdetalle.setFecha(new Date());
+                    cntMovdetalle.setFacDocumentosmaster(documentoMaster);
+                    cntMovdetalle.setInvMovimiento(null);//NO ES UN MOVIMIENTO DE INVENTARIO
+                    //COMO ES UN RECIBO DE CAJA INGRESO O EGRESO, EL TERCERO PUEDE SER UN USUARIO O EL CLIENTE
+                    String tercero;
+                    if (documentoMaster.getCfgclienteidCliente() != null) {
+                        tercero = documentoMaster.getCfgclienteidCliente().nombreCompleto();
+                    } else {
+                        tercero = documentoMaster.getSegusuarioidUsuario1().nombreCompleto();
+                    }
+                    if (tercero.length() > 150) {
+                        tercero = tercero.substring(0, 149);
+                    }
+                    cntMovdetalle.setTercero(tercero);
+                    cntMovdetalle.setCntpuccodigoCuenta(cntPuc);
+                    cntMovdetalle.setDetalle(documentoMaster.getObservaciones());
+                    float valr = 0;
+                    switch (cmc.getCntDetalle().getIdcntDetalle()) {
+                        case 1://SUBTOTAL
+                            valr = documentoMaster.getSubtotal();
+                            break;
+                        case 2://DESCUENTO
+                            valr = documentoMaster.getDescuento();
+                            break;
+                        case 3://IMPUESTO
+                            List<FacDocumentoimpuesto> listaImpuesto = documentoimpuestoFacade.buscarByDocumentoMaster(documentoMaster);
+                            valr = calcularImpuestoCntMovDetalle(listaImpuesto);
+                            break;
+                        case 4://TOTAL
+                            valr = documentoMaster.getTotal();
+                            break;
+                    }
+                    int ban = cmc.getAplica();
+                    float debito = 0;//debe
+                    float credito = 0;//haber
+                    if (ban == 1) {
+                        debito = valr;
+                    } else {
+                        credito = valr;
+                    }
+                    cntMovdetalle.setDebito(debito);
+                    cntMovdetalle.setCredito(credito);
+                    float tot = debito - credito;
+                    cntMovdetalle.setTotal(tot);
+                    cntMovdetalleFacade.create(cntMovdetalle);
+                } catch (Exception e) {
+//                    System.out.println(e);
+                    Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+
+        }
+    }
+
+    //calcula el impuesto para el moduclo de contabilidad cnt_movdetalle
+    private float calcularImpuestoCntMovDetalle(List<FacDocumentoimpuesto> lista) {
+        float aux = 0;
+        for (FacDocumentoimpuesto impuesto : lista) {
+            aux += impuesto.getValorImpuesto();
+        }
+        return aux;
     }
 
     public void imprimirRecibo() {

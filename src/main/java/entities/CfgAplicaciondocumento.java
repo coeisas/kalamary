@@ -8,6 +8,7 @@ package entities;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -45,6 +46,8 @@ public class CfgAplicaciondocumento implements Serializable {
     @Basic(optional = false)
     @Column(name = "nomaplicacion", nullable = false, length = 45)
     private String nomaplicacion;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgAplicaciondocumento")
+    private List<CfgMovCta> cfgMovCtaList;    
     @OneToMany(mappedBy = "cfgAplicaciondocumentoIdaplicacion")
     private List<CfgDocumento> cfgDocumentoList;
 
@@ -84,6 +87,15 @@ public class CfgAplicaciondocumento implements Serializable {
     public void setNomaplicacion(String nomaplicacion) {
         this.nomaplicacion = nomaplicacion;
     }
+    
+    @XmlTransient
+    public List<CfgMovCta> getCfgMovCtaList() {
+        return cfgMovCtaList;
+    }
+
+    public void setCfgMovCtaList(List<CfgMovCta> cfgMovCtaList) {
+        this.cfgMovCtaList = cfgMovCtaList;
+    }    
 
     @XmlTransient
     public List<CfgDocumento> getCfgDocumentoList() {

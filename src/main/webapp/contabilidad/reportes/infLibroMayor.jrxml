@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4a6da306-1242-4a6b-b059-85115c2e76e7">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="title" class="java.lang.String"/>
+	<parameter name="logo" class="java.io.InputStream"/>
+	<parameter name="header" class="java.lang.String"/>
+	<field name="cuenta" class="java.lang.String"/>
+	<field name="nombreCuenta" class="java.lang.String"/>
+	<field name="debitos" class="java.lang.Float"/>
+	<field name="creditos" class="java.lang.Float"/>
+	<field name="fecha" class="java.util.Date"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="572" height="50" uuid="e3c3c2a1-fb51-4692-95c6-c0ce1bbd15d6"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="572" height="50" uuid="9ea0c640-9ef0-469d-9b64-ad99de09c08c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{title}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="5" y="1" width="100" height="48" uuid="091963a0-8bb9-4d18-b1fd-a7c369cd4f11"/>
+			</image>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="572" height="30" uuid="f1e91192-d20b-4b9a-9527-9b38ba0263a0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="html"/>
+				<textFieldExpression><![CDATA[$P{header}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="24" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="20" uuid="700cc3bf-5b3b-413f-aacf-eb3e3dca013e"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cuenta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="0" width="300" height="20" uuid="bafb810d-80b5-4df0-bd64-03a2dc18cd1a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nombre Cuenta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="100" height="20" uuid="2076da83-b385-4d36-832e-b3952c1bfb05"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debitos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="465" y="0" width="100" height="20" uuid="6fa46af2-acd1-42c7-bd27-7218105883d0"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Creditos]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="20" uuid="3d9350d2-9a28-4e88-884f-8ab8084c7fa1"/>
+				<textFieldExpression><![CDATA[$F{cuenta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="55" y="0" width="300" height="20" uuid="673c6c9d-75b8-4a74-9c84-45568a2583c2"/>
+				<textFieldExpression><![CDATA[$F{nombreCuenta}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="360" y="0" width="100" height="20" uuid="ce71f489-2596-473e-b234-c2d020002c5c"/>
+				<textFieldExpression><![CDATA[$F{debitos}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="465" y="0" width="100" height="20" uuid="d19f7b0c-cb34-40e7-81c0-712af65cb63b"/>
+				<textFieldExpression><![CDATA[$F{creditos}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

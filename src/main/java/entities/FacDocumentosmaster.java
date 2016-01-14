@@ -109,6 +109,8 @@ public class FacDocumentosmaster implements Serializable {
     private List<FacDocumentodetalle> facDocumentodetalleList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "facDocumentosmaster")
     private List<FacMovcajadetalle> facMovcajadetalleList;
+    @OneToMany(mappedBy = "facDocumentosmaster")
+    private List<CntMovdetalle> cntMovdetalleList;    
 
     public FacDocumentosmaster() {
     }
@@ -326,6 +328,15 @@ public class FacDocumentosmaster implements Serializable {
     public void setFacMovcajadetalleList(List<FacMovcajadetalle> facMovcajadetalleList) {
         this.facMovcajadetalleList = facMovcajadetalleList;
     }
+    
+    @XmlTransient
+    public List<CntMovdetalle> getCntMovdetalleList() {
+        return cntMovdetalleList;
+    }
+
+    public void setCntMovdetalleList(List<CntMovdetalle> cntMovdetalleList) {
+        this.cntMovdetalleList = cntMovdetalleList;
+    }    
 
     public String formasPagoString() {
         String pago = "";

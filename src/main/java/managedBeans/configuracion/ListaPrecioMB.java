@@ -79,26 +79,97 @@ public class ListaPrecioMB implements Serializable {
     public void onCellEdit(CellEditEvent event) {
         if (validar()) {
             int index = event.getRowIndex();
+            String clientId = event.getColumn().getClientId();
+            String[] id = clientId.split(":");//guarda en el array los id. empenzando desde el form. Intereza el id de la columna modificada
+            String idColumna = id[3];
+//            System.out.println(idColumna);
 //            String nomProducto = listaProducto.get(index).getNomProducto();
-            Float nuevoPrecio;
+            Float valor;
             try {
-                nuevoPrecio = (Float) event.getNewValue();
+                valor = (Float) event.getNewValue();
             } catch (Exception e) {
-                nuevoPrecio = (Float) event.getOldValue();
+                valor = (Float) event.getOldValue();
             }
-            if (nuevoPrecio < 0) {
-                nuevoPrecio = (Float) event.getOldValue();
+            if (valor < 0) {
+                valor = (Float) event.getOldValue();
             }
-            try {
             CfgProducto producto = listaProducto.get(index);
-            producto.setPrecio(nuevoPrecio);
-            productoFacade.edit(producto);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Precio Actualizado"));                
+            float vlrs[];
+            switch (idColumna) {
+                case "costoAdq":
+                    producto.setCostoAdquisicion(valor);
+                    vlrs = determinarCostoFinalAndPrecio(producto);
+                    if (vlrs.length > 0) {
+                        producto.setCosto(vlrs[0]);
+                        producto.setPrecio(vlrs[1]);
+                    }
+                    break;
+                case "costoInd":
+                    producto.setCostoIndirecto(valor);
+                    vlrs = determinarCostoFinalAndPrecio(producto);
+                    if (vlrs.length > 0) {
+                        producto.setCosto(vlrs[0]);
+                        producto.setPrecio(vlrs[1]);
+                    }
+                    break;
+                case "iva":
+                    producto.setIva(valor);
+                    vlrs = determinarCostoFinalAndPrecio(producto);
+                    if (vlrs.length > 0) {
+                        producto.setCosto(vlrs[0]);
+                        producto.setPrecio(vlrs[1]);
+                    }
+                    break;                    
+                case "flete":
+                    producto.setFlete(valor);
+                    vlrs = determinarCostoFinalAndPrecio(producto);
+                    if (vlrs.length > 0) {
+                        producto.setCosto(vlrs[0]);
+                        producto.setPrecio(vlrs[1]);
+                    }
+                    break;
+                case "utilidad":
+                    producto.setUtilidad(valor);
+                    float precio = determinarPrecioPorUtilidad(producto.getCosto(), valor);
+                    producto.setPrecio(precio);
+                    break;
+                case "precio":
+                    producto.setPrecio(valor);
+                    float utilidad = determinarUtilidadPorPrecioAndCostoFinal(producto.getCosto(), valor);
+                    producto.setUtilidad(utilidad);
+                    break;
+            }
+            try {
+                productoFacade.edit(producto);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto Actualizado"));
             } catch (Exception e) {
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Precio No Actualizado"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto No Actualizado"));
             }
         }
         RequestContext.getCurrentInstance().update("msg");
+    }
+
+    public float[] determinarCostoFinalAndPrecio(CfgProducto producto) {
+        float[] valores = new float[2];
+        valores[0] = 0;
+        valores[0] = producto.getCostoAdquisicion() + (producto.getCostoAdquisicion() * (producto.getIva() / 100));
+        valores[0] = valores[0] + (valores[0] * (producto.getFlete() / 100));
+        valores[0] = valores[0] + (valores[0] * (producto.getCostoIndirecto() / 100));
+        valores[1] = (valores[0] + (valores[0] * (producto.getUtilidad() / 100)));
+        return valores;
+    }
+
+    public float determinarUtilidadPorPrecioAndCostoFinal(float costoFinal, float precio) {
+        float utilidad, aux;
+        aux = ((precio / costoFinal) - 1) * 100;
+        utilidad = aux;
+        return utilidad;
+    }
+
+    public float determinarPrecioPorUtilidad(float costoFinal, float utilidad) {
+        float precio;
+        precio = (costoFinal + (costoFinal * (utilidad / 100)));
+        return precio;
     }
 
     private boolean validar() {

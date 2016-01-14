@@ -14,6 +14,7 @@ import entities.CfgKitproductomaestro;
 import entities.CfgMovInventarioDetalle;
 import entities.CfgMovInventarioMaestro;
 import entities.CfgProducto;
+import entities.CntMovdetalle;
 import entities.FacDocuementopago;
 import entities.FacDocumentodetalle;
 import entities.FacDocumentoimpuesto;
@@ -29,6 +30,7 @@ import facades.CfgDocumentoFacade;
 import facades.CfgKitproductodetalleFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
+import facades.CntMovdetalleFacade;
 import facades.FacDocuementopagoFacade;
 import facades.FacDocumentodetalleFacade;
 import facades.FacDocumentoimpuestoFacade;
@@ -134,6 +136,8 @@ public class ListadoFacturaMB implements Serializable {
     InvMovimientoFacade inventarioMovimientoMaestroFacade;
     @EJB
     InvMovimientoDetalleFacade inventarioMovimientoDetalleFacade;
+    @EJB
+    CntMovdetalleFacade cntMovdetalleFacade;
 
     public ListadoFacturaMB() {
     }
@@ -463,6 +467,32 @@ public class ListadoFacturaMB implements Serializable {
                     inventarioConsolidado.setFechaUltEntrada(new Date());
                     inventarioConsolidado.setEntradas(inventarioConsolidado.getEntradas() + auxilarMovInventario.getCantidad());
                     consolidadoInventarioFacade.edit(inventarioConsolidado);
+                }
+                //MODIFICAR LA INFORMACION DE CONTABILIDAD DE FACTURA ANULADA
+                List<CntMovdetalle> listaCntMovdetalle = cntMovdetalleFacade.buscarPorDocumentoMaster(documentoSeleccionado);
+                float vlr = 0;
+                boolean debito;
+                float tot;
+                for (CntMovdetalle cm : listaCntMovdetalle) {
+                    vlr = cm.getDebito() == null ? 0 : cm.getDebito();
+                    if (vlr != 0) {
+                        debito = true;
+                        cm.setCredito(vlr);
+                        cm.setDebito(0f);
+                        tot = cm.getDebito() - cm.getCredito();
+                        cm.setTotal(tot);
+                        cntMovdetalleFacade.edit(cm);
+                    } else {
+                        debito = false;
+                        vlr = cm.getCredito() == null ? 0 : cm.getCredito();
+                    }
+                    if (!debito && vlr != 0) {
+                        cm.setCredito(0f);
+                        cm.setDebito(vlr);
+                        tot = cm.getDebito() - cm.getCredito();
+                        cm.setTotal(tot);                        
+                        cntMovdetalleFacade.edit(cm);
+                    }
                 }
             } catch (Exception e) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se logro anular la factura"));

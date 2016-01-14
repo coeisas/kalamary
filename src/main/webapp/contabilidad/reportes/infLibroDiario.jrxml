@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8ecede70-e7fe-4291-a47d-89a55bc82d46">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="title" class="java.lang.String"/>
+	<parameter name="logo" class="java.io.InputStream"/>
+	<field name="noMovimiento" class="java.lang.Long"/>
+	<field name="fechaMovimiento" class="java.util.Date"/>
+	<field name="documento" class="java.lang.String"/>
+	<field name="cuenta" class="java.lang.String"/>
+	<field name="nombreCuenta" class="java.lang.String"/>
+	<field name="tercero" class="java.lang.String"/>
+	<field name="identificacionTercero" class="java.lang.String"/>
+	<field name="detalle" class="java.lang.String"/>
+	<field name="debito" class="java.lang.Float"/>
+	<field name="credito" class="java.lang.Float"/>
+	<field name="total" class="java.lang.Float"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="56" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="752" height="50" uuid="6392aa72-8753-4e08-9c97-9ea5e6ef8948"/>
+			</rectangle>
+			<textField>
+				<reportElement x="0" y="0" width="752" height="50" uuid="d0a08c2b-0442-4cc1-ae2e-bc1202cb3f19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{title}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="5" y="1" width="100" height="48" uuid="2833ec97-f99b-4346-9d91-32641ed876d8"/>
+				<imageExpression><![CDATA[$P{logo}]]></imageExpression>
+			</image>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="26" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="50" height="20" uuid="aee0cf3e-8375-4fc4-b8d3-e3959ff02477"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No. Mov]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="0" width="45" height="20" uuid="12cc65d8-35f2-4931-ab68-e106ab5e6145"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="155" y="0" width="70" height="20" uuid="6f684746-37d8-4209-bc4c-8522209b9e3c"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Identificacion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="0" width="105" height="20" uuid="97629727-450e-430d-ba12-831f52a1e9d1"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tercero]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="0" width="50" height="20" uuid="8a13fa02-164b-44c9-91a5-2ca8a025137f"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cuenta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="395" y="0" width="105" height="20" uuid="987a5e52-949c-44bb-a644-dd9e3cc00857"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nombre Cuenta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="505" y="0" width="100" height="20" uuid="b0a2eac0-6402-4c1a-a87b-15547aa814a0"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Detalle]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="610" y="0" width="45" height="20" uuid="dda5e073-8c72-4d6f-b8d9-713e97d99fc0"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Debito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="660" y="0" width="45" height="20" uuid="9013f706-3b08-4c19-9cd3-08cd7105d9b8"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Credito]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="710" y="0" width="45" height="20" uuid="171b94f3-e680-4efd-a0af-f7d4ec4d70f4"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="105" y="0" width="45" height="20" uuid="bb0c356c-2172-40a6-ac27-bc590763e7d2"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Documento]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="50" height="20" uuid="89a28a6e-6edb-4799-977f-6650124ed4a4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{noMovimiento}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="55" y="0" width="45" height="20" uuid="524caeba-ec00-4148-ab41-1b2d8a1f7beb"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{fechaMovimiento}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="155" y="0" width="70" height="20" uuid="b9f41a8f-be1e-4e67-a829-d49e823a620b"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{identificacionTercero}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="230" y="0" width="105" height="20" uuid="0825b668-cc03-47f9-969c-1f100560e486"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tercero}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="395" y="0" width="105" height="20" uuid="ea997695-0536-4068-988f-9b37e67f0064"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nombreCuenta}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="505" y="0" width="100" height="20" uuid="25314507-8ef6-42e6-ad24-a7b372904836"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{detalle}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="610" y="0" width="45" height="20" uuid="f3e49575-3496-4c92-bf2c-920e27c45a01"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{debito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="660" y="0" width="45" height="20" uuid="2bdd8b7d-fa88-430c-8c1b-5c386f9015e7"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{credito}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="710" y="0" width="45" height="20" uuid="1ea7fa12-704a-4fde-a0c6-65ce784033c8"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="0" width="50" height="20" uuid="cea6bbce-8f22-4005-91d8-921d7322b168"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cuenta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="105" y="0" width="45" height="20" uuid="83c2dd70-e260-4458-a01d-2de59080609c"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{documento}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="19" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

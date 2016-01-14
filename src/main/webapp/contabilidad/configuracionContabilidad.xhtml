@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Configuracion Contable</ui:define>
+    <ui:define name="content">
+        <style>
+            .ui-selectonemenu-filter-container {
+                width: 99% !important;
+            }
+        </style>
+        <p:growl showDetail="true" autoUpdate="true"/>
+        <h:form id="IdFormConfiguracionContable">
+            <p:panelGrid style="width: 80%;margin: 0 auto">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="5">
+                            Configuracion Movimientos Contables
+                        </p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column width="15%">
+                        <h:outputLabel value="Tipo Movimiento:"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu value="#{configuracionContabilidadMB.idTipoMovimiento}">
+                            <p:ajax event="change" listener="#{configuracionContabilidadMB.buscarConfiguracionContable}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItems value="#{aplicacionMB.listaAplicacionDocumento}" var="movimiento" itemLabel="#{movimiento.nomaplicacion}" itemValue="#{movimiento.idaplicacion}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column  colspan="2">
+                        <h:outputLabel value="Forma Pago:"/>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.idFormaPago}">
+                            <p:ajax event="change" listener="#{configuracionContabilidadMB.buscarConfiguracionContable}" update="@none"/>
+                            <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="EFECTIVO" itemValue="1"/>
+                            <f:selectItem itemLabel="CREDITO" itemValue="2"/>
+                        </p:selectOneMenu>
+                    </p:column>                    
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputLabel value="Subtotal"/>
+                    </p:column>
+                    <p:column colspan="3">
+                        <p:selectOneMenu value="#{configuracionContabilidadMB.codCuentaSubtotal}" style="width: 400px" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{aplicacionMB.listaCntPuc}" var="puc" itemLabel="#{puc.codigoCuenta} - #{puc.nombreCuentas}" itemValue="#{puc.codigoCuenta}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.idAfectaSubutotal}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="DEBE" itemValue="1"/>
+                            <f:selectItem itemLabel="HABER" itemValue="2"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputLabel value="Descuento"/>
+                    </p:column>
+                    <p:column colspan="3">
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.codCuentaDescuento}" style="width: 400px" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{aplicacionMB.listaCntPuc}" var="puc" itemLabel="#{puc.codigoCuenta} - #{puc.nombreCuentas}" itemValue="#{puc.codigoCuenta}"/>
+                        </p:selectOneMenu>
+                    </p:column>                    
+                    <p:column>
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.idAfectaDescuento}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="DEBE" itemValue="1"/>
+                            <f:selectItem itemLabel="HABER" itemValue="2"/>
+                        </p:selectOneMenu>
+                    </p:column>                        
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputLabel value="Impuesto"/>
+                    </p:column>
+                    <p:column colspan="3">
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.codCuentaImpuesto}" style="width: 400px" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{aplicacionMB.listaCntPuc}" var="puc" itemLabel="#{puc.codigoCuenta} - #{puc.nombreCuentas}" itemValue="#{puc.codigoCuenta}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.idAfectaImpuesto}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="DEBE" itemValue="1"/>
+                            <f:selectItem itemLabel="HABER" itemValue="2"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column>
+                        <h:outputLabel value="Total"/>
+                    </p:column>
+                    <p:column colspan="3">
+                        <p:selectOneMenu  value="#{configuracionContabilidadMB.codCuentaTotal}" style="width: 400px" filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{aplicacionMB.listaCntPuc}" var="puc" itemLabel="#{puc.codigoCuenta} - #{puc.nombreCuentas}" itemValue="#{puc.codigoCuenta}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                    <p:column>
+                        <p:selectOneMenu value="#{configuracionContabilidadMB.idAfectaTotal}">
+                            <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
+                            <f:selectItem itemLabel="DEBE" itemValue="1"/>
+                            <f:selectItem itemLabel="HABER" itemValue="2"/>
+                        </p:selectOneMenu>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center" colspan="5">
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{configuracionContabilidadMB.accion}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

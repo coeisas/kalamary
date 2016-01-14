@@ -7,6 +7,7 @@ package facades;
 
 import entities.CfgCategoriaproducto;
 import entities.CfgEmpresa;
+import entities.CfgMarcaproducto;
 import entities.CfgReferenciaproducto;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -74,7 +75,7 @@ public class CfgReferenciaproductoFacade extends AbstractFacade<CfgReferenciapro
             return null;
         }
     }
-
+    
     public CfgReferenciaproducto buscarPorEmpresaCategoriaAndCodigo(CfgEmpresa empresa, CfgCategoriaproducto categoriaproducto, String codigo) {
         try {
             Query query = em.createQuery("SELECT r FROM CfgReferenciaproducto r WHERE r.cfgempresaidEmpresa = ?1 AND r.cfgcategoriaproductoidCategoria =?2 AND r.codigoReferencia = ?3");

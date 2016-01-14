@@ -8,11 +8,16 @@ package managedBeans.inventario;
 import entities.CfgDocumento;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
+import entities.CfgMovCta;
 import entities.CfgMovInventarioDetalle;
 import entities.CfgMovInventarioMaestro;
 import entities.CfgProducto;
 import entities.CfgProveedor;
 import entities.CfgformaPagoproveedor;
+import entities.CntMovdetalle;
+import entities.CntPuc;
+import entities.FacDocumentoimpuesto;
+import entities.FacDocumentosmaster;
 import entities.InvConsolidado;
 import entities.InvConsolidadoPK;
 import entities.InvMovimiento;
@@ -23,11 +28,13 @@ import entities.InvMovimientoInfoadicionalPK;
 import entities.InvMovimientoPK;
 import entities.SegUsuario;
 import facades.CfgDocumentoFacade;
+import facades.CfgMovCtaFacade;
 import facades.CfgMovInventarioDetalleFacade;
 import facades.CfgMovInventarioMaestroFacade;
 import facades.CfgProductoFacade;
 import facades.CfgProveedorFacade;
 import facades.CfgformaPagoproveedorFacade;
+import facades.CntMovdetalleFacade;
 import facades.InvConsolidadoFacade;
 import facades.InvMovimientoDetalleFacade;
 import facades.InvMovimientoFacade;
@@ -136,6 +143,10 @@ public class MovimientoInventarioMB implements Serializable {
     InvMovimientoInfoadicionalFacade inventarioMovimientoInfoadicionalFacade;
     @EJB
     InvConsolidadoFacade consolidadoFacade;
+    @EJB
+    CfgMovCtaFacade cfgMovCtaFacade;
+    @EJB
+    CntMovdetalleFacade cntMovdetalleFacade;
 
     public MovimientoInventarioMB() {
     }
@@ -572,6 +583,8 @@ public class MovimientoInventarioMB implements Serializable {
             invMovimientoMaestro.setInvMovimientoDetalleList(aux);
             inventarioMovimientoMaestroFacade.edit(invMovimientoMaestro);
             movimientoInventarioActual = invMovimientoMaestro;
+            //se registra el cnt_mov_detalle correspondiente al movimiento de inventario
+            cargaCntMovDetalle(invMovimientoMaestro);
             cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Movimiento guardado"));
         } catch (Exception e) {
@@ -580,6 +593,77 @@ public class MovimientoInventarioMB implements Serializable {
 
     }
 
+    private void cargaCntMovDetalle(InvMovimiento invMovimiento) {
+        //EL TIPO DE MOVIMIENTO ES LA APLICACION DEL DOCUMENTO ACTUAL.
+        int idTipoMovimiento = invMovimiento.getCfgDocumento().getCfgAplicaciondocumentoIdaplicacion().getIdaplicacion();
+        //LA FORMA DE PAGO EN EL MOVIMIENTO DE INVENTARIO SE REDUCE AFECTIVO(1) Y CREDITO(2)
+        int idFormaPago = 1;
+        String codigoFormaPago = invMovimiento.getCfgformaPagoproveedoridFormaPago().getCodigo();
+        if (codigoFormaPago.equals("1") || codigoFormaPago.equals("2")) {//FORMAPAGOPROVEEDOR -> EFECTIVO Y NO APLICA
+            idFormaPago = 1;
+        } else {
+            idFormaPago = 2;
+        }
+        //LOS VALORES: SUBTOTAL, DESCUENTO, IMPUESTO, TOTAL PUEDEN IR A DIFERENTES CUENTAS SEGUN LA CONFIGURACION EXISTENTE EN cfg_mov_cta
+        List<CfgMovCta> listaCfgMovCta = cfgMovCtaFacade.buscarPorTipoMovimientoAndFormaPago(sedeActual.getIdSede(), idTipoMovimiento, idFormaPago);
+        for (CfgMovCta cmc : listaCfgMovCta) {
+            CntPuc cntPuc = cmc.getCntpuccodigoCuenta();
+            if (cntPuc != null && cmc.getAplica() != 0) {//SI SE ASIGNO UNA CUENTA PUC AL VALOR ACTUAL DE LA ITERACION Y SI TIENE ASIGANDO UNA APLICACION DIFERENTE A 0 (DEBE, HABER)
+                try {
+                    CntMovdetalle cntMovdetalle = new CntMovdetalle();
+                    cntMovdetalle.setCfgempresasedeidSede(sedeActual);
+                    cntMovdetalle.setFecha(new Date());
+                    cntMovdetalle.setFacDocumentosmaster(null);//NO ES UNA FACTURA
+                    cntMovdetalle.setInvMovimiento(invMovimiento);
+                    //COMO ES UN MOVIMIENTO DE INVENTARIO EL PROVEEDOR ES EL TERCERO
+                    String tercero = null;
+                    if(invMovimiento.getCfgproveedoridProveedor() != null){
+                        tercero = invMovimiento.getCfgproveedoridProveedor().getNomProveedor();
+                    }
+                    
+                    if (tercero != null && tercero.length() > 150) {
+                        tercero = tercero.substring(0, 149);
+                    }
+                    cntMovdetalle.setTercero(tercero);
+                    cntMovdetalle.setCntpuccodigoCuenta(cntPuc);
+                    cntMovdetalle.setDetalle(invMovimiento.getObservacion());
+                    float valor = 0;
+                    switch (cmc.getCntDetalle().getIdcntDetalle()) {
+                        case 1://SUBTOTAL
+                            valor = invMovimiento.getSubtotal();
+                            break;
+                        case 2://DESCUENTO
+                            valor = invMovimiento.getDescuento();
+                            break;
+                        case 3://IMPUESTO
+                            valor = invMovimiento.getIva();
+                            break;
+                        case 4://TOTAL
+                            valor = invMovimiento.getTotal();
+                            break;
+                    }
+                    int ban = cmc.getAplica();
+                    float debito = 0;//debe
+                    float credito = 0;//haber
+                    if (ban == 1) {
+                        debito = valor;
+                    } else {
+                        credito = valor;
+                    }
+                    cntMovdetalle.setDebito(debito);
+                    cntMovdetalle.setCredito(credito);
+                    float tot = debito - credito;
+                    cntMovdetalle.setTotal(tot);
+                    cntMovdetalleFacade.create(cntMovdetalle);
+                } catch (Exception e) {
+//                    System.out.println(e);
+                    Logger.getLogger(FacturaMB.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+
+        }
+    }    
+    
     private void actualizarTablaProducto(InvMovimientoDetalle detalle) {
         try {
             CfgProducto producto = detalle.getCfgProducto();

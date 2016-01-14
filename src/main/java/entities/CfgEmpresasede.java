@@ -96,6 +96,12 @@ public class CfgEmpresasede implements Serializable {
     private List<FacDocumentosmaster> facDocumentosmasterList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
     private List<ConsolidadoMovcaja> consolidadoMovcajaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
+    private List<ResCfgMovCta> resCfgMovCtaList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgEmpresasede")
+    private List<CfgMovCta> cfgMovCtaList;
+    @OneToMany(mappedBy = "cfgempresasedeidSede")
+    private List<CntMovdetalle> cntMovdetalleList;    
 
     public CfgEmpresasede() {
     }
@@ -277,6 +283,32 @@ public class CfgEmpresasede implements Serializable {
         this.consolidadoMovcajaList = consolidadoMovcajaList;
     }
 
+    @XmlTransient
+    public List<ResCfgMovCta> getResCfgMovCtaList() {
+        return resCfgMovCtaList;
+    }
+
+    public void setResCfgMovCtaList(List<ResCfgMovCta> resCfgMovCtaList) {
+        this.resCfgMovCtaList = resCfgMovCtaList;
+    }
+    
+    @XmlTransient
+    public List<CfgMovCta> getCfgMovCtaList() {
+        return cfgMovCtaList;
+    }
+
+    public void setCfgMovCtaList(List<CfgMovCta> cfgMovCtaList) {
+        this.cfgMovCtaList = cfgMovCtaList;
+    }    
+
+    public List<CntMovdetalle> getCntMovdetalleList() {
+        return cntMovdetalleList;
+    }
+
+    public void setCntMovdetalleList(List<CntMovdetalle> cntMovdetalleList) {
+        this.cntMovdetalleList = cntMovdetalleList;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

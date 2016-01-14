@@ -62,9 +62,73 @@
                 <p:ajax event="cellEdit" listener="#{listaPrecioMB.onCellEdit}" oncomplete="update()" update="@none"/>
                 <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                 <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
-                <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
+                <p:column headerText="Producto" width="30%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
                 <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
-                <p:column headerText="Precio">
+                <p:column id="costoAdq" headerText="Costo Adquisicion">
+                    <p:cellEditor>
+                        <f:facet name="input"><h:inputText value="#{producto.costoAdquisicion}" /></f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.costoAdquisicion}">
+                                <f:convertNumber type="currency"/>
+                            </h:outputText>
+                        </f:facet> 
+                    </p:cellEditor>
+
+                </p:column>
+                <p:column id="costoInd" headerText="%Costo Indirecto">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{producto.costoIndirecto}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.costoIndirecto}">
+                                <f:convertNumber maxFractionDigits="0"/>
+                            </h:outputText>
+                        </f:facet>  
+                    </p:cellEditor>
+                </p:column>
+                <p:column id="iva" headerText="%IVA">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{producto.iva}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.iva}">
+                                <f:convertNumber maxFractionDigits="0"/>
+                            </h:outputText>
+                        </f:facet>  
+                    </p:cellEditor>
+                </p:column>
+                <p:column id="flete" headerText="%Flete">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{producto.flete}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.flete}">
+                                <f:convertNumber maxFractionDigits="0"/>
+                            </h:outputText>
+                        </f:facet>  
+                    </p:cellEditor>
+                </p:column>
+                <p:column headerText="Costo Final">
+                    <h:outputText value="#{producto.costo}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>                   
+                </p:column>
+                <p:column id="utilidad" headerText="%Utilidad">
+                    <p:cellEditor>
+                        <f:facet name="input">
+                            <h:inputText value="#{producto.utilidad}"/>
+                        </f:facet>
+                        <f:facet name="output">
+                            <h:outputText value="#{producto.utilidad}">
+                                <f:convertNumber maxFractionDigits="0"/>
+                            </h:outputText>
+                        </f:facet>  
+                    </p:cellEditor>
+                </p:column>                
+                <p:column id="precio" headerText="Precio">
                     <p:cellEditor>
                         <f:facet name="input"><h:inputText value="#{producto.precio}" /></f:facet>
                         <f:facet name="output">

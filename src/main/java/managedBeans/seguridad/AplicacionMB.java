@@ -5,6 +5,7 @@
  */
 package managedBeans.seguridad;
 
+import entities.CfgAplicaciondocumento;
 import entities.CfgDepartamento;
 import entities.CfgEmpresa;
 import entities.CfgPais;
@@ -12,7 +13,9 @@ import entities.CfgRol;
 import entities.CfgTipodocempresa;
 import entities.CfgTipoempresa;
 import entities.CfgTipoidentificacion;
+import entities.CntPuc;
 import entities.SegUsuario;
+import facades.CfgAplicaciondocumentoFacade;
 import facades.CfgDepartamentoFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgPaisFacade;
@@ -20,6 +23,7 @@ import facades.CfgRolFacade;
 import facades.CfgTipodocempresaFacade;
 import facades.CfgTipoempresaFacade;
 import facades.CfgTipoidentificacionFacade;
+import facades.CntPucFacade;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +52,8 @@ public class AplicacionMB implements Serializable {
     private List<CfgTipoidentificacion> listaTipoIdentificacion;
     private List<CfgRol> listaRoles;
     private List<CfgEmpresa> listaEmpresas;
+    private List<CfgAplicaciondocumento> listaAplicacionDocumento;
+    private List<CntPuc> listaCntPuc;
 
     @EJB
     CfgDepartamentoFacade departamentoFacade;
@@ -69,6 +75,12 @@ public class AplicacionMB implements Serializable {
     
     @EJB
     CfgPaisFacade paisFacade;
+    
+    @EJB
+    CfgAplicaciondocumentoFacade aplicaciondocumentoFacade;
+    
+    @EJB
+    CntPucFacade cntPucFacade;
 
     @PostConstruct
     private void init() {
@@ -81,6 +93,8 @@ public class AplicacionMB implements Serializable {
         setListaEmpresas(empresaFacade.findAll());
         setListaRoles(rolFacade.buscarRolVisibles());
         listaPaises = paisFacade.findAll();
+        listaAplicacionDocumento = aplicaciondocumentoFacade.findAll();
+        listaCntPuc = cntPucFacade.findAll();
         setListaUsuariosActivos((List<SegUsuario>) new ArrayList());
         for (int i = 1; i <= 6; i++) {
             String img = "idx" + i + ".jpg";
@@ -207,6 +221,14 @@ public class AplicacionMB implements Serializable {
 
     public List<CfgPais> getListaPaises() {
         return listaPaises;
+    }
+
+    public List<CfgAplicaciondocumento> getListaAplicacionDocumento() {
+        return listaAplicacionDocumento;
+    }
+
+    public List<CntPuc> getListaCntPuc() {
+        return listaCntPuc;
     }
 
 }

@@ -268,4 +268,15 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
             return 0;
         }
     }
+
+    public CfgProducto buscarPorCodigoInterno(int idEmpresa, String codigoInterno) {
+        try {
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa.idEmpresa = ?1 AND p.codigoInterno LIKE ?2");
+            query.setParameter(1, idEmpresa);
+            query.setParameter(2, codigoInterno);
+            return (CfgProducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
