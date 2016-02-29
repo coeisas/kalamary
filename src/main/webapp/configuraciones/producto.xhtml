@@ -25,7 +25,7 @@
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCategoria').show()"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
-                           <h:inputText class="campoFormulario cajaH" value="#{productoMB.referenciaSeleccionada.nombreReferencia}" readonly="true"/>
+                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.referenciaSeleccionada.nombreReferencia}" readonly="true"/>
                             <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgReferencia').show()"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
                             <p:outputLabel class="labelFormularioObligatorio" value="Marca:"/>
@@ -130,7 +130,10 @@
                     <p:column headerText="Categoria">#{categoria.nombreCategoria}</p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionCategoria}" onclick="PF('dlgCategoria').hide()"/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionCategoria}" onclick="PF('dlgCategoria').hide()"/>&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{productoMB.deseleccionar(productoMB.categoriaSeleccionada)}" onclick="PF('dlgCategoria').hide()"/>
+                </div>
             </h:form>
         </p:dialog>
         <p:dialog id="IdModalReferencia" widgetVar="dlgReferencia" header="BUSCAR REFERENCIA" resizable="false" width="700px" modal="true">
@@ -140,7 +143,10 @@
                     <p:column headerText="Referencia">#{referencia.nombreReferencia}</p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionReferencia}" onclick="PF('dlgReferencia').hide()"/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionReferencia}" onclick="PF('dlgReferencia').hide()"/>&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{productoMB.deseleccionar(productoMB.referenciaSeleccionada)}" onclick="PF('dlgReferencia').hide()"/>
+                </div>
             </h:form>
         </p:dialog>
         <p:dialog id="IdModalMarca" widgetVar="dlgMarca" header="BUSCAR MARCA" resizable="false" width="700px" modal="true">
@@ -150,7 +156,10 @@
                     <p:column headerText="Marca">#{marca.nombreMarca}</p:column>
                 </p:dataTable>
                 <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionMarca}" onclick="PF('dlgMarca').hide()"/>
+                <div style="text-align: center">
+                    <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionMarca}" onclick="PF('dlgMarca').hide()"/>&nbsp;
+                    <p:commandButton value="Cancelar" actionListener="#{productoMB.deseleccionar(productoMB.marcaSeleccionada)}" onclick="PF('dlgReferencia').hide()"/>
+                </div>
             </h:form>
         </p:dialog>
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="700px" modal="true">

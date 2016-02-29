@@ -217,7 +217,8 @@ public class MovimientoInventarioMB implements Serializable {
         if (proveedorSeleccionado != null) {
             proveedor = proveedorSeleccionado.getNomProveedor();
             numIdentificacion = proveedorSeleccionado.getNumDoc();
-            formaPago = proveedorSeleccionado.getCfgformaPagoproveedoridFormaPago().getIdFormaPago();
+            CfgformaPagoproveedor formaPagoProveedor = proveedorSeleccionado.getCfgformaPagoproveedoridFormaPago();
+            formaPago = formaPagoProveedor != null ? formaPagoProveedor.getIdFormaPago() : 0;
         } else {
             limpiarFormulario();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro Proveedor"));
@@ -617,10 +618,10 @@ public class MovimientoInventarioMB implements Serializable {
                     cntMovdetalle.setInvMovimiento(invMovimiento);
                     //COMO ES UN MOVIMIENTO DE INVENTARIO EL PROVEEDOR ES EL TERCERO
                     String tercero = null;
-                    if(invMovimiento.getCfgproveedoridProveedor() != null){
+                    if (invMovimiento.getCfgproveedoridProveedor() != null) {
                         tercero = invMovimiento.getCfgproveedoridProveedor().getNomProveedor();
                     }
-                    
+
                     if (tercero != null && tercero.length() > 150) {
                         tercero = tercero.substring(0, 149);
                     }
@@ -662,8 +663,8 @@ public class MovimientoInventarioMB implements Serializable {
             }
 
         }
-    }    
-    
+    }
+
     private void actualizarTablaProducto(InvMovimientoDetalle detalle) {
         try {
             CfgProducto producto = detalle.getCfgProducto();

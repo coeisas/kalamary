@@ -126,7 +126,8 @@ public class ProveedorMB implements Serializable {
             setNumIdentificacion(proveedorSeleccionado.getNumDoc());
             setProveedor(proveedorSeleccionado.getNomProveedor());
             setContacto(proveedorSeleccionado.getContactoProveedor());
-            formaPago = proveedorSeleccionado.getCfgformaPagoproveedoridFormaPago().getIdFormaPago();
+            CfgformaPagoproveedor formaPagoProveedor = proveedorSeleccionado.getCfgformaPagoproveedoridFormaPago();
+            formaPago = formaPagoProveedor != null ? formaPagoProveedor.getIdFormaPago() : 0;
             setDireccion(proveedorSeleccionado.getDirProveedor());
             setTelefono1(proveedorSeleccionado.getTel1Proveedor());
             setTelefono2(proveedorSeleccionado.getTel2Proveedor());

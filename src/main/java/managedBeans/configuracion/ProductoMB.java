@@ -152,6 +152,7 @@ public class ProductoMB implements Serializable {
         if (categoriaSeleccionada != null) {
 //            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
             listaReferencia = referenciaFacade.buscarPorCategoria(categoriaSeleccionada);
+            deseleccionar(referenciaSeleccionada);
         } else {
             listaReferencia.clear();
         }
@@ -163,6 +164,7 @@ public class ProductoMB implements Serializable {
         if (referenciaSeleccionada != null) {
 //            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
             listaMarca = marcaFacade.buscarPorReferencia(referenciaSeleccionada);
+            deseleccionar(marcaSeleccionada);
         } else {
             listaMarca.clear();
         }
@@ -183,6 +185,28 @@ public class ProductoMB implements Serializable {
 //            getListaProducto().clear();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Determine la empresa"));
         }
+    }
+
+    //Controla la integridad de Categoria - Referencia - Marca
+    public void deseleccionar(Object o) {
+        String opcion = o != null ? o.getClass().toString() : "";
+        List<String> updates = new ArrayList();
+        updates.add("IdFormProducto");
+        switch (opcion) {
+            case "class entities.CfgCategoriaproducto":
+                categoriaSeleccionada = null;
+                updates.add("FormModalCategoria");
+                listaReferencia.clear();
+            case "class entities.CfgReferenciaproducto":
+                referenciaSeleccionada = null;
+                updates.add("FormModalReferencia");
+                listaMarca.clear();
+            case "class entities.CfgMarcaproducto":
+                marcaSeleccionada = null;
+                updates.add("FormModalMarca");
+                break;
+        }
+        RequestContext.getCurrentInstance().update(updates);
     }
 
 //    public void buscarProducto() {
