@@ -8,7 +8,12 @@
     xmlns:f="http://xmlns.jcp.org/jsf/core"
     template="../templates/layout.xhtml">
     <ui:define name="title">Producto</ui:define>
-    <ui:define name="content">        
+    <ui:define name="content">  
+        <script>
+            function reloadPage() {
+                location.reload();
+            }
+        </script>
         <p:growl autoUpdate="true" showDetail="true"/>
         <div style="text-align: center">
             <h:form id="IdFormProducto">
@@ -59,7 +64,9 @@
                         <p:column>
                             <p:outputLabel class="labelFormularioObligatorio" value="Producto:"/>
                             <p:inputText class="campoFormulario upperCase" size="100" value="#{productoMB.nombreProducto}"/>
-                            <!--p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen"/-->
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen" onclick="PF('dlgImagen').show()"/>
+                            <p:outputLabel id="nombreImagen" value="#{productoMB.nombreArchivo}" class="labelFormularioInformativa"/>
                         </p:column>
                     </p:row>
                     <p:row>
@@ -120,6 +127,14 @@
                         </p:column>
                     </p:row>
                 </p:panelGrid>
+                <br/>
+                <div style="display: inline-block; width: 17%; vertical-align: top">
+                    <p:panel rendered="#{productoMB.productoSeleccionado != null}" style="text-align: center">
+                        <p:graphicImage  value="#{productoMB.image}" style="width: 90%; height: 112.5%;text-align: center">
+                            <f:param name="id" value="#{productoMB.productoSeleccionado.codigoInterno}"/>
+                        </p:graphicImage>                
+                    </p:panel>
+                </div>
             </h:form>
         </div>
 
@@ -178,7 +193,12 @@
                 <p:separator/>
                 <p:commandButton value="Aceptar" actionListener="#{productoMB.cargarInformacionProducto}" onclick="PF('dlgProducto').hide()"/>
             </h:form>
-        </p:dialog>  
+        </p:dialog>
+        <p:dialog id="IdModalImagen" widgetVar="dlgImagen" header="Cargar Imagen" modal="true" width="600px" resizable="false">
+            <h:form>
+                <p:fileUpload value="#{productoMB.file}" fileUploadListener="#{productoMB.handleFileUpload}" label="Buscar Imagen" cancelLabel="Cancelar" uploadLabel="Cargar" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" mode="advanced" update=":IdFormProducto" oncomplete="reloadPage()" sizeLimit="16777215"/>
+            </h:form>
+        </p:dialog>
     </ui:define>
 </ui:composition>
 

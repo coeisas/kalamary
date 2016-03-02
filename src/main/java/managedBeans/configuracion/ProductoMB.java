@@ -5,6 +5,7 @@
  */
 package managedBeans.configuracion;
 
+import com.google.common.io.Files;
 import entities.CfgCategoriaproducto;
 import entities.CfgColor;
 import entities.CfgEmpresa;
@@ -21,6 +22,11 @@ import facades.CfgMarcaproductoFacade;
 import facades.CfgProductoFacade;
 import facades.CfgReferenciaproductoFacade;
 import facades.CfgTallaFacade;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -32,8 +38,14 @@ import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
+import javax.faces.event.PhaseId;
 import managedBeans.seguridad.SesionMB;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.ByteArrayContent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import utilities.LazyProductosModel;
 
 /**
@@ -60,6 +72,11 @@ public class ProductoMB implements Serializable {
     private float precio;
     private boolean activo;
     private boolean esServicio;
+    private StreamedContent image;
+    private UploadedFile file;
+
+    private String pathRoot;
+    private String nombreArchivo;
 
     private String nombreEmpresa;
     private SesionMB sesionMB;
@@ -106,6 +123,7 @@ public class ProductoMB implements Serializable {
     @PostConstruct
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
+        pathRoot = context.getExternalContext().getInitParameter("directory.images");
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
@@ -146,6 +164,7 @@ public class ProductoMB implements Serializable {
         setPrecio(0);
         activo = true;
         esServicio = false;
+        nombreArchivo = null;
     }
 
     public void cargarInformacionCategoria() {
@@ -271,6 +290,29 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update(listFormsModal);
     }
 
+    public void handleFileUpload(FileUploadEvent event) {
+        file = event.getFile();
+        if (file != null) {
+            if (productoSeleccionado == null) {// SI NO SE HA CREADO EL PRODUCTO SIMPLEMENTE SE GUARDA LA IMAGEN EN LA SESION
+                nombreArchivo = file.getFileName();
+                RequestContext.getCurrentInstance().update("IdFormProducto:nombreImagen");
+            } else {//SI YA EXISTE EL PRODUCTO. SE GUARDA INMEDIATAMENTE LA IMAGEN EN EL SERVIDOR
+                String nombreOriginal = file.getFileName();
+                String[] id = nombreOriginal.split("\\.");
+                String extension = ".".concat(id[1]);
+                String filename = productoSeleccionado.getCodigoInterno().concat(extension);
+                productoSeleccionado.setImgProducto(filename);
+                uploadArchivo(file, filename);
+                image = new ByteArrayContent(file.getContents());
+                setImage(image);
+                productoFacade.edit(productoSeleccionado);
+                RequestContext.getCurrentInstance().update("IdFormProducto");
+            }
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Imagen cargada"));
+            RequestContext.getCurrentInstance().execute("PF('dlgImagen').hide()");
+        }
+    }
+
     public void determinarAccion() {
         if (productoSeleccionado != null) {
             editarProducto();
@@ -359,12 +401,41 @@ public class ProductoMB implements Serializable {
             String codigoInterno = generarCodigoInterno(producto);
             producto.setCodigoInterno(codigoInterno);
             producto.setCodBarProducto(codigoInterno);
+            if (file != null) {
+                String nombreOriginal = file.getFileName();
+                String[] id = nombreOriginal.split("\\.");
+                String extension = ".".concat(id[1]);
+                String filename = producto.getCodigoInterno().concat(extension);
+                producto.setImgProducto(filename);
+                uploadArchivo(file, filename);
+            }
             productoFacade.edit(producto);
             cancelar();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto creado"));
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Producto no creado"));
         }
+    }
+
+    public boolean uploadArchivo(UploadedFile archivoCargado, String nombreArchivo) {
+        String path = pathRoot.concat(nombreArchivo);
+        File fichero = new java.io.File(path);
+        if (fichero.exists()) {//si existe se borra
+            fichero.delete();
+        }
+        fichero = new java.io.File(path);
+        try (FileOutputStream fileOutput = new FileOutputStream(fichero)) {
+            InputStream inputStream = archivoCargado.getInputstream();
+            byte[] buffer = new byte[1024];
+            int bufferLength;
+            while ((bufferLength = inputStream.read(buffer)) > 0) {
+                fileOutput.write(buffer, 0, bufferLength);
+            }
+        } catch (Exception e) {
+            System.out.println("Error 01: " + e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     private String generarCodigoInterno(CfgProducto producto) {
@@ -679,6 +750,48 @@ public class ProductoMB implements Serializable {
 
     public List<CfgTalla> getListaTalla() {
         return listaTalla;
+    }
+
+    public UploadedFile getFile() {
+        return file;
+    }
+
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
+
+    public StreamedContent getImage() throws IOException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
+            image = new DefaultStreamedContent();
+            return image;
+        } else if (productoSeleccionado != null) {
+            String codInterno = context.getExternalContext().getRequestParameterMap().get("id");
+            CfgProducto producto = productoFacade.buscarPorCodigoInterno(empresaSeleccionada.getIdEmpresa(), codInterno);
+            String path;
+            if (producto.getImgProducto() == null) {//si el producto no tiene una imagen asociada se muestra la imagen por default
+                path = pathRoot.concat("0.jpg");
+            } else {
+                path = pathRoot.concat(producto.getImgProducto());
+            }
+            File f = new File(path);
+            byte[] data = Files.toByteArray(f);
+            image = new DefaultStreamedContent(new ByteArrayInputStream(data));
+            return image;
+        } else {
+            return null;
+        }
+    }
+
+    public void setImage(StreamedContent image) {
+        this.image = image;
+    }
+
+    /**
+     * @return the nombreArchivo
+     */
+    public String getNombreArchivo() {
+        return nombreArchivo;
     }
 
 }

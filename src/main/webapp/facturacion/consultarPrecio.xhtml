@@ -20,7 +20,7 @@
                     <p:column>
                         <p:outputLabel class="labelFormulario" value="Cod Producto:"/>
                         <p:inputText id="IdCodigoProducto" class="campoFormulario" value="#{consutarPrecioMB.codigoProducto}">
-                            <p:ajax event="blur" listener="#{consutarPrecioMB.buscarProducto}" update="@none"/>
+                            <p:ajax event="blur" listener="#{consutarPrecioMB.buscarProducto}" update="IdImagenProducto"/>
                         </p:inputText>
                         <p:watermark for="IdCodigoProducto" value="Codigo Producto"/>
                         <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Producto" actionListener="#{consutarPrecioMB.cargarModalProductos}"/>
@@ -36,6 +36,14 @@
                     </p:column>
                 </p:row>
             </p:panelGrid>
+            <br/>
+            <div style="width: 90%; margin: 0 auto; text-align: center">
+                <p:panel id="IdImagenProducto" rendered="#{consutarPrecioMB.productoSeleccionado != null}">
+                    <p:graphicImage  value="#{consutarPrecioMB.image}" style="width: 25%; height: 25%">
+                        <f:param name="id" value="#{consutarPrecioMB.productoSeleccionado.codigoInterno}"/>
+                    </p:graphicImage>
+                </p:panel>
+            </div>
         </h:form>
 
         <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
@@ -54,7 +62,7 @@
                 </p:dataTable>
                 <p:separator/>
                 <div style="text-align: center">
-                    <p:commandButton value="Aceptar" actionListener="#{consutarPrecioMB.cargarInformacionProducto}"/>
+                    <p:commandButton value="Aceptar" actionListener="#{consutarPrecioMB.cargarInformacionProducto}" update=":IdFormPrecios:IdImagenProducto"/>
                 </div>
             </h:form>
         </p:dialog>

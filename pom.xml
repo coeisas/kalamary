@@ -68,7 +68,7 @@
             <artifactId>guava</artifactId>
             <groupId>com.google.guava</groupId>
             <version>18.0</version>
-        </dependency>        
+        </dependency>       
     </dependencies>
 
     <build>

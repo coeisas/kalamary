@@ -26,7 +26,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import managedBeans.seguridad.SesionMB;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.CellEditEvent;
+import org.primefaces.event.RowEditEvent;
 
 /**
  *
@@ -76,68 +76,17 @@ public class ListaPrecioMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormListaPrecios:IdTableProducto");
     }
 
-    public void onCellEdit(CellEditEvent event) {
+    public void onRowEdit(RowEditEvent event) {
         if (validar()) {
-            int index = event.getRowIndex();
-            String clientId = event.getColumn().getClientId();
-            String[] id = clientId.split(":");//guarda en el array los id. empenzando desde el form. Intereza el id de la columna modificada
-            String idColumna = id[3];
-//            System.out.println(idColumna);
-//            String nomProducto = listaProducto.get(index).getNomProducto();
-            Float valor;
-            try {
-                valor = (Float) event.getNewValue();
-            } catch (Exception e) {
-                valor = (Float) event.getOldValue();
-            }
-            if (valor < 0) {
-                valor = (Float) event.getOldValue();
-            }
-            CfgProducto producto = listaProducto.get(index);
+//            SOLO PARA CellEditEvent
+//            String clientId = event.getColumn().getClientId();
+//            se obtiene el id de la columna modificada. empenzando desde el form.
+            CfgProducto producto = (CfgProducto) event.getObject();
             float vlrs[];
-            switch (idColumna) {
-                case "costoAdq":
-                    producto.setCostoAdquisicion(valor);
-                    vlrs = determinarCostoFinalAndPrecio(producto);
-                    if (vlrs.length > 0) {
-                        producto.setCosto(vlrs[0]);
-                        producto.setPrecio(vlrs[1]);
-                    }
-                    break;
-                case "costoInd":
-                    producto.setCostoIndirecto(valor);
-                    vlrs = determinarCostoFinalAndPrecio(producto);
-                    if (vlrs.length > 0) {
-                        producto.setCosto(vlrs[0]);
-                        producto.setPrecio(vlrs[1]);
-                    }
-                    break;
-                case "iva":
-                    producto.setIva(valor);
-                    vlrs = determinarCostoFinalAndPrecio(producto);
-                    if (vlrs.length > 0) {
-                        producto.setCosto(vlrs[0]);
-                        producto.setPrecio(vlrs[1]);
-                    }
-                    break;                    
-                case "flete":
-                    producto.setFlete(valor);
-                    vlrs = determinarCostoFinalAndPrecio(producto);
-                    if (vlrs.length > 0) {
-                        producto.setCosto(vlrs[0]);
-                        producto.setPrecio(vlrs[1]);
-                    }
-                    break;
-                case "utilidad":
-                    producto.setUtilidad(valor);
-                    float precio = determinarPrecioPorUtilidad(producto.getCosto(), valor);
-                    producto.setPrecio(precio);
-                    break;
-                case "precio":
-                    producto.setPrecio(valor);
-                    float utilidad = determinarUtilidadPorPrecioAndCostoFinal(producto.getCosto(), valor);
-                    producto.setUtilidad(utilidad);
-                    break;
+            vlrs = determinarCostoFinalAndPrecio(producto);
+            if (vlrs.length > 0) {
+                producto.setCosto(vlrs[0]);
+                producto.setPrecio(vlrs[1]);
             }
             try {
                 productoFacade.edit(producto);

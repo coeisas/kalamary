@@ -58,8 +58,9 @@
                          currentPageReportTemplate="Mostrando {startRecord}-{endRecord} de {totalRecords}"
                          rowKey="#{producto.idProducto}" 
                          disabledSelection="true"
-                         editable="true" editMode="cell">
-                <p:ajax event="cellEdit" listener="#{listaPrecioMB.onCellEdit}" oncomplete="update()" update="@none"/>
+                         editable="true">
+                <p:ajax event="rowEdit" listener="#{listaPrecioMB.onRowEdit}" oncomplete="update()" update="@none"/>
+                <p:ajax event="rowEditCancel" oncomplete="update()" update="@none"/>
                 <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
                 <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                 <p:column headerText="Producto" width="30%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
@@ -129,14 +130,12 @@
                     </p:cellEditor>
                 </p:column>                
                 <p:column id="precio" headerText="Precio">
-                    <p:cellEditor>
-                        <f:facet name="input"><h:inputText value="#{producto.precio}" /></f:facet>
-                        <f:facet name="output">
-                            <h:outputText value="#{producto.precio}">
-                                <f:convertNumber type="currency"/>
-                            </h:outputText>
-                        </f:facet>
-                    </p:cellEditor>
+                    <h:outputText value="#{producto.precio}">
+                        <f:convertNumber type="currency"/>
+                    </h:outputText>   
+                </p:column>
+                <p:column style="width:20px;text-align: center">
+                    <p:rowEditor />
                 </p:column>
             </p:dataTable>            
         </h:form>
