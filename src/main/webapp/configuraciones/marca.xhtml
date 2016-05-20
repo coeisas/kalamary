@@ -18,10 +18,6 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
-                        <h:inputText class="campoFormulario cajaH" value="#{marcaMB.referencia}" readonly="true"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Referencia" actionListener="#{marcaMB.cargarReferencias}"/>
-                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
                         <p:inputText class="campoFormulario upperCase" value="#{marcaMB.codigoMarca}" size="8" maxlength="5">
                             <p:ajax event="blur" listener="#{marcaMB.buscarMarca}" update="@none"/>
@@ -50,12 +46,6 @@
                 rows="10"
                 disabledSelection="true"
                 paginatorPosition="bottom">
-                <p:column headerText="Categoria">
-                    #{marca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria.nombreCategoria}
-                </p:column>
-                <p:column headerText="Referencia">
-                    #{marca.cfgreferenciaproductoidReferencia.nombreReferencia}
-                </p:column>
                 <p:column headerText="Codigo Marca">
                     #{marca.codigoMarca}
                 </p:column>
@@ -63,17 +53,6 @@
                     #{marca.nombreMarca}
                 </p:column>
             </p:dataTable>
-        </h:form>
-        <p:dialog id="IdModalReferencia" widgetVar="dlgReferencia" header="BUSCAR REFERENCIA" resizable="false" width="700px" modal="true">
-            <h:form id="FormModalReferencia">
-                <p:dataTable value="#{marcaMB.listaReferencia}" var="referencia" emptyMessage="No hay referencias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{marcaMB.referenciaSeleccionada}" rowKey="#{referencia.idReferencia}" selectionMode="single">
-                    <p:column headerText="Categoria">#{referencia.cfgcategoriaproductoidCategoria.nombreCategoria}</p:column>
-                    <p:column headerText="Codigo" filterBy="#{referencia.codigoReferencia}"  filterStyle="width:90%">#{referencia.codigoReferencia}</p:column>
-                    <p:column headerText="Referencia" filterBy="#{referencia.nombreReferencia}" filterMatchMode="contains"  filterStyle="width:90%">#{referencia.nombreReferencia}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{marcaMB.cargarInformacionReferencia}"/>
-            </h:form>
-        </p:dialog>        
+        </h:form>    
     </ui:define>
 </ui:composition>

@@ -67,9 +67,6 @@ public class CfgMarcaproducto implements Serializable {
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
-    @JoinColumn(name = "cfg_referenciaproducto_idReferencia", referencedColumnName = "idReferencia", nullable = false)
-    @ManyToOne(optional = false)
-    private CfgReferenciaproducto cfgreferenciaproductoidReferencia;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgmarcaproductoidMarca")
     private List<CfgProducto> cfgProductoList;
 
@@ -127,14 +124,6 @@ public class CfgMarcaproducto implements Serializable {
         this.cfgempresaidEmpresa = cfgempresaidEmpresa;
     }
     
-    public CfgReferenciaproducto getCfgreferenciaproductoidReferencia() {
-        return cfgreferenciaproductoidReferencia;
-    }
-
-    public void setCfgreferenciaproductoidReferencia(CfgReferenciaproducto cfgreferenciaproductoidReferencia) {
-        this.cfgreferenciaproductoidReferencia = cfgreferenciaproductoidReferencia;
-    }
-
     @XmlTransient
     public List<CfgProducto> getCfgProductoList() {
         return cfgProductoList;

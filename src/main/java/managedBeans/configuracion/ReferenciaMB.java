@@ -5,7 +5,6 @@
  */
 package managedBeans.configuracion;
 
-import entities.CfgCategoriaproducto;
 import entities.CfgEmpresa;
 import entities.CfgReferenciaproducto;
 import entities.SegUsuario;
@@ -15,7 +14,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -32,14 +30,11 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class ReferenciaMB implements Serializable {
 
-    private String categoria;
     private String codigoReferencia;
     private String nombreReferencia;
 
-    private List<CfgCategoriaproducto> listaCategorias;
     private List<CfgReferenciaproducto> listaReferencias;
 
-    private CfgCategoriaproducto categoriaSeleccionada;
     private CfgReferenciaproducto referenciaSeleccionada;
 
     private SegUsuario usuarioActual;
@@ -59,7 +54,6 @@ public class ReferenciaMB implements Serializable {
         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         empresaActual = sesionMB.getEmpresaActual();
-        listaCategorias = new ArrayList();
         actualizarTabla();
     }
 
@@ -69,33 +63,10 @@ public class ReferenciaMB implements Serializable {
         }
     }
 
-    public void cargarCategoria() {
-        if (empresaActual != null) {
-            listaCategorias = categoriaproductoFacade.buscarPorEmpresa(empresaActual);
-        } else {
-            listaCategorias.clear();
-        }
-        RequestContext.getCurrentInstance().update("FormModalCategoria");
-        RequestContext.getCurrentInstance().execute("PF('dlgCategoria').show()");
-    }
-
-    public void cargarInformacionCategoria() {
-        if (categoriaSeleccionada != null) {
-            categoria = categoriaSeleccionada.getCodigoCategoria() + "-" + categoriaSeleccionada.getNombreCategoria();
-            listaReferencias = referenciaproductoFacade.buscarPorCategoria(categoriaSeleccionada);
-            RequestContext.getCurrentInstance().update("IdFormReferencia");
-        }
-        RequestContext.getCurrentInstance().execute("PF('dlgCategoria').hide()");
-    }
-
     public void buscarReferencia() {
         if (empresaActual != null) {
             if (!codigoReferencia.trim().isEmpty()) {
-                if (categoriaSeleccionada == null) {
-                    referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoReferencia);
-                } else {
-                    referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaCategoriaAndCodigo(empresaActual, categoriaSeleccionada, codigoReferencia);
-                }
+                referenciaSeleccionada = referenciaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoReferencia);
             }
             cargarReferencia();
         }
@@ -104,10 +75,8 @@ public class ReferenciaMB implements Serializable {
 
     private void cargarReferencia() {
         if (referenciaSeleccionada != null) {
-            categoriaSeleccionada = referenciaSeleccionada.getCfgcategoriaproductoidCategoria();
             codigoReferencia = referenciaSeleccionada.getCodigoReferencia();
             nombreReferencia = referenciaSeleccionada.getNombreReferencia();
-            cargarInformacionCategoria();
         } else {
             limpiar();
         }
@@ -127,10 +96,6 @@ public class ReferenciaMB implements Serializable {
         }
         if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro Informacion del usuario"));
-            return false;
-        }
-        if (categoriaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la categoria"));
             return false;
         }
         if (codigoReferencia.trim().isEmpty()) {
@@ -159,7 +124,6 @@ public class ReferenciaMB implements Serializable {
         }
         try {
             CfgReferenciaproducto referenciaproducto = new CfgReferenciaproducto();
-            referenciaproducto.setCfgcategoriaproductoidCategoria(categoriaSeleccionada);
             referenciaproducto.setCodigoReferencia(codigoReferencia.toUpperCase());
             referenciaproducto.setNombreReferencia(nombreReferencia.toUpperCase());
             referenciaproducto.setCfgempresaidEmpresa(empresaActual);
@@ -182,7 +146,6 @@ public class ReferenciaMB implements Serializable {
         }
         try {
             referenciaSeleccionada.setNombreReferencia(nombreReferencia.toUpperCase());
-            referenciaSeleccionada.setCfgcategoriaproductoidCategoria(categoriaSeleccionada);
             referenciaproductoFacade.edit(referenciaSeleccionada);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Referencia Modificada"));
             cancelar();
@@ -192,9 +155,7 @@ public class ReferenciaMB implements Serializable {
     }
 
     public void cancelar() {
-        categoriaSeleccionada = null;
         referenciaSeleccionada = null;
-        categoria = null;
         codigoReferencia = null;
         limpiar();
         actualizarTabla();
@@ -217,24 +178,8 @@ public class ReferenciaMB implements Serializable {
         this.nombreReferencia = nombreReferencia;
     }
 
-    public List<CfgCategoriaproducto> getListaCategorias() {
-        return listaCategorias;
-    }
-
     public List<CfgReferenciaproducto> getListaReferencias() {
         return listaReferencias;
-    }
-
-    public CfgCategoriaproducto getCategoriaSeleccionada() {
-        return categoriaSeleccionada;
-    }
-
-    public void setCategoriaSeleccionada(CfgCategoriaproducto categoriaSeleccionada) {
-        this.categoriaSeleccionada = categoriaSeleccionada;
-    }
-
-    public String getCategoria() {
-        return categoria;
     }
 
 }

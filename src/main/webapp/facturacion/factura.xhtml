@@ -33,6 +33,7 @@
         <p:growl id="msg" showDetail="true"/>
         <h:form id="IdFormFactura">
             <p:remoteCommand name="update" actionListener="#{facturaMB.updateTabla}"/>
+            <p:remoteCommand name="updateTablaProducto" actionListener="#{facturaMB.updateTablaProducto()}"/>
             <p:remoteCommand name="updateTablaFormaPago" actionListener="#{facturaMB.actualizarTablaFormaPago}"/>
             <p:remoteCommand name="determinarValorFormaPago" actionListener="#{facturaMB.determinarValorFormaPago}"/>  
             <p:remoteCommand name="determinarCodigoInterno" actionListener="#{facturaMB.determinarCodigoInterno}"/>  
@@ -228,7 +229,7 @@
                 </div>
             </h:form>                                
         </p:dialog>
-        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" onShow="updateTablaProducto()" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
             <h:form id="FormModalProducto">               
                 <p:dataTable
                     id="IdTablaProductos"

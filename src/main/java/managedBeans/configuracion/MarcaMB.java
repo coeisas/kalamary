@@ -7,7 +7,6 @@ package managedBeans.configuracion;
 
 import entities.CfgEmpresa;
 import entities.CfgMarcaproducto;
-import entities.CfgReferenciaproducto;
 import entities.SegUsuario;
 import facades.CfgMarcaproductoFacade;
 import facades.CfgReferenciaproductoFacade;
@@ -16,7 +15,6 @@ import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -32,17 +30,14 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class MarcaMB implements Serializable {
 
-    private String referencia;
     private String codigoMarca;
     private String nombreMarca;
 
     private SegUsuario usuarioActual;
     private CfgEmpresa empresaActual;
 
-    private List<CfgReferenciaproducto> listaReferencia;
     private List<CfgMarcaproducto> listaMarca;
 
-    private CfgReferenciaproducto referenciaSeleccionada;
     private CfgMarcaproducto marcaSeleccionada;
 
     @EJB
@@ -59,7 +54,6 @@ public class MarcaMB implements Serializable {
         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         empresaActual = sesionMB.getEmpresaActual();
-        listaReferencia = new ArrayList();
         actualizarTabla();
     }
 
@@ -73,33 +67,10 @@ public class MarcaMB implements Serializable {
         }
     }
 
-    public void cargarReferencias() {
-        if (empresaActual != null) {
-            listaReferencia = referenciaproductoFacade.buscarPorEmpresa(empresaActual);
-        } else {
-            listaReferencia.clear();
-        }
-        RequestContext.getCurrentInstance().update("FormModalReferencia");
-        RequestContext.getCurrentInstance().execute("PF('dlgReferencia').show()");
-    }
-
-    public void cargarInformacionReferencia() {
-        if (referenciaSeleccionada != null) {
-            referencia = referenciaSeleccionada.getCodigoReferencia() + "-" + referenciaSeleccionada.getNombreReferencia();
-            listaMarca = marcaproductoFacade.buscarPorReferencia(referenciaSeleccionada);
-            RequestContext.getCurrentInstance().update("IdFormMarca");
-        }
-        RequestContext.getCurrentInstance().execute("PF('dlgReferencia').hide()");
-    }
-
     public void buscarMarca() {
         if (empresaActual != null) {
             if (!codigoMarca.trim().isEmpty()) {
-                if (referenciaSeleccionada == null) {
                     marcaSeleccionada = marcaproductoFacade.buscarPorEmpresaAndCodigo(empresaActual, codigoMarca);
-                } else {
-                    marcaSeleccionada = marcaproductoFacade.buscarPorEmpresaReferenciaAndCodigo(empresaActual, referenciaSeleccionada, codigoMarca);
-                }
             }
             cargarMarca();
         }
@@ -107,10 +78,8 @@ public class MarcaMB implements Serializable {
 
     private void cargarMarca() {
         if (marcaSeleccionada != null) {
-            referenciaSeleccionada = marcaSeleccionada.getCfgreferenciaproductoidReferencia();
             codigoMarca = marcaSeleccionada.getCodigoMarca();
             nombreMarca = marcaSeleccionada.getNombreMarca();
-            cargarInformacionReferencia();
         } else {
             limpiar();
         }
@@ -126,10 +95,6 @@ public class MarcaMB implements Serializable {
         }
         if (usuarioActual == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro Informacion del usuario"));
-            return false;
-        }
-        if (referenciaSeleccionada == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la Referencia"));
             return false;
         }
         if (codigoMarca.trim().isEmpty()) {
@@ -157,7 +122,6 @@ public class MarcaMB implements Serializable {
         }
         try {
             CfgMarcaproducto marcaproducto = new CfgMarcaproducto();
-            marcaproducto.setCfgreferenciaproductoidReferencia(referenciaSeleccionada);
             marcaproducto.setCodigoMarca(codigoMarca.toUpperCase());
             marcaproducto.setNombreMarca(nombreMarca.toUpperCase());
             marcaproducto.setCfgempresaidEmpresa(empresaActual);
@@ -179,7 +143,6 @@ public class MarcaMB implements Serializable {
             return;
         }
         try {
-            marcaSeleccionada.setCfgreferenciaproductoidReferencia(referenciaSeleccionada);
             marcaSeleccionada.setNombreMarca(nombreMarca.toUpperCase());
             marcaproductoFacade.edit(marcaSeleccionada);
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Marca Modificada"));
@@ -190,22 +153,12 @@ public class MarcaMB implements Serializable {
     }
 
     public void cancelar() {
-        referenciaSeleccionada = null;
         marcaSeleccionada = null;
-        referencia = null;
         codigoMarca = null;
         limpiar();
         actualizarTabla();
         RequestContext.getCurrentInstance().update("FormModalReferencia");
         RequestContext.getCurrentInstance().update("IdFormMarca");
-    }
-
-    public String getReferencia() {
-        return referencia;
-    }
-
-    public void setReferencia(String referencia) {
-        this.referencia = referencia;
     }
 
     public String getCodigoMarca() {
@@ -224,20 +177,8 @@ public class MarcaMB implements Serializable {
         this.nombreMarca = nombreMarca;
     }
 
-    public List<CfgReferenciaproducto> getListaReferencia() {
-        return listaReferencia;
-    }
-
     public List<CfgMarcaproducto> getListaMarca() {
         return listaMarca;
-    }
-
-    public CfgReferenciaproducto getReferenciaSeleccionada() {
-        return referenciaSeleccionada;
-    }
-
-    public void setReferenciaSeleccionada(CfgReferenciaproducto referenciaSeleccionada) {
-        this.referenciaSeleccionada = referenciaSeleccionada;
     }
 
     public CfgMarcaproducto getMarcaSeleccionada() {

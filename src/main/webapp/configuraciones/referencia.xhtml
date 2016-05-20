@@ -19,10 +19,6 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
-                        <h:inputText class="campoFormulario cajaH" value="#{referenciaMB.categoria}" readonly="true"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Categoria" actionListener="#{referenciaMB.cargarCategoria}"/>
-                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
                         <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
                         <p:inputText class="campoFormulario upperCase" value="#{referenciaMB.codigoReferencia}" size="8" maxlength="5">
                             <p:ajax event="blur" listener="#{referenciaMB.buscarReferencia}" update="@none"/>
@@ -51,9 +47,6 @@
                 rows="10"
                 disabledSelection="true"
                 paginatorPosition="bottom">
-                <p:column headerText="Categoria">
-                    #{referencia.cfgcategoriaproductoidCategoria.nombreCategoria}
-                </p:column>
                 <p:column headerText="Codigo">
                     #{referencia.codigoReferencia}
                 </p:column>
@@ -62,17 +55,7 @@
                 </p:column>
             </p:dataTable>
         </h:form>
-        
-         <p:dialog id="IdModalCategoria" widgetVar="dlgCategoria" header="BUSCAR CATEGORIA" resizable="false" width="500px" modal="true">
-            <h:form id="FormModalCategoria">
-                <p:dataTable value="#{referenciaMB.listaCategorias}" var="categoria" emptyMessage="No hay categorias registradas" rows="10" paginator="true" paginatorPosition="bottom" selection="#{referenciaMB.categoriaSeleccionada}" rowKey="#{categoria.idCategoria}" selectionMode="single">
-                    <p:column headerText="Codigo" filterBy="#{categoria.codigoCategoria}" filterStyle="width:90%">#{categoria.codigoCategoria}</p:column>
-                    <p:column headerText="Categoria" filterBy="#{categoria.nombreCategoria}" filterMatchMode="contains" filterStyle="width:90%">#{categoria.nombreCategoria}</p:column>
-                </p:dataTable>
-                <p:separator/>
-                <p:commandButton value="Aceptar" actionListener="#{referenciaMB.cargarInformacionCategoria}"/>
-            </h:form>
-        </p:dialog>       
+           
     </ui:define>
 </ui:composition>
 

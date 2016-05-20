@@ -5,7 +5,6 @@
  */
 package entities;
 
-import facades.InvConsolidadoFacade;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -116,6 +115,12 @@ public class CfgProducto implements Serializable {
     @JoinColumn(name = "cfg_kitproductomaestro_idKit", referencedColumnName = "idKit")
     @ManyToOne
     private CfgKitproductomaestro cfgkitproductomaestroidKit;
+    @JoinColumn(name = "cfg_categoriaproducto_idCategoria", referencedColumnName = "idCategoria", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgCategoriaproducto cfgcategoriaproductoidCategoria;
+    @JoinColumn(name = "cfg_referenciaproducto_idReferencia", referencedColumnName = "idReferencia", nullable = false)
+    @ManyToOne(optional = false)
+    private CfgReferenciaproducto cfgreferenciaproductoidReferencia;    
     @JoinColumn(name = "cfg_marcaproducto_idMarca", referencedColumnName = "idMarca", nullable = false)
     @ManyToOne(optional = false)
     private CfgMarcaproducto cfgmarcaproductoidMarca;
@@ -338,7 +343,23 @@ public class CfgProducto implements Serializable {
     public void setCfgkitproductomaestroidKit(CfgKitproductomaestro cfgkitproductomaestroidKit) {
         this.cfgkitproductomaestroidKit = cfgkitproductomaestroidKit;
     }
+    
+    public CfgCategoriaproducto getCfgcategoriaproductoidCategoria() {
+        return cfgcategoriaproductoidCategoria;
+    }
 
+    public void setCfgcategoriaproductoidCategoria(CfgCategoriaproducto cfgcategoriaproductoidCategoria) {
+        this.cfgcategoriaproductoidCategoria = cfgcategoriaproductoidCategoria;
+    }
+    
+    public CfgReferenciaproducto getCfgreferenciaproductoidReferencia() {
+        return cfgreferenciaproductoidReferencia;
+    }
+
+    public void setCfgreferenciaproductoidReferencia(CfgReferenciaproducto cfgreferenciaproductoidReferencia) {
+        this.cfgreferenciaproductoidReferencia = cfgreferenciaproductoidReferencia;
+    }
+    
     public CfgMarcaproducto getCfgmarcaproductoidMarca() {
         return cfgmarcaproductoidMarca;
     }
@@ -394,7 +415,7 @@ public class CfgProducto implements Serializable {
             if (consolidado != null) {
                 return consolidado.getExistencia();
             } else {//si no se encontro consolidado significa que no esta registrado el producto en el inventario
-               return 0;
+                return 0;
             }
         } else {
             return 0;

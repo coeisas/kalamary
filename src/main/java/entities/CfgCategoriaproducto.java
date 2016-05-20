@@ -64,7 +64,7 @@ public class CfgCategoriaproducto implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fecCrea;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cfgcategoriaproductoidCategoria")
-    private List<CfgReferenciaproducto> cfgReferenciaproductoList;
+    private List<CfgProducto> cfgProductoList;    
     @JoinColumn(name = "cfg_empresa_idEmpresa", referencedColumnName = "idEmpresa", nullable = false)
     @ManyToOne(optional = false)
     private CfgEmpresa cfgempresaidEmpresa;
@@ -114,16 +114,16 @@ public class CfgCategoriaproducto implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
-
-    @XmlTransient
-    public List<CfgReferenciaproducto> getCfgReferenciaproductoList() {
-        return cfgReferenciaproductoList;
-    }
-
-    public void setCfgReferenciaproductoList(List<CfgReferenciaproducto> cfgReferenciaproductoList) {
-        this.cfgReferenciaproductoList = cfgReferenciaproductoList;
-    }
     
+    @XmlTransient
+    public List<CfgProducto> getCfgProductoList() {
+        return cfgProductoList;
+    }
+
+    public void setCfgProductoList(List<CfgProducto> cfgProductoList) {
+        this.cfgProductoList = cfgProductoList;
+    }    
+   
     public CfgEmpresa getCfgempresaidEmpresa() {
         return cfgempresaidEmpresa;
     }

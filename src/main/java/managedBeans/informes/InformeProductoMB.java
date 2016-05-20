@@ -93,9 +93,9 @@ public class InformeProductoMB implements Serializable {
             informeProducto.setDescripcion(producto.getNomProducto());
             CfgMarcaproducto marca = producto.getCfgmarcaproductoidMarca();
             informeProducto.setMarca(marca.getNombreMarca());
-            CfgReferenciaproducto referencia = marca.getCfgreferenciaproductoidReferencia();
+            CfgReferenciaproducto referencia = producto.getCfgreferenciaproductoidReferencia();
             informeProducto.setReferencia(referencia.getNombreReferencia());
-            CfgCategoriaproducto categoria = referencia.getCfgcategoriaproductoidCategoria();
+            CfgCategoriaproducto categoria = producto.getCfgcategoriaproductoidCategoria();
             informeProducto.setCategoria(categoria.getNombreCategoria());
             informeProducto.setColor(producto.getCfgColorIdColor().getColor());
             informeProducto.setTalla(producto.getCfgTallaIdTalla().getTalla());

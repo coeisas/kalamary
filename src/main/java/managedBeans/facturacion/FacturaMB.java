@@ -536,7 +536,6 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("FormBuscarCliente");
     }
 
-    
     public void buscarProductoPorCodigoInterno() {
         if (codigoInterno != null && !codigoInterno.isEmpty()) {
             productoSeleccionado = productoFacade.buscarPorCodigoInterno(sedeActual.getCfgempresaidEmpresa().getIdEmpresa(), codigoInterno);
@@ -729,6 +728,10 @@ public class FacturaMB implements Serializable {
         RequestContext.getCurrentInstance().update("IdFormFactura:IdTableItemFactura");
     }
 
+    public void updateTablaProducto() {
+        RequestContext.getCurrentInstance().update("FormModalProducto:IdTablaProductos");
+    }
+
     private void calcularTotalDescuento() {
         totalDescuento = 0;
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
@@ -910,9 +913,6 @@ public class FacturaMB implements Serializable {
                     //se realiza  los respectivos cambios en precio unitario, total y descuento
                     documentodetalle.setValorUnitario(precionUnitario);
                     documentodetalle.setValorTotal(precionUnitario * documentodetalle.getCantidad());
-                    float valorDescuento = documentodetalle.getValorTotal() * documentodetalle.getDescuento() / (float) 100;
-                    valorDescuento = Redondear(valorDescuento, 0);
-                    documentodetalle.setValorDescuento(valorDescuento);
                 }
                 documentodetalleFacade.create(documentodetalle);
                 //UN SEPARADO NO HACE MOVIMIENTOS DE IVENTARIO. SOLO CUANDO SE CUMPLE EL TOTAL DE LAS CUOTAS
@@ -2116,15 +2116,13 @@ public class FacturaMB implements Serializable {
         if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
             image = new DefaultStreamedContent();
             return image;
+        } else if (clienteSeleccionado != null) {
+            String imageId = context.getExternalContext().getRequestParameterMap().get("id");
+            CfgCliente cliente = clienteFacade.find(Integer.parseInt(imageId));
+            image = new DefaultStreamedContent(new ByteArrayInputStream(cliente.getFoto()));
+            return image;
         } else {
-            if (clienteSeleccionado != null) {
-                String imageId = context.getExternalContext().getRequestParameterMap().get("id");
-                CfgCliente cliente = clienteFacade.find(Integer.parseInt(imageId));
-                image = new DefaultStreamedContent(new ByteArrayInputStream(cliente.getFoto()));
-                return image;
-            } else {
-                return null;
-            }
+            return null;
         }
     }
 

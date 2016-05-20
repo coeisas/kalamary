@@ -181,7 +181,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public List<CfgProducto> buscarPorEmpresaAndReferencia(CfgEmpresa empresa, CfgReferenciaproducto referenciaproducto, int first, int pageSize) {
         try {
-            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia = ?2");
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgreferenciaproductoidReferencia = ?2");
             query.setParameter(1, empresa);
             query.setParameter(2, referenciaproducto);
             query.setFirstResult(first);
@@ -194,7 +194,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public int TotalProductosPorEmpresaAndReferencia(CfgEmpresa empresa, CfgReferenciaproducto referenciaproducto) {
         try {
-            Query query = em.createQuery("SELECT COUNT(p.idProducto) FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia = ?2");
+            Query query = em.createQuery("SELECT COUNT(p.idProducto) FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgreferenciaproductoidReferencia = ?2");
             query.setParameter(1, empresa);
             query.setParameter(2, referenciaproducto);
             return Integer.parseInt(query.getSingleResult().toString());
@@ -205,7 +205,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public List<CfgProducto> buscarPorEmpresaAndCategoria(CfgEmpresa empresa, CfgCategoriaproducto categoriaproducto, int first, int pageSize) {
         try {
-            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria = ?2");
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgcategoriaproductoidCategoria = ?2");
             query.setParameter(1, empresa);
             query.setParameter(2, categoriaproducto);
             query.setFirstResult(first);
@@ -218,7 +218,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public int totalProductosPorEmpresaAndCategoria(CfgEmpresa empresa, CfgCategoriaproducto categoriaproducto) {
         try {
-            Query query = em.createQuery("SELECT COUNT(p.idProducto) FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgmarcaproductoidMarca.cfgreferenciaproductoidReferencia.cfgcategoriaproductoidCategoria = ?2");
+            Query query = em.createQuery("SELECT COUNT(p.idProducto) FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.cfgcategoriaproductoidCategoria = ?2");
             query.setParameter(1, empresa);
             query.setParameter(2, categoriaproducto);
             return Integer.parseInt(query.getSingleResult().toString());

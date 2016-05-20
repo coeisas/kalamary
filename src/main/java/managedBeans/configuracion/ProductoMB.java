@@ -131,13 +131,15 @@ public class ProductoMB implements Serializable {
         listaTalla = tallaFacade.findAll();
         if (empresaSeleccionada != null) {
             listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
+            listaReferencia = referenciaFacade.buscarPorEmpresa(empresaSeleccionada);
+            listaMarca = marcaFacade.buscarPorEmpresa(empresaSeleccionada);
         } else {
             listaCategoria = new ArrayList();
+            listaReferencia = new ArrayList();
+            listaMarca = new ArrayList();
         }
         setPrecio(0);
         setCostoFinal(0);
-        listaReferencia = new ArrayList();
-        listaMarca = new ArrayList();
         listFormsModal = new ArrayList();
         listFormsModal.add("FormModalCategoria");
         listFormsModal.add("FormModalReferencia");
@@ -168,25 +170,11 @@ public class ProductoMB implements Serializable {
     }
 
     public void cargarInformacionCategoria() {
-        if (categoriaSeleccionada != null) {
-//            setCodigoCategoria(categoriaSeleccionada.getCodigoCategoria());
-            listaReferencia = referenciaFacade.buscarPorCategoria(categoriaSeleccionada);
-            deseleccionar(referenciaSeleccionada);
-        } else {
-            listaReferencia.clear();
-        }
         RequestContext.getCurrentInstance().update("FormModalReferencia");
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
 
     public void cargarInformacionReferencia() {
-        if (referenciaSeleccionada != null) {
-//            setCodigoReferencia(referenciaSeleccionada.getCodigoReferencia());
-            listaMarca = marcaFacade.buscarPorReferencia(referenciaSeleccionada);
-            deseleccionar(marcaSeleccionada);
-        } else {
-            listaMarca.clear();
-        }
         RequestContext.getCurrentInstance().update("FormModalMarca");
         RequestContext.getCurrentInstance().update("IdFormProducto");
     }
@@ -215,11 +203,11 @@ public class ProductoMB implements Serializable {
             case "class entities.CfgCategoriaproducto":
                 categoriaSeleccionada = null;
                 updates.add("FormModalCategoria");
-                listaReferencia.clear();
+                break;
             case "class entities.CfgReferenciaproducto":
                 referenciaSeleccionada = null;
                 updates.add("FormModalReferencia");
-                listaMarca.clear();
+                break;
             case "class entities.CfgMarcaproducto":
                 marcaSeleccionada = null;
                 updates.add("FormModalMarca");
@@ -228,32 +216,11 @@ public class ProductoMB implements Serializable {
         RequestContext.getCurrentInstance().update(updates);
     }
 
-//    public void buscarProducto() {
-//        if (empresaSeleccionada != null) {
-//            if (marcaSeleccionada != null) {
-//                productoSeleccionado = productoFacade.buscarPorEmpresaAndMarcaAndCodigo(empresaSeleccionada, marcaSeleccionada, codigoProducto.trim());
-//            } else if (referenciaSeleccionada != null) {
-//                productoSeleccionado = productoFacade.buscarPorEmpresaAndReferenciaAndCodigo(empresaSeleccionada, referenciaSeleccionada, codigoProducto.trim());
-//            } else if (categoriaSeleccionada != null) {
-//                productoSeleccionado = productoFacade.buscarPorEmpresaAndCategoriaAndCodigo(empresaSeleccionada, categoriaSeleccionada, codigoProducto.trim());
-//            } else {
-//                productoSeleccionado = productoFacade.buscarPorEmpresaAndCodigo(empresaSeleccionada, codigoProducto.trim());
-//            }
-//            cargarInformacionProducto();
-////            if (productoSeleccionado == null && !codigoProducto.trim().isEmpty()) {
-////                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No se encontro el producto"));
-////            }
-//        } else {
-//            productoSeleccionado = null;
-//            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "No ha determinado la empresa"));
-//        }
-//
-//    }
     public void cargarInformacionProducto() {
         if (productoSeleccionado != null) {
             setMarcaSeleccionada(productoSeleccionado.getCfgmarcaproductoidMarca());
-            setReferenciaSeleccionada(marcaSeleccionada.getCfgreferenciaproductoidReferencia());
-            setCategoriaSeleccionada(referenciaSeleccionada.getCfgcategoriaproductoidCategoria());
+            setReferenciaSeleccionada(productoSeleccionado.getCfgreferenciaproductoidReferencia());
+            setCategoriaSeleccionada(productoSeleccionado.getCfgcategoriaproductoidCategoria());
             setCodigoProducto(productoSeleccionado.getCodProducto());
             setCodigoBarra(productoSeleccionado.getCodBarProducto());
             setIdcolor(productoSeleccionado.getCfgColorIdColor().getIdColor());
@@ -372,6 +339,8 @@ public class ProductoMB implements Serializable {
         try {
             CfgProducto producto = new CfgProducto();
             producto.setCodProducto(codigoProducto.toUpperCase());
+            producto.setCfgcategoriaproductoidCategoria(categoriaSeleccionada);
+            producto.setCfgreferenciaproductoidReferencia(referenciaSeleccionada);
             producto.setCfgmarcaproductoidMarca(marcaSeleccionada);
             producto.setNomProducto(nombreProducto.toUpperCase());
             producto.setCodBarProducto(codigoBarra.toUpperCase());
@@ -440,8 +409,8 @@ public class ProductoMB implements Serializable {
 
     private String generarCodigoInterno(CfgProducto producto) {
         CfgMarcaproducto marca = producto.getCfgmarcaproductoidMarca();
-        CfgReferenciaproducto referencia = marca.getCfgreferenciaproductoidReferencia();
-        CfgCategoriaproducto categoria = referencia.getCfgcategoriaproductoidCategoria();
+        CfgReferenciaproducto referencia = producto.getCfgreferenciaproductoidReferencia();
+        CfgCategoriaproducto categoria = producto.getCfgcategoriaproductoidCategoria();
         String aux;
         if (marca != null && referencia != null && categoria != null) {
             aux = categoria.getCodigoCategoria() + referencia.getCodigoReferencia() + marca.getCodigoMarca() + producto.getIdProducto();
@@ -465,6 +434,15 @@ public class ProductoMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
             return false;
         }
+        if (categoriaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la categoria del producto"));
+            return false;
+        }
+        if (referenciaSeleccionada == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la referencia del producto"));
+            return false;
+        }
+
         if (marcaSeleccionada == null) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Determine la marca del producto"));
             return false;
