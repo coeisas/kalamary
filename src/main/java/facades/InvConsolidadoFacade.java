@@ -62,4 +62,14 @@ public class InvConsolidadoFacade extends AbstractFacade<InvConsolidado> {
             return null;
         }
     }
+
+    public List<CfgProducto> findIdProductosBySedeWithExistencia(CfgEmpresasede sede) {
+        try {
+            Query query = em.createQuery("SELECT i.cfgProducto FROM InvConsolidado i WHERE i.cfgEmpresasede = ?1 AND i.existencia > 0", CfgProducto.class);
+            query.setParameter(1, sede);
+            return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

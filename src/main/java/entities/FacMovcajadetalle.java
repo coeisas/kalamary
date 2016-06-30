@@ -17,8 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -34,19 +32,16 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "FacMovcajadetalle.findByFacdocumentosmastercfgdocumentoidDoc", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.facdocumentosmastercfgdocumentoidDoc = :facdocumentosmastercfgdocumentoidDoc"),
     @NamedQuery(name = "FacMovcajadetalle.findByFacdocumentosmasternumDocumento", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.facdocumentosmasternumDocumento = :facdocumentosmasternumDocumento"),
     @NamedQuery(name = "FacMovcajadetalle.findByCfgformapagoidFormaPago", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.cfgformapagoidFormaPago = :cfgformapagoidFormaPago"),
-    @NamedQuery(name = "FacMovcajadetalle.findByValor", query = "SELECT f FROM FacMovcajadetalle f WHERE f.valor = :valor"),
-    @NamedQuery(name = "FacMovcajadetalle.findByFecha", query = "SELECT f FROM FacMovcajadetalle f WHERE f.fecha = :fecha")})
+    @NamedQuery(name = "FacMovcajadetalle.findByFecha", query = "SELECT f FROM FacMovcajadetalle f WHERE f.facMovcajadetallePK.fecha = :fecha"),
+    @NamedQuery(name = "FacMovcajadetalle.findByValor", query = "SELECT f FROM FacMovcajadetalle f WHERE f.valor = :valor")})
 public class FacMovcajadetalle implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacMovcajadetallePK facMovcajadetallePK;
     @Basic(optional = false)
     @Column(name = "valor", nullable = false)
     private float valor;
-    @Basic(optional = false)
-    @Column(name = "fecha", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
     @JoinColumn(name = "cfg_formapago_idFormaPago", referencedColumnName = "idFormaPago", nullable = false, insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private CfgFormapago cfgFormapago;
@@ -66,14 +61,13 @@ public class FacMovcajadetalle implements Serializable {
         this.facMovcajadetallePK = facMovcajadetallePK;
     }
 
-    public FacMovcajadetalle(FacMovcajadetallePK facMovcajadetallePK, float valor, Date fecha) {
+    public FacMovcajadetalle(FacMovcajadetallePK facMovcajadetallePK, float valor) {
         this.facMovcajadetallePK = facMovcajadetallePK;
         this.valor = valor;
-        this.fecha = fecha;
     }
 
-    public FacMovcajadetalle(int facmovcajaidMovimiento, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento, int cfgformapagoidFormaPago) {
-        this.facMovcajadetallePK = new FacMovcajadetallePK(facmovcajaidMovimiento, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento, cfgformapagoidFormaPago);
+    public FacMovcajadetalle(int facmovcajaidMovimiento, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento, int cfgformapagoidFormaPago, Date fecha) {
+        this.facMovcajadetallePK = new FacMovcajadetallePK(facmovcajaidMovimiento, facdocumentosmastercfgdocumentoidDoc, facdocumentosmasternumDocumento, cfgformapagoidFormaPago, fecha);
     }
 
     public FacMovcajadetallePK getFacMovcajadetallePK() {
@@ -90,14 +84,6 @@ public class FacMovcajadetalle implements Serializable {
 
     public void setValor(float valor) {
         this.valor = valor;
-    }
-
-    public Date getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
     }
 
     public CfgFormapago getCfgFormapago() {

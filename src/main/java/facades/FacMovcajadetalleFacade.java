@@ -7,6 +7,7 @@ package facades;
 
 import entities.CfgCliente;
 import entities.CfgEmpresasede;
+import entities.FacDocumentosmaster;
 import entities.FacMovcaja;
 import entities.FacMovcajadetalle;
 import entities.SegUsuario;
@@ -16,6 +17,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -61,18 +63,18 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
             Query query;
             String consulta = "SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja.faccajaidCaja.cfgempresasedeidSede = ?1";
             if (fechaInicial != null) {
-                consulta = consulta.concat(" AND mcd.fecha >= ?2");
+                consulta = consulta.concat(" AND mcd.facMovcajadetallePK.fecha >= ?2");
             }
             if (fechaFinal != null) {
-                consulta = consulta.concat(" AND mcd.fecha <= ?3");
+                consulta = consulta.concat(" AND mcd.facMovcajadetallePK.fecha <= ?3");
             }
             if (cliente != null) {
                 consulta = consulta.concat(" AND mcd.facDocumentosmaster.cfgclienteidCliente = ?4");
             }
-            if(usuario != null){
+            if (usuario != null) {
                 consulta = consulta.concat(" AND (mcd.facDocumentosmaster.segusuarioidUsuario1 = ?5 AND mcd.facDocumentosmaster.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion IN ('2', '9'))");
             }
-            consulta = consulta.concat(" ORDER BY mcd.fecha");
+            consulta = consulta.concat(" ORDER BY mcd.facMovcajadetallePK.fecha");
             query = em.createQuery(consulta);
 //            query = em.createQuery("SELECT mcd FROM FacMovcajadetalle mcd WHERE mcd.facMovcaja.faccajaidCaja.cfgempresasedeidSede = ?1 AND mcd.fecha >= ?2 AND mcd.fecha <= ?3 AND mcd.facDocumentosmaster.cfgclienteidCliente = ?4 AND (mcd.facDocumentosmaster.segusuarioidUsuario1 = ?5 AND mcd.facDocumentosmaster.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion IN ('2', '9')) ORDER BY mcd.fecha");
             query.setParameter(1, sede);
@@ -85,10 +87,23 @@ public class FacMovcajadetalleFacade extends AbstractFacade<FacMovcajadetalle> {
             if (cliente != null) {
                 query.setParameter(4, cliente);
             }
-            if(usuario != null){
+            if (usuario != null) {
                 query.setParameter(5, usuario);
-            }            
+            }
             return query.getResultList();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //usado en anular factura
+    public FacMovcaja findByDocumentoMaestro(FacDocumentosmaster docmaestro) {
+        try {
+            Query query = em.createQuery("SELECT fmd.facMovcaja FROM FacMovcajadetalle fmd WHERE fmd.facDocumentosmaster = ?1", FacMovcaja.class);
+            query.setParameter(1, docmaestro);
+            query.setMaxResults(1);
+            FacMovcaja fmc = (FacMovcaja) query.getSingleResult();
+            return fmc;
         } catch (Exception e) {
             return null;
         }

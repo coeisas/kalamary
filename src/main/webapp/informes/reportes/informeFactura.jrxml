@@ -14,6 +14,21 @@
 	<field name="utilidad" class="java.lang.Float"/>
 	<field name="tipoPago" class="java.lang.String"/>
 	<field name="vendedor" class="java.lang.String"/>
+	<variable name="subtotal_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+	</variable>
+	<variable name="descuento_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{descuento}]]></variableExpression>
+	</variable>
+	<variable name="impuesto_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{impuesto}]]></variableExpression>
+	</variable>
+	<variable name="total_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<variable name="utilidad_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{utilidad}]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -185,4 +200,88 @@
 			</textField>
 		</band>
 	</pageFooter>
+	<summary>
+		<band height="79">
+			<rectangle>
+				<reportElement x="96" y="39" width="532" height="40" uuid="0aed260b-96de-426b-860f-dd1577de1dc0"/>
+			</rectangle>
+			<textField pattern="¤ #,##0">
+				<reportElement x="108" y="59" width="100" height="20" uuid="0d13d43c-22aa-4b3a-bce4-e6a1573d3331"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{subtotal_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="213" y="59" width="100" height="20" uuid="6729440e-cd12-4702-b0e6-db02e4203ee6"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{descuento_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="318" y="59" width="100" height="20" uuid="41f3bebe-4c88-454e-be97-a3ad043a11bd"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{impuesto_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="423" y="59" width="100" height="20" uuid="3bc419b1-8215-44e6-ba56-ac02d5ab385a"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{total_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤ #,##0">
+				<reportElement x="528" y="59" width="100" height="20" uuid="0d04505b-4933-47da-a781-39e203d4bcd6"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{utilidad_1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="108" y="39" width="100" height="20" uuid="b6115123-d9f7-4a1a-bfb6-6ac544f4b6a7"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SUBTOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="213" y="39" width="100" height="20" uuid="2730fe9e-36a5-4fe8-b79d-aae3d40b2090"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DESCUENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="318" y="39" width="100" height="20" uuid="2b2eb14e-306d-47cf-af13-6b4f090fd1fc"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[IMPUESTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="423" y="39" width="100" height="20" uuid="52540532-705f-4838-ba44-bbc5da3d7d65"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="528" y="39" width="100" height="20" uuid="0a8cd5b9-4479-46e9-b736-05e9880f8d06"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[UTILIDAD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="19" width="752" height="20" uuid="a6eb9ce4-4ed1-48ed-85e1-0b4a7ae81c04"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="false"/>
+				</textElement>
+				<text><![CDATA[TOTALES]]></text>
+			</staticText>
+		</band>
+	</summary>
 </jasperReport>

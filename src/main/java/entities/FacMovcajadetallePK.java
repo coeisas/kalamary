@@ -6,9 +6,12 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -16,6 +19,7 @@ import javax.persistence.Embeddable;
  */
 @Embeddable
 public class FacMovcajadetallePK implements Serializable {
+
     @Basic(optional = false)
     @Column(name = "fac_movcaja_idMovimiento", nullable = false)
     private int facmovcajaidMovimiento;
@@ -28,15 +32,20 @@ public class FacMovcajadetallePK implements Serializable {
     @Basic(optional = false)
     @Column(name = "cfg_formapago_idFormaPago", nullable = false)
     private int cfgformapagoidFormaPago;
+    @Basic(optional = false)
+    @Column(name = "fecha", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fecha;
 
     public FacMovcajadetallePK() {
     }
 
-    public FacMovcajadetallePK(int facmovcajaidMovimiento, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento, int cfgformapagoidFormaPago) {
+    public FacMovcajadetallePK(int facmovcajaidMovimiento, int facdocumentosmastercfgdocumentoidDoc, int facdocumentosmasternumDocumento, int cfgformapagoidFormaPago, Date fecha) {
         this.facmovcajaidMovimiento = facmovcajaidMovimiento;
         this.facdocumentosmastercfgdocumentoidDoc = facdocumentosmastercfgdocumentoidDoc;
         this.facdocumentosmasternumDocumento = facdocumentosmasternumDocumento;
         this.cfgformapagoidFormaPago = cfgformapagoidFormaPago;
+        this.fecha = fecha;
     }
 
     public int getFacmovcajaidMovimiento() {
@@ -71,6 +80,14 @@ public class FacMovcajadetallePK implements Serializable {
         this.cfgformapagoidFormaPago = cfgformapagoidFormaPago;
     }
 
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -78,6 +95,7 @@ public class FacMovcajadetallePK implements Serializable {
         hash += (int) facdocumentosmastercfgdocumentoidDoc;
         hash += (int) facdocumentosmasternumDocumento;
         hash += (int) cfgformapagoidFormaPago;
+        hash += (fecha != null ? fecha.hashCode() : 0);
         return hash;
     }
 
@@ -100,12 +118,15 @@ public class FacMovcajadetallePK implements Serializable {
         if (this.cfgformapagoidFormaPago != other.cfgformapagoidFormaPago) {
             return false;
         }
+        if ((this.fecha == null && other.fecha != null) || (this.fecha != null && !this.fecha.equals(other.fecha))) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-        return "entities.FacMovcajadetallePK[ facmovcajaidMovimiento=" + facmovcajaidMovimiento + ", facdocumentosmastercfgdocumentoidDoc=" + facdocumentosmastercfgdocumentoidDoc + ", facdocumentosmasternumDocumento=" + facdocumentosmasternumDocumento + ", cfgformapagoidFormaPago=" + cfgformapagoidFormaPago + " ]";
+        return "entities.FacMovcajadetallePK[ facmovcajaidMovimiento=" + facmovcajaidMovimiento + ", facdocumentosmastercfgdocumentoidDoc=" + facdocumentosmastercfgdocumentoidDoc + ", facdocumentosmasternumDocumento=" + facdocumentosmasternumDocumento + ", cfgformapagoidFormaPago=" + cfgformapagoidFormaPago + ", fecha=" + fecha + " ]";
     }
     
 }

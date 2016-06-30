@@ -9,6 +9,9 @@
 	<field name="protagonista" class="java.lang.String"/>
 	<field name="valor" class="java.lang.Float"/>
 	<field name="formaPago" class="java.lang.String"/>
+	<variable name="valor_1" class="java.lang.Float" calculation="Sum">
+		<variableExpression><![CDATA[$F{valor}]]></variableExpression>
+	</variable>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -112,4 +115,25 @@
 			</textField>
 		</band>
 	</pageFooter>
+	<summary>
+		<band height="21">
+			<textField pattern="¤ #,##0">
+				<reportElement x="386" y="1" width="186" height="20" uuid="e29fd212-b4f7-4eb0-95dd-acbb89fbfbd6"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{valor_1}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="572" height="1" uuid="f17505d6-fd1f-4c12-a457-506ffc883768"/>
+			</line>
+			<staticText>
+				<reportElement x="281" y="1" width="100" height="20" uuid="64ddd83b-4e5d-4d4a-8413-c201abf171b7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL: ]]></text>
+			</staticText>
+		</band>
+	</summary>
 </jasperReport>

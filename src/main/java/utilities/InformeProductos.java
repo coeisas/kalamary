@@ -17,6 +17,9 @@ public class InformeProductos {
     String marca;
     String color;
     String talla;
+    int existencia;
+    float costo;
+    float valor;
     float precio;
     boolean esServicio;
     boolean esKit;
@@ -81,6 +84,30 @@ public class InformeProductos {
         this.talla = talla;
     }
 
+    public int getExistencia() {
+        return existencia;
+    }
+
+    public void setExistencia(int existencia) {
+        this.existencia = existencia;
+    }
+
+    public float getCosto() {
+        return costo;
+    }
+
+    public void setCosto(float costo) {
+        this.costo = costo;
+    }
+
+    public float getValor() {
+        return valor;
+    }
+
+    public void setValor(float valor) {
+        this.valor = valor;
+    }
+    
     public float getPrecio() {
         return precio;
     }

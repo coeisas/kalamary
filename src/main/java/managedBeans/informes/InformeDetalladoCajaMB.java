@@ -203,7 +203,7 @@ public class InformeDetalladoCajaMB implements Serializable {
         List<InformeDetalladoCaja> lista = new ArrayList();
         for (FacMovcajadetalle fm : movcajadetalles) {
             InformeDetalladoCaja informeDetalladoCaja = new InformeDetalladoCaja();
-            informeDetalladoCaja.setFechaRegistro(fm.getFecha());
+            informeDetalladoCaja.setFechaRegistro(fm.getFacMovcajadetallePK().getFecha());
             informeDetalladoCaja.setNumDocumento(fm.getFacDocumentosmaster().determinarNumFactura());
             CfgCliente cliente = fm.getFacDocumentosmaster().getCfgclienteidCliente();
             if (cliente != null) {

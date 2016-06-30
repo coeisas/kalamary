@@ -40,12 +40,14 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "FacDocumentosmaster.findByNumDocumento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.facDocumentosmasterPK.numDocumento = :numDocumento"),
     @NamedQuery(name = "FacDocumentosmaster.findByTotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.total = :total"),
     @NamedQuery(name = "FacDocumentosmaster.findByFecCrea", query = "SELECT f FROM FacDocumentosmaster f WHERE f.fecCrea = :fecCrea"),
+    @NamedQuery(name = "FacDocumentosmaster.findByFecAnul", query = "SELECT f FROM FacDocumentosmaster f WHERE f.fecAnul = :fecAnul"),
     @NamedQuery(name = "FacDocumentosmaster.findByEstado", query = "SELECT f FROM FacDocumentosmaster f WHERE f.estado = :estado"),
     @NamedQuery(name = "FacDocumentosmaster.findByTotalUSD", query = "SELECT f FROM FacDocumentosmaster f WHERE f.totalUSD = :totalUSD"),
     @NamedQuery(name = "FacDocumentosmaster.findBySubtotal", query = "SELECT f FROM FacDocumentosmaster f WHERE f.subtotal = :subtotal"),
     @NamedQuery(name = "FacDocumentosmaster.findByDescuento", query = "SELECT f FROM FacDocumentosmaster f WHERE f.descuento = :descuento"),
     @NamedQuery(name = "FacDocumentosmaster.findByUtilidad", query = "SELECT f FROM FacDocumentosmaster f WHERE f.utilidad = :utilidad")})
 public class FacDocumentosmaster implements Serializable {
+    
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected FacDocumentosmasterPK facDocumentosmasterPK;
@@ -59,7 +61,10 @@ public class FacDocumentosmaster implements Serializable {
     @Column(name = "fecCrea", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecCrea;
-    @Column(name = "estado", length = 10)
+    @Column(name = "fecAnul")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fecAnul;    
+    @Column(name = "estado", length = 10)    
     private String estado;
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "totalUSD", precision = 12)
@@ -160,6 +165,14 @@ public class FacDocumentosmaster implements Serializable {
     public void setFecCrea(Date fecCrea) {
         this.fecCrea = fecCrea;
     }
+    
+    public Date getFecAnul() {
+        return fecAnul;
+    }
+
+    public void setFecAnul(Date fecAnul) {
+        this.fecAnul = fecAnul;
+    }    
 
     public String getEstado() {
         return estado;

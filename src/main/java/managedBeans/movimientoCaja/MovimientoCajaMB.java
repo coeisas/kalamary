@@ -386,11 +386,10 @@ public class MovimientoCajaMB implements Serializable {
 
             //SE CREA EL MOVIMIENTO DE CAJA
             FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
-            movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentoMaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentoMaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getIdFormaPago()));
+            movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentoMaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentoMaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getIdFormaPago(), new Date()));
             movcajadetalle.setFacMovcaja(movimientoCajaMaster);
             movcajadetalle.setFacDocumentosmaster(documentoMaster);
             movcajadetalle.setCfgFormapago(formapago);
-            movcajadetalle.setFecha(new Date());
             if (idMovimientoCaja == 1) {
                 movcajadetalle.setValor(valor);
             } else {

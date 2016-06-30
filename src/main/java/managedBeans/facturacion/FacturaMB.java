@@ -1018,11 +1018,10 @@ public class FacturaMB implements Serializable {
         try {
             for (FacDocuementopago formapago : listaformapago) {
                 FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
-                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago()));
+                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago(), new Date()));
                 movcajadetalle.setFacMovcaja(movimientoCajaMaster);
                 movcajadetalle.setFacDocumentosmaster(documentosmaster);
                 movcajadetalle.setCfgFormapago(formapago.getCfgFormapago());
-                movcajadetalle.setFecha(new Date());
                 movcajadetalle.setValor(formapago.getValorPago());
                 movcajadetalleFacade.create(movcajadetalle);
             }
@@ -1073,11 +1072,10 @@ public class FacturaMB implements Serializable {
             }
             for (FacDocuementopago formapago : listaformapago) {
                 FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
-                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago()));
+                movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documento.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documento.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago(), new Date()));
                 movcajadetalle.setFacMovcaja(movimientoCajaMaster);
                 movcajadetalle.setFacDocumentosmaster(documento);
                 movcajadetalle.setCfgFormapago(formapago.getCfgFormapago());
-                movcajadetalle.setFecha(new Date());
                 movcajadetalle.setValor(formapago.getValorPago());
                 movcajadetalleFacade.create(movcajadetalle);
             }

@@ -470,11 +470,10 @@ public class AbonoMB implements Serializable {
 
                     //REGISTRAMOS EL MOVIMIENTO DE CADA FORMA DE PAGO EN LOS MOVIMIENTOS DE LA CAJA
                     FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
-                    movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getIdFormaPago()));
+                    movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentosmaster.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentosmaster.getFacDocumentosmasterPK().getNumDocumento(), formapago.getIdFormaPago(), new Date()));
                     movcajadetalle.setFacMovcaja(movimientoCajaMaster);
                     movcajadetalle.setFacDocumentosmaster(documentosmaster);
                     movcajadetalle.setCfgFormapago(formapago);
-                    movcajadetalle.setFecha(new Date());
                     movcajadetalle.setValor(formapago.getSubtotal());
                     movcajadetalleFacade.create(movcajadetalle);
                 }

@@ -15,10 +15,14 @@ import entities.CfgMovInventarioDetalle;
 import entities.CfgMovInventarioMaestro;
 import entities.CfgProducto;
 import entities.CntMovdetalle;
+import entities.FacCaja;
 import entities.FacDocuementopago;
 import entities.FacDocumentodetalle;
 import entities.FacDocumentoimpuesto;
 import entities.FacDocumentosmaster;
+import entities.FacMovcaja;
+import entities.FacMovcajadetalle;
+import entities.FacMovcajadetallePK;
 import entities.InvConsolidado;
 import entities.InvMovimiento;
 import entities.InvMovimientoDetalle;
@@ -35,6 +39,8 @@ import facades.FacDocuementopagoFacade;
 import facades.FacDocumentodetalleFacade;
 import facades.FacDocumentoimpuestoFacade;
 import facades.FacDocumentosmasterFacade;
+import facades.FacMovcajaFacade;
+import facades.FacMovcajadetalleFacade;
 import facades.InvConsolidadoFacade;
 import facades.InvMovimientoDetalleFacade;
 import facades.InvMovimientoFacade;
@@ -112,6 +118,8 @@ public class ListadoFacturaMB implements Serializable {
     private SegUsuario usuarioActual;
     private FacDocumentosmaster documentoSeleccionado;
 
+    private SesionMB sesionMB;
+
     @EJB
     CfgClienteFacade clienteFacade;
     @EJB
@@ -138,6 +146,10 @@ public class ListadoFacturaMB implements Serializable {
     InvMovimientoDetalleFacade inventarioMovimientoDetalleFacade;
     @EJB
     CntMovdetalleFacade cntMovdetalleFacade;
+    @EJB
+    FacMovcajaFacade movcajamaestroFacade;
+    @EJB
+    FacMovcajadetalleFacade movcajadetalleFacade;
 
     public ListadoFacturaMB() {
     }
@@ -145,7 +157,7 @@ public class ListadoFacturaMB implements Serializable {
     @PostConstruct
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
-        SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
+        sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         if (sesionMB.getSedeActual() != null) {
             sedeActual = sesionMB.getSedeActual();
@@ -429,6 +441,17 @@ public class ListadoFacturaMB implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No tiene permisos para efectuar esta accion"));
                 return;
             }
+            FacMovcaja movimientoCajaMaster = null;
+            Date fechaFactura = documentoSeleccionado.getFecCrea();
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(fechaFactura);
+            cal.add(Calendar.SECOND, 5);
+            Date fechaMovimiento = cal.getTime();
+            movimientoCajaMaster = movcajadetalleFacade.findByDocumentoMaestro(documentoSeleccionado);
+            if (movimientoCajaMaster == null) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se pudo encontrar información de esta factura en los movimientos de caja"));
+                return;
+            }
             CfgDocumento documentoEntradaInventario = documentoFacade.buscarDocumentoInventarioEntradaBySede(sedeActual);
             if (documentoEntradaInventario == null) {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro un documento de entrada de inventario vigente"));
@@ -436,6 +459,7 @@ public class ListadoFacturaMB implements Serializable {
             }
             try {
                 documentoSeleccionado.setEstado("ANULADA");
+                documentoSeleccionado.setFecAnul(new Date());
                 documentosmasterFacade.edit(documentoSeleccionado);
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Factura anulada"));
                 listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
@@ -468,6 +492,17 @@ public class ListadoFacturaMB implements Serializable {
                     inventarioConsolidado.setEntradas(inventarioConsolidado.getEntradas() + auxilarMovInventario.getCantidad());
                     consolidadoInventarioFacade.edit(inventarioConsolidado);
                 }
+                //CREAR MOVIMIENTOS DE CAJA INVERSOS A LAS FORMAS DE PAGO APLICADOS EN LA FACTURA
+                List<FacDocuementopago> listaformapago = docuementopagoFacade.buscarByDocumentoMaster(documentoSeleccionado);
+                for (FacDocuementopago formapago : listaformapago) {
+                    FacMovcajadetalle movcajadetalle = new FacMovcajadetalle();
+                    movcajadetalle.setFacMovcajadetallePK(new FacMovcajadetallePK(movimientoCajaMaster.getIdMovimiento(), documentoSeleccionado.getFacDocumentosmasterPK().getCfgdocumentoidDoc(), documentoSeleccionado.getFacDocumentosmasterPK().getNumDocumento(), formapago.getFacDocuementopagoPK().getCfgformapagoidFormaPago(), fechaMovimiento));
+                    movcajadetalle.setFacMovcaja(movimientoCajaMaster);
+                    movcajadetalle.setFacDocumentosmaster(documentoSeleccionado);
+                    movcajadetalle.setCfgFormapago(formapago.getCfgFormapago());
+                    movcajadetalle.setValor(formapago.getValorPago() * (-1f));
+                    movcajadetalleFacade.create(movcajadetalle);
+                }
                 //MODIFICAR LA INFORMACION DE CONTABILIDAD DE FACTURA ANULADA
                 List<CntMovdetalle> listaCntMovdetalle = cntMovdetalleFacade.buscarPorDocumentoMaster(documentoSeleccionado);
                 float vlr = 0;
@@ -490,7 +525,7 @@ public class ListadoFacturaMB implements Serializable {
                         cm.setCredito(0f);
                         cm.setDebito(vlr);
                         tot = cm.getDebito() - cm.getCredito();
-                        cm.setTotal(tot);                        
+                        cm.setTotal(tot);
                         cntMovdetalleFacade.edit(cm);
                     }
                 }
