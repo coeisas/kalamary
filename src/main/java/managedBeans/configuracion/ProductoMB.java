@@ -169,6 +169,24 @@ public class ProductoMB implements Serializable {
         nombreArchivo = null;
     }
 
+    public void reloadCategoriaReferenciaAndMarca() {
+        int count = categoriaFacade.totalCategoriaPorEmpresa(empresaSeleccionada);
+        if (count > listaCategoria.size()) {
+            listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
+            RequestContext.getCurrentInstance().update("FormModalCategoria");
+        }
+        count = referenciaFacade.totalReferenciaPorEmpresa(empresaSeleccionada);
+        if (count > listaReferencia.size()) {
+            listaReferencia = referenciaFacade.buscarPorEmpresa(empresaSeleccionada);
+            RequestContext.getCurrentInstance().update("FormModalReferencia");
+        }
+        count = marcaFacade.totalMarcaPorEmpresa(empresaSeleccionada);
+        if (count > listaMarca.size()) {
+            listaMarca = marcaFacade.buscarPorEmpresa(empresaSeleccionada);
+            RequestContext.getCurrentInstance().update("FormModalMarca");
+        }
+    }
+
     public void cargarInformacionCategoria() {
         RequestContext.getCurrentInstance().update("FormModalReferencia");
         RequestContext.getCurrentInstance().update("IdFormProducto");
@@ -503,8 +521,6 @@ public class ProductoMB implements Serializable {
         referenciaSeleccionada = null;
         categoriaSeleccionada = null;
         productoSeleccionado = null;
-        listaMarca.clear();
-        listaReferencia.clear();
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
 

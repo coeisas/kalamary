@@ -64,6 +64,16 @@ public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
         }
     }
 
+    public int totalMarcaPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT COUNT(m.idMarca) FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     public CfgMarcaproducto buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
         try {
             Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1 AND m.codigoMarca LIKE ?2");
@@ -74,7 +84,7 @@ public class CfgMarcaproductoFacade extends AbstractFacade<CfgMarcaproducto> {
             return null;
         }
     }
-    
+
     public CfgMarcaproducto buscarPorEmpresaReferenciaAndCodigo(CfgEmpresa empresa, CfgReferenciaproducto referencia, String codigo) {
         try {
             Query query = em.createQuery("SELECT m FROM CfgMarcaproducto m WHERE m.cfgempresaidEmpresa = ?1 AND m.cfgreferenciaproductoidReferencia = ?2 AND m.codigoMarca LIKE ?3");

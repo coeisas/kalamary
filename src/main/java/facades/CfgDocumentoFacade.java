@@ -55,7 +55,7 @@ public class CfgDocumentoFacade extends AbstractFacade<CfgDocumento> {
 
     public CfgDocumento buscarAplicacionDocumentoPorSede(CfgEmpresasede sede, int idaplicacion) {
         try {
-            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.idaplicacion = ?2 AND d.finalizado =  FALSE");
+            Query query = em.createQuery("SELECT d FROM CfgDocumento d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgAplicaciondocumentoIdaplicacion.idaplicacion = ?2 AND (d.finalizado =  FALSE OR d.activo = TRUE)");
             query.setParameter(1, sede);
             query.setParameter(2, idaplicacion);
             return (CfgDocumento) query.getSingleResult();

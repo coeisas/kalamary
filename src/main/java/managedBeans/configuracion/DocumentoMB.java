@@ -16,6 +16,7 @@ import facades.CfgDocumentoFacade;
 import facades.CfgEmpresaFacade;
 import facades.CfgEmpresasedeFacade;
 import facades.CfgTipoempresaFacade;
+import facades.FacDocumentosmasterFacade;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.ejb.EJB;
@@ -75,6 +76,9 @@ public class DocumentoMB implements Serializable {
 
     @EJB
     CfgAplicaciondocumentoFacade aplicaciondocumentoFacade;
+
+    @EJB
+    FacDocumentosmasterFacade documentosmasterFacade;
 
     public DocumentoMB() {
     }
@@ -158,6 +162,7 @@ public class DocumentoMB implements Serializable {
         setRangoFinal(0);
         setNumActual(0);
         setResDian(null);
+        setAplicacion(0);
         setObservacion(null);
     }
 
@@ -180,10 +185,8 @@ public class DocumentoMB implements Serializable {
                 if (documentoSeleccionado != null) {
                     if (!documentoSeleccionado.equals(cfgDocumento)) {
                         aplicacionValidada = false;
+                        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Aplicacion ya implementada por el documento " + cfgDocumento.getNomDoc()));
                     }
-                } else {
-                    aplicacionValidada = false;
-                    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Aplicacion ya implementada por el documento " + cfgDocumento.getNomDoc()));
                 }
             }
         }
@@ -288,9 +291,21 @@ public class DocumentoMB implements Serializable {
             return;
         }
         if (documentoSeleccionado.getFinalizado()) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "El documento se encuentra finalizado"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "El documento se encuentra finalizado. Debe crear uno nuevo"));
             return;
         }
+        int aplicacionActual = documentoSeleccionado.getCfgAplicaciondocumentoIdaplicacion() == null ? 0 : documentoSeleccionado.getCfgAplicaciondocumentoIdaplicacion().getIdaplicacion();
+        int rangoIncialActual = documentoSeleccionado.getIniDocumento();
+        int rangoFinalActual = documentoSeleccionado.getFinDocumento();
+        int totalCreados = documentosmasterFacade.totalDocumentosPorAplicacionAndRango(documentoSeleccionado.getIdDoc(), rangoInicial, rangoFinal);
+        if (aplicacionActual != aplicacion || (rangoIncialActual != rangoInicial || rangoFinalActual != rangoFinal)) {
+            //SE VALIDA QUE EL RANGO ESTE LIBRE. NO HAY DOCUKENTOSMASTER CREADOS
+            if (totalCreados > 0) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Informacion", "Ya existen elementos creados dentro del rango"));
+                return;
+            }
+            documentoSeleccionado.setActDocumento(0);
+        } 
         try {
             CfgTipoempresa tipoempresa = tipoempresaFacade.find(tipoEmpresa);
             documentoSeleccionado.setCfgTipoempresaId(tipoempresa);

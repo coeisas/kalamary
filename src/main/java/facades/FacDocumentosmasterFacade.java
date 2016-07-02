@@ -327,7 +327,7 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             if (cliente != null) {
                 consulta = consulta.concat(" AND d.cfgclienteidCliente = ?4");
             }
-            if(numSeparado > 0){
+            if (numSeparado > 0) {
                 consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?5");
             }
             consulta = consulta.concat(" ORDER BY d.fecCrea, d.facDocumentosmasterPK");
@@ -342,12 +342,24 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
             if (cliente != null) {
                 query.setParameter(4, cliente);
             }
-            if(numSeparado > 0){
+            if (numSeparado > 0) {
                 query.setParameter(5, numSeparado);
             }
             return query.getResultList();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public int totalDocumentosPorAplicacionAndRango(int idDoc, int ini, int fin) {
+        try {
+            Query query = em.createQuery("SELECT COUNT(d.facDocumentosmasterPK) FROM FacDocumentosmaster d WHERE d.facDocumentosmasterPK.cfgdocumentoidDoc = ?1 AND d.facDocumentosmasterPK.numDocumento >= ?2 AND d.facDocumentosmasterPK.numDocumento <= ?3");
+            query.setParameter(1, idDoc);
+            query.setParameter(2, ini);
+            query.setParameter(3, fin);
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
         }
     }
 }

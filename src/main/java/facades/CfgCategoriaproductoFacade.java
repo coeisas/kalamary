@@ -31,6 +31,16 @@ public class CfgCategoriaproductoFacade extends AbstractFacade<CfgCategoriaprodu
     public CfgCategoriaproductoFacade() {
         super(CfgCategoriaproducto.class);
     }
+    
+    public int totalCategoriaPorEmpresa(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT COUNT(c.idCategoria) FROM CfgCategoriaproducto c WHERE c.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return Integer.parseInt(query.getSingleResult().toString());
+        } catch (Exception e) {
+            return 0;
+        }
+    }
 
     public List<CfgCategoriaproducto> buscarPorEmpresa(CfgEmpresa empresa) {
         try {

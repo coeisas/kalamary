@@ -525,6 +525,7 @@ public class MovimientoInventarioMB implements Serializable {
         if (documento.getFinDocumento() < documento.getActDocumento()) {
             if (!documento.getFinalizado()) {//si el documento se finaliza si aun no lo esta
                 documento.setFinalizado(true);
+                documento.setActivo(false);
                 documentoFacade.edit(documento);
             }
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Ha llegado al limite de creacion de este tipo de movimiento. Revice la configuracion de documentos"));
@@ -552,6 +553,7 @@ public class MovimientoInventarioMB implements Serializable {
             inventarioMovimientoMaestroFacade.create(invMovimientoMaestro);
             if (documento.getActDocumento() >= documento.getFinDocumento()) {//dependiendo de la situacion se finaliza el documento aplicado al movimiento de salida
                 documento.setFinalizado(true);
+                documento.setActivo(false);
             }
             documentoFacade.edit(documento);
 
