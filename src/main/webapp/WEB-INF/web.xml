@@ -6,7 +6,7 @@
     </context-param>
     <context-param>
         <param-name>directory.images</param-name>
-        <param-value>/home/kalamaryImagenes/</param-value>
+        <param-value>C:\kalamaryImagenes\</param-value>
     </context-param>       
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
