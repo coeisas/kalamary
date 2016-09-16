@@ -156,6 +156,8 @@ public class ListadoFacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(2, "ESPECIAL");
             listaTipoFactura.add(aux);
+            aux = new SelectItem(3, "SEPARADO");
+            listaTipoFactura.add(aux);
         }
         fechaIncial = new Date();
         fechaFinal = new Date();
@@ -195,9 +197,11 @@ public class ListadoFacturaMB implements Serializable {
                     CfgDocumento documento;
                     if (tipoFactura == 1) {
                         documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
-                    } else {
+                    } else if (tipoFactura==2){
                         documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
-                    }
+                    }else{
+                            documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
+                     }
                     String aux = documento.getPrefijoDoc();
                     int init = aux.length();
                     if (init < factura.length()) {

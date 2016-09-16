@@ -17,6 +17,7 @@ public class InformeSeparado {
     private String cliente;
     private String telefono;
     private Date fecha;
+    private Date fechaVencimiento;
     private float valor;
     private float abonado;
     private float saldo;
@@ -56,6 +57,14 @@ public class InformeSeparado {
 
     public void setFecha(Date fecha) {
         this.fecha = fecha;
+    }
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
     }
 
     public float getValor() {

@@ -5,6 +5,7 @@
  */
 package managedBeans.facturacion;
 
+import com.google.common.io.Files;
 import entities.CfgCliente;
 import entities.CfgDocumento;
 import entities.CfgEmpresa;
@@ -48,6 +49,7 @@ import facades.InvMovimientoDetalleFacade;
 import facades.InvMovimientoFacade;
 import facades.SegUsuarioFacade;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.faces.bean.ManagedBean;
@@ -105,9 +107,15 @@ public class CotizacionMB implements Serializable {
     private String nombreCliente;
     private float subtotal;
     private float totalDescuento;
+    private float descuentoTotal;
+    private float descuentoTotalValor;
+    private int   tipoDescuentoFactura;
     private float totalFactura;
     private float totalUSD;
+    private Date fechaSeleccionada;
+    private Date fechaVencimiento;
     private String observacion;
+    private String pathRoot;
     private SegUsuario vendedorSeleccionado;
     private LazyDataModel<CfgProducto> listaProducto;
     private List<FacDocumentodetalle> listaDetalle;
@@ -130,7 +138,7 @@ public class CotizacionMB implements Serializable {
     private SegUsuario usuarioActual;
     private FacDocumentosmaster documentoActual;
     private boolean enableBtnPrint;
-
+    private StreamedContent productImage;
     private SesionMB sesionMB;
 
 //--------------------------------------------------------
@@ -213,13 +221,20 @@ public class CotizacionMB implements Serializable {
 
     @PostConstruct
     private void init() {
+        FacesContext context = FacesContext.getCurrentInstance();
         //si es super usuario o admin permitir escoger la empresa y la sede
+        pathRoot = context.getExternalContext().getInitParameter("directory.images");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, 8);
+        fechaVencimiento = calendar.getTime();
+        fechaSeleccionada = fechaVencimiento;
+        descuentoTotal = 0;
         tipoImpresion = 1;
         setEnableBtnPrint(false);
         listaMunicipios = new ArrayList();
         setListaDetalle((List<FacDocumentodetalle>) new ArrayList());
         setListaImpuestos((List<CfgImpuesto>) new ArrayList());
-        FacesContext context = FacesContext.getCurrentInstance();
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         sedeActual = sesionMB.getSedeActual();
@@ -347,10 +362,10 @@ public class CotizacionMB implements Serializable {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se tiene registro de este producto en el inventario"));
                     return;
                 }
-                if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
+                /*if (consolidado.getExistencia() == 0) {//no hay unidades disponibles
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay existencias de este producto"));
                     return;
-                }
+                }*/
             }
             int cantidadPosibleKit = 0;
             if (productoSeleccionado.getEsKit()) {//si el producto es un kit. se busca existencia de cada elemento en el inventario
@@ -417,10 +432,10 @@ public class CotizacionMB implements Serializable {
                 listaDetalle.add(facdetalle);
             } else {
                 int aux = facdetalle.getCantidad() + 1;
-                if (aux > facdetalle.getCantidadPosible()) {
+                /*if (aux > facdetalle.getCantidadPosible()) {
                     FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "La cantidad insertada excede las existencias del producto"));
                     return;
-                }
+                }*/
                 subtotal -= facdetalle.getValorTotal();
                 facdetalle.setCantidad(facdetalle.getCantidad() + 1);
                 facdetalle.setValorTotal(facdetalle.getCantidad() * facdetalle.getValorUnitario());
@@ -507,12 +522,44 @@ public class CotizacionMB implements Serializable {
     public void updateTabla() {
         RequestContext.getCurrentInstance().update("IdFormCotizacion:IdTableItemCotizacion");
     }
+    
+    public void cambio(){
+        descuentoTotal = 0;
+        descuentoTotalValor = 0;
+        RequestContext.getCurrentInstance().update("IdFormCotizacion");
+    }
+    
+    public void aplicarDescuento(){
+        try {
+            descuentoTotal = 0;
+            calcularTotalDescuento();
+            calcularImpuesto();
+            calcularTotalFactura();
+            calcularTotalUSD();
+            if(tipoDescuentoFactura==1){
+                descuentoTotalValor = descuentoTotalValor/10;
+                descuentoTotal = totalFactura * descuentoTotalValor;
+                descuentoTotal  =Redondear(descuentoTotal,0);
+                
+                
+            }else{
+                descuentoTotal = descuentoTotalValor;
+            }
+            calcularTotalDescuento();
+            calcularImpuesto();
+            calcularTotalFactura();
+            calcularTotalUSD();
+            RequestContext.getCurrentInstance().update("IdFormCotizacion");
+        } catch (Exception e) {
+        }
+    }
 
     private void calcularTotalDescuento() {
         totalDescuento = 0;
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
             totalDescuento += documentodetalle.getValorDescuento();
         }
+        totalDescuento = totalDescuento + descuentoTotal;
     }
 
     private void calcularImpuesto() {
@@ -587,6 +634,10 @@ public class CotizacionMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No hay un documento existente ó sin finalizar aplicado a cotizacion"));
             return;
         }
+        if (fechaVencimiento == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Seleccione fecha de vencimiento"));
+            return;
+        }
         if (documento.getActDocumento() == 0) {
             documento.setActDocumento(documento.getIniDocumento());
         } else {
@@ -631,6 +682,7 @@ public class CotizacionMB implements Serializable {
                 documentoimpuestoFacade.create(documentoimpuesto);
             }
             documentoActual = documentosmaster;
+            fechaSeleccionada = fechaVencimiento;
             limpiarFormulario();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Informacion", "Cotizacion " + documentosmaster.determinarNumFactura() + " creada"));
         } catch (Exception e) {
@@ -711,7 +763,7 @@ public class CotizacionMB implements Serializable {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(documento.getFecCrea());
             calendar.add(Calendar.DATE, 8);
-            parametros.put("vencimiento", calendar.getTime());
+            parametros.put("vencimiento", fechaSeleccionada);
             CfgCliente cliente = documento.getCfgclienteidCliente();
             parametros.put("dircli", cliente.getDirCliente());
             parametros.put("telcli", cliente.getTel1());
@@ -743,6 +795,7 @@ public class CotizacionMB implements Serializable {
             facturaDetalleReporte.setNomProducto(detalle.getCfgProducto().getNomProducto());
             facturaDetalleReporte.setValorUnitario(detalle.getValorUnitario());
             facturaDetalleReporte.setValorTotal(detalle.getValorTotal());
+            facturaDetalleReporte.setImagen(pathRoot+detalle.getCfgProducto().getImgProducto());
             String presentacion = "";
             if (detalle.getTipoDescuento() != null && detalle.getTipoDescuento() == 1) {
                 presentacion = "%";
@@ -774,6 +827,12 @@ public class CotizacionMB implements Serializable {
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
+        setDescuentoTotal(0);
+        setDescuentoTotalValor(0);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DATE, 8);
+        fechaVencimiento = calendar.getTime();
         totalUSD = 0;
         setEnableBtnPrint(false);
         RequestContext.getCurrentInstance().update("IdFormCotizacion");
@@ -1369,5 +1428,78 @@ public class CotizacionMB implements Serializable {
     public List<SelectItem> getListaTipoDescuento() {
         return listaTipoDescuento;
     }
+
+    public float getDescuentoTotal() {
+        return descuentoTotal;
+    }
+
+    public void setDescuentoTotal(float descuentoTotal) {
+        this.descuentoTotal = descuentoTotal;
+    }
+
+    public Date getFechaSeleccionada() {
+        return fechaSeleccionada;
+    }
+
+    public void setFechaSeleccionada(Date fechaSeleccionada) {
+        this.fechaSeleccionada = fechaSeleccionada;
+    }
+
+    public Date getFechaVencimiento() {
+        return fechaVencimiento;
+    }
+
+    public void setFechaVencimiento(Date fechaVencimiento) {
+        this.fechaVencimiento = fechaVencimiento;
+    }
+
+    public float getDescuentoTotalValor() {
+        return descuentoTotalValor;
+    }
+
+    public void setDescuentoTotalValor(float descuentoTotalValor) {
+        this.descuentoTotalValor = descuentoTotalValor;
+    }
+
+    public int getTipoDescuentoFactura() {
+        return tipoDescuentoFactura;
+    }
+
+    public void setTipoDescuentoFactura(int tipoDescuentoFactura) {
+        this.tipoDescuentoFactura = tipoDescuentoFactura;
+    }
+
+    public StreamedContent getProductImage() throws IOException{
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {//fase de jsf
+            image = new DefaultStreamedContent();
+            return image;
+        } else {
+        	String id = context.getExternalContext().getRequestParameterMap()
+					.get("pid");
+                String path;
+                if(id!=null){
+                    if(!id.equals(""))
+                        path = pathRoot.concat(id);
+                    else{
+                        path = pathRoot.concat("0.jpg");
+                    }
+                }else{
+                    return null;
+                }
+            File f = new File(path);
+            if(f.isFile()){
+                byte[] data = Files.toByteArray(f);
+                image = new DefaultStreamedContent(new ByteArrayInputStream(data));
+                return image;
+            }else return null;
+        } 
+        
+    }
+
+    public void setProductImage(StreamedContent productImage) {
+        this.productImage = productImage;
+    }
+    
 
 }

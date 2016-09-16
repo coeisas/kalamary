@@ -21,28 +21,28 @@
                 </f:facet>
                 <p:row>
                     <p:column colspan="3">
-                        <p:outputLabel class="labelFormulario" value="Cliente:"/>
-                        <h:inputText class="campoFormulario cajaH" style="width: 300px" readonly="true" value="${listadoFacturaMB.clienteSeleccionado.nombreCompleto()}"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" onclick="PF('dlgCliente').show()"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Cliente:"/>
+                        <h:inputText styleClass="campoFormulario cajaH" style="width: 300px" readonly="true" value="${listadoFacturaMB.clienteSeleccionado.nombreCompleto()}"/>
+                        <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" onclick="PF('dlgCliente').show()"/>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{listadoFacturaMB.tipoFactura}">
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Tipo Factura:"/>
+                        <p:selectOneMenu styleClass="campoFormulario" value="#{listadoFacturaMB.tipoFactura}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{listadoFacturaMB.listaTipoFactura}"/>
                         </p:selectOneMenu>                        
                     </p:column>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Numero Factura:"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Numero Factura:"/>
                         <p:inputText value="#{listadoFacturaMB.factura}"/>
                     </p:column>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Inicial:"/>
-                        <p:calendar class="campoFormulario" value="#{listadoFacturaMB.fechaIncial}" locale="es" timeZone="America/Bogota" navigator="true" pattern="dd/MM/yyyy"/>
-                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
-                        <p:calendar class="campoFormulario" value="#{listadoFacturaMB.fechaFinal}" locale="es" timeZone="America/Bogota" navigator="true" pattern="dd/MM/yyyy"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Inicial:"/>
+                        <p:calendar styleClass="campoFormulario" value="#{listadoFacturaMB.fechaIncial}" locale="es" timeZone="America/Bogota" navigator="true" pattern="dd/MM/yyyy"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar styleClass="campoFormulario" value="#{listadoFacturaMB.fechaFinal}" locale="es" timeZone="America/Bogota" navigator="true" pattern="dd/MM/yyyy"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -111,7 +111,7 @@
         </p:dialog>
         <p:dialog widgetVar="dlgImpresion" modal="true" header="TIPO DE IMPRESION" resizable="false" width="15%">
             <h:form>
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:panelGrid styleClass="panelGridSinBorder" style="margin: 0 auto">
                     <p:row>
                         <p:column>
                             <p:selectOneRadio value="#{listadoFacturaMB.tipoImpresion}">

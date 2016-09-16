@@ -5,6 +5,7 @@
  */
 package managedBeans.configuracion;
 
+import entities.CfgCategoriaproducto;
 import entities.CfgEmpresa;
 import entities.CfgEmpresasede;
 import entities.CfgKitproductodetalle;
@@ -12,6 +13,7 @@ import entities.CfgKitproductodetallePK;
 import entities.CfgKitproductomaestro;
 import entities.CfgMarcaproducto;
 import entities.CfgProducto;
+import entities.CfgReferenciaproducto;
 import entities.SegUsuario;
 import facades.CfgEmpresaFacade;
 import facades.CfgKitproductodetalleFacade;
@@ -156,9 +158,10 @@ public class KitMB implements Serializable {
                 kitproductodetalle.setCant(1);
                 kitproductodetalle.setCfgProducto(productoSeleccionado);
                 kitproductodetalle.setNuevo(true);//variable tenidad en cuenta para editar el paquete. Cuando es igual a true se creara un nuevo elemento de lo contrario se modifica
-                float aux = Redondear(productoSeleccionado.getPrecio(), 0);
+                float aux = Redondear(productoSeleccionado.getCosto(), 0);
                 kitproductodetalle.setPrecioUnitario(aux);
                 listaKitDetalle.add(kitproductodetalle);
+                
             } else {
                 kitproductodetalle.setCant(kitproductodetalle.getCant() + 1);
             }
@@ -232,7 +235,7 @@ public class KitMB implements Serializable {
     }
 
     public void calcularPrecioKit() {
-        precio = costo + (costo * utilidad / (float) 100);
+        precio = costo + (costo * utilidad);
         precio = Redondear(precio, 0);
     }
 
@@ -287,15 +290,22 @@ public class KitMB implements Serializable {
             kitmaestro.setUtilidad(utilidad);
             kitMaestroFacade.create(kitmaestro);
             List<CfgKitproductodetalle> aux = new ArrayList();
+            CfgCategoriaproducto cfgCategoriaProducto =null;
+            CfgReferenciaproducto cfgReferenciaProducto = null;
+            CfgMarcaproducto cfgMarcaProducto = null;
             for (CfgKitproductodetalle kitproductodetalle : listaKitDetalle) {
                 kitproductodetalle.getCfgKitproductodetallePK().setCfgkitproductomaestroidKit(kitmaestro.getIdKit());
                 kitproductodetalle.setCfgKitproductomaestro(kitmaestro);
                 kitDetalleFacade.create(kitproductodetalle);
                 aux.add(kitproductodetalle);
+                cfgCategoriaProducto = kitproductodetalle.getCfgProducto().getCfgcategoriaproductoidCategoria();
+                cfgReferenciaProducto = kitproductodetalle.getCfgProducto().getCfgreferenciaproductoidReferencia();
+                cfgMarcaProducto = kitproductodetalle.getCfgProducto().getCfgmarcaproductoidMarca();
             }
             kitmaestro.setCfgKitproductodetalleList(aux);
             kitMaestroFacade.edit(kitmaestro);
-            crearProductoKit(kitmaestro);
+            
+            crearProductoKit(kitmaestro,cfgCategoriaProducto,cfgReferenciaProducto,cfgMarcaProducto);
             setCodigoKit(null);
             limpiarInformacionKit();
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Kit creado"));
@@ -349,7 +359,7 @@ public class KitMB implements Serializable {
     }
 
     //un kit sera visto como un producto. solo que estara relacionado a un kit y la bandera de que si es un kit sera igual a true
-    private void crearProductoKit(CfgKitproductomaestro kitmaestro) {
+    private void crearProductoKit(CfgKitproductomaestro kitmaestro, CfgCategoriaproducto cfgCategoriaproducto, CfgReferenciaproducto cfgReferenciaproducto, CfgMarcaproducto cfgMarcaproducto) {
         try {
             CfgProducto producto = new CfgProducto();
             producto.setCodProducto(kitmaestro.getCodKit());
@@ -367,6 +377,9 @@ public class KitMB implements Serializable {
             producto.setFecCrea(new Date());
             producto.setCfgempresaidEmpresa(empresaSeleccionada);
             producto.setSegusuarioidUsuario(usuarioActual);
+            producto.setCfgcategoriaproductoidCategoria(cfgCategoriaproducto);
+            producto.setCfgreferenciaproductoidReferencia(cfgReferenciaproducto);
+            producto.setCfgmarcaproductoidMarca(cfgMarcaproducto);
             productoFacade.create(producto);
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Kit no Insertado en la tabla productos"));

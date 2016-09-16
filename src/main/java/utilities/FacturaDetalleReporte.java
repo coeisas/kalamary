@@ -17,7 +17,7 @@ public class FacturaDetalleReporte {
    private float valorTotal;
    private float descuento;
    private String presentacionDescuento;
-
+   private String imagen;
     public FacturaDetalleReporte() {
     }
 
@@ -75,6 +75,14 @@ public class FacturaDetalleReporte {
 
     public void setPresentacionDescuento(String presentacionDescuento) {
         this.presentacionDescuento = presentacionDescuento;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
     
 }

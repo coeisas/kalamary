@@ -18,23 +18,23 @@
                 </f:facet>
                 <p:row>
                     <p:column colspan="2">
-                        <p:outputLabel class="labelFormulario" value="Cliente:"/>
-                        <p:inputText id="IdCliente" class="campoFormulario" value="#{informeClienteMB.identificacion}">
+                        <p:outputLabel styleClass="labelFormulario" value="Cliente:"/>
+                        <p:inputText id="IdCliente" styleClass="campoFormulario" value="#{informeClienteMB.identificacion}">
                             <p:ajax event="blur" listener="#{informeClienteMB.buscarCliente}" update="@none"/>
                         </p:inputText>
                         <p:watermark for="IdCliente" value="Identificacion"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{informeClienteMB.cargarClientes}"/>
-                        <p:outputLabel id="IdNombreCliente" class="labelFormularioInformativa" value="#{informeClienteMB.nombreCliente}"/>
+                        <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{informeClienteMB.cargarClientes}"/>
+                        <p:outputLabel id="IdNombreCliente" styleClass="labelFormularioInformativa" value="#{informeClienteMB.nombreCliente}"/>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Incial:"/>
-                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaInicial}"/>     
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Incial:"/>
+                        <p:calendar styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaInicial}"/>     
                     </p:column>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Final:"/>
-                        <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaFinal}"/>     
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeClienteMB.fechaFinal}"/>     
                     </p:column>
                 </p:row>
                 <p:row>

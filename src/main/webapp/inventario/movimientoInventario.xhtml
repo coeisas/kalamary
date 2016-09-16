@@ -24,14 +24,14 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Proveedor:"/>
-                        <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
+                        <p:outputLabel styleClass="labelFormulario" value="Proveedor:"/>
+                        <p:inputText styleClass="campoFormulario" value="#{movimientoInventarioMB.numIdentificacion}">
                             <p:ajax event="blur" listener="#{movimientoInventarioMB.buscarProveedor}" update="@none"/>
                         </p:inputText>
-                        <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{movimientoInventarioMB.cargarProveedores}"/>                      
-                        <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.proveedor}"/>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Forma de Pago:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.formaPago}">
+                        <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" actionListener="#{movimientoInventarioMB.cargarProveedores}"/>                      
+                        <p:outputLabel styleClass="labelFormularioInformativa" value="#{movimientoInventarioMB.proveedor}"/>
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Forma de Pago:"/>
+                        <p:selectOneMenu styleClass="campoFormulario" value="#{movimientoInventarioMB.formaPago}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{movimientoInventarioMB.listaFormaPago}" var="formaPago" itemLabel="#{formaPago.descripcion}" itemValue="#{formaPago.idFormaPago}"/>
                         </p:selectOneMenu>  
@@ -39,44 +39,44 @@
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Tipo Movimiento:"/>
-                        <p:selectOneMenu class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioMaestro}">
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Tipo Movimiento:"/>
+                        <p:selectOneMenu styleClass="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioMaestro}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{movimientoInventarioMB.listaMovInventarioMaestro}" var="movInvMaestro" itemLabel="#{movInvMaestro.nombreMovimiento}" itemValue="#{movInvMaestro.idMovInventarioMaestro}"/>
                             <p:ajax event="change" listener="#{movimientoInventarioMB.cargarListaMovInventarioDetalle}" update="@none"/>
                         </p:selectOneMenu>
-                        <p:selectOneMenu id="IdListDetalleMovimiento" class="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioDetalle}">
+                        <p:selectOneMenu id="IdListDetalleMovimiento" styleClass="campoFormulario" value="#{movimientoInventarioMB.idMovInventarioDetalle}">
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{movimientoInventarioMB.listaMovInventarioDetalle}" var="movInvDetalle" itemLabel="#{movInvDetalle.nomMovimientoDetalle}" itemValue="#{movInvDetalle.idMovInventarioDetalle}"/>
                             <p:ajax event="change" listener="#{movimientoInventarioMB.cargarInformacionAdicional()}" update="@none"/>
                         </p:selectOneMenu>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" style="width: 130px" value="Documento Soporte:"/>
-                        <p:inputText class="campoFormulario" value="#{movimientoInventarioMB.documentoSoporte}" maxlength="15"/>
+                        <p:outputLabel styleClass="labelFormulario" style="width: 130px" value="Documento Soporte:"/>
+                        <p:inputText styleClass="campoFormulario" value="#{movimientoInventarioMB.documentoSoporte}" maxlength="15"/>
                     </p:column>
                 </p:row>
                 <p:row rendered="#{movimientoInventarioMB.displayInfoAdicional}">
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Ciudad:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.ciudad}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Ciudad:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{movimientoInventarioMB.ciudad}"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Dirección:"/>
-                        <p:inputText class="campoFormulario upperCase" size="80" value="#{movimientoInventarioMB.direccion}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Dirección:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" size="80" value="#{movimientoInventarioMB.direccion}"/>
                     </p:column>
                 </p:row>
                 <p:row rendered="#{movimientoInventarioMB.displayInfoAdicional}">
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Transportadora:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.transportadora}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Transportadora:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{movimientoInventarioMB.transportadora}"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Conductor:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{movimientoInventarioMB.conductor}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Conductor:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{movimientoInventarioMB.conductor}"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Placa:"/>
-                        <p:inputText class="campoFormulario upperCase" size="7" value="#{movimientoInventarioMB.placa}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Placa:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" size="7" value="#{movimientoInventarioMB.placa}"/>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Peso:"/>
-                        <p:inputText class="campoFormulario upperCase" size="9" value="#{movimientoInventarioMB.peso}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Peso:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" size="9" value="#{movimientoInventarioMB.peso}"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -193,21 +193,21 @@
                 </f:facet>
             </p:dataTable>
             <p:panel id="IdSubTotal" style="width: 90%;margin: 0 auto;padding: 0;border: none">
-                <div class="divContent">
+                <div styleClass="divContent">
                     <p:panelGrid columns="2">
-                        <p:outputLabel class="label" value="SUBTOTAL:"/>
+                        <p:outputLabel styleClass="label" value="SUBTOTAL:"/>
                         <p:outputLabel value="#{movimientoInventarioMB.subtotal}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="DESCUENTO:"/> 
+                        <p:outputLabel styleClass="label" value="DESCUENTO:"/> 
                         <p:outputLabel value="#{movimientoInventarioMB.totalDescuento}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="IVA:"/>
+                        <p:outputLabel styleClass="label" value="IVA:"/>
                         <p:outputLabel value="#{movimientoInventarioMB.totalIva}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="TOTAL"/> 
+                        <p:outputLabel styleClass="label" value="TOTAL"/> 
                         <p:outputLabel value="#{movimientoInventarioMB.totalMovimiento}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
@@ -259,11 +259,11 @@
         </p:dialog>
         <p:dialog widgetVar="dlgResult" modal="true" header="CONFIRMAR IMPRESION" resizable="false" width="25%">
             <h:form id="IdFormConfirmacion">
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:panelGrid styleClass="panelGridSinBorder" style="margin: 0 auto">
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Mov Inventario:"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{movimientoInventarioMB.concecutivo}"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Mov Inventario:"/>
+                            <p:outputLabel styleClass="labelFormularioInformativa" value="#{movimientoInventarioMB.concecutivo}"/>
                         </p:column>
                     </p:row>
                     <p:row>

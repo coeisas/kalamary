@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="vencimientosSeparados" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bb1d7581-e14c-4150-a0e2-342a00860d56">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="P_EMPRESA" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT cc.numDoc,
+      concat(cc.nom1Cliente,' ',cc.nom2Cliente,' ',cc.apellido1,' ',cc.apellido2) cliente,
+       cc.tel1,
+       fc.valor,
+       fc.saldo,
+       fc.fecha_limite,
+       concat(d.prefijoDoc,' ',fd.numDocumento) documento
+FROM kalamarypos.fac_cartera_cliente fc
+inner join fac_documentosmaster fd on fc.fac_documentosmaster_numDocumento = fd.numDocumento
+inner join cfg_cliente cc on cc.idCliente = fc.cfg_cliente_idCliente
+inner join cfg_documento d on d.cfg_empresasede_idSede = fd.cfg_empresasede_idSede
+ where fc.estado='PENDIENTE'
+and fecha_limite<=ADDDATE(now(), INTERVAL 15 DAY)
+and fd.cfg_documento_idDoc = fc.fac_documentosmaster_cfg_documento_idDoc
+and d.codDocumento  =7
+and fd.cfg_documento_idDoc =d.idDoc
+and fd.cfg_empresasede_idSede=$P{P_EMPRESA}
+and fd.cfg_documento_idDoc = fc.fac_documentosmaster_cfg_documento_idDoc
+order by fecha_limite]]>
+	</queryString>
+	<field name="numDoc" class="java.lang.String">
+		<fieldDescription><![CDATA[Numero del documento de la empresa]]></fieldDescription>
+	</field>
+	<field name="cliente" class="java.lang.String"/>
+	<field name="tel1" class="java.lang.String">
+		<fieldDescription><![CDATA[Telefono 1 de cliente]]></fieldDescription>
+	</field>
+	<field name="valor" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="saldo" class="java.lang.Float">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="fecha_limite" class="java.sql.Date">
+		<fieldDescription><![CDATA[fecha limite para los pagos]]></fieldDescription>
+	</field>
+	<field name="documento" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="70" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="752" height="50" uuid="eefe267d-7846-4189-a2ee-bc0281f4ea36"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true"/>
+				</textElement>
+				<text><![CDATA[VENCIMIENTOS DE SEPARADOS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="6" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="99" height="34" uuid="aea1fa4f-6465-4844-b239-0072145b579d"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DOCUMENTO]]></text>
+			</staticText>
+			<line>
+				<reportElement x="4" y="34" width="752" height="1" uuid="e6a69add-0b93-4314-b358-8bb8ed0961af"/>
+			</line>
+			<staticText>
+				<reportElement x="98" y="0" width="117" height="34" uuid="e31c9b58-0649-4938-a1a9-2ecad708df29"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IDENTIFICACION CLIENTE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="580" y="0" width="82" height="34" uuid="b86a351d-82b2-45bc-8cfc-4d346793eb2e"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SALDO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="500" y="1" width="80" height="34" uuid="be20e1c5-d23f-4589-9883-57bf27b096b7"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[VALOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="661" y="1" width="91" height="34" uuid="32bfe66d-eebc-4a03-8cf1-788fdbbaef42"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FECHA VENCIMIENTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="1" width="80" height="33" uuid="6c7a0c10-a911-4d95-b845-20126febca38"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TELEFONO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="215" y="1" width="205" height="34" uuid="16908ed6-7c6e-4417-be8d-5a0fe2c5e35e"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CLIENTE]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="99" height="32" uuid="14d43d19-59bc-4cfb-9b25-7b69eced2766"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{documento}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MMM-yyyy">
+				<reportElement x="662" y="0" width="90" height="32" uuid="bb405f8f-25b1-4510-93e5-8454c31b6644"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{fecha_limite}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="98" y="0" width="117" height="32" uuid="2c9091c9-2aaa-4536-9f2c-7e6775d7aadf"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{numDoc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="80" height="32" uuid="3cd9ff0b-2d2c-407e-9888-cc0e114b2da3"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{tel1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$ #,##0">
+				<reportElement x="580" y="0" width="82" height="32" uuid="071a778c-bc1b-4109-af70-58250eb30147"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{saldo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$ #,##0">
+				<reportElement x="500" y="0" width="80" height="32" uuid="7e7b8909-aaa5-420a-95d0-8671bf82b14b"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{valor}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="215" y="0" width="205" height="32" uuid="79b3bc7e-0812-43c0-8d6d-78147aaf2ffb"/>
+				<box leftPadding="3"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{cliente}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="15" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField pattern="dd/MMM/yyyy h.mm a">
+				<reportElement x="650" y="0" width="100" height="20" uuid="6ac28ba7-a1df-4389-9815-70d1e09cf408"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="550" y="0" width="100" height="20" uuid="04005d0f-dde0-4785-b185-a3b1620109b9"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha Generación]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Informe Ventas Vendedores</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormInformeVentaVendedores">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="2">Informe Venta de Vendedores</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column colspan="2">
+                        <p:outputLabel value="Vendedor:" styleClass="labelFormularioObligatorio"/>
+                <p:inputText id="IdDocumentoVendedor" value="#{informeVentaVendedoresMB.documentoVendedor}" styleClass="campoFormulario">
+                    <p:ajax event="blur" listener="#{informeVentaVendedoresMB.buscarVendedor}" update="@none"/>
+                </p:inputText>
+                <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" styleClass="campoFormulario" actionListener="#{informeVentaVendedoresMB.cargarListaVendedores}"/>
+                <p:outputLabel id="IdNomVendedor" styleClass="labelFormularioInformativa" value="#{informeVentaVendedoresMB.nombreVendedor}"/>                
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center" colspan="2">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte PDF" title="Generar Reporte" onclick="this.form.target = '_blank'" actionListener="#{informeVentaVendedoresMB.generarReporte}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte CSV" title="Generar Reporte" actionListener="#{informeVentaVendedoresMB.generarReporteCSV}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeVentaVendedoresMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog header="BUSCAR VENDEDOR" widgetVar="dlgVendedor" modal="true" width="60%" resizable="false">
+            <h:form id="FormModalVendedor">
+                <p:dataTable value="#{informeVentaVendedoresMB.listaVendedor}" var="vendedor" selection="#{informeVentaVendedoresMB.vendedorSeleccionado}"  rowKey="#{vendedor.idUsuario}" paginator="true" paginatorPosition="bottom" selectionMode="single" emptyMessage="No hay vendedores registrados">
+                    <p:column headerText="Identificacion">#{vendedor.numDoc}</p:column>
+                    <p:column headerText="Vendedor">#{vendedor.nombreCompleto()}</p:column>
+                    <p:column headerText="Rol">#{vendedor.cfgRolIdrol.nomrol}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <p:commandButton value="Aceptar" actionListener="#{informeVentaVendedoresMB.cargarInformacionVendedor}"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>
+

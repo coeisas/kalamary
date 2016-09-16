@@ -20,61 +20,61 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
-                            <p:inputText class="campoFormulario" value="#{documentoMB.codigoDocumento}" maxlength="10">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Codigo:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{documentoMB.codigoDocumento}" maxlength="10">
                                 <p:ajax event="blur" listener="#{documentoMB.buscarDocumento}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{documentoMB.cargarListaDocumento}"/>                        
+                            <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" actionListener="#{documentoMB.cargarListaDocumento}"/>                        
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Documento:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{documentoMB.nombreDocumento}" maxlength="25" size="30"/>                            
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Documento:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{documentoMB.nombreDocumento}" maxlength="25" size="30"/>                            
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Abreviatura:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{documentoMB.abreviatura}" maxlength="3" size="3"/>                            
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Abreviatura:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{documentoMB.abreviatura}" maxlength="3" size="3"/>                            
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Prefijo:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{documentoMB.prefijo}" maxlength="5" size="5"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Prefijo:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{documentoMB.prefijo}" maxlength="5" size="5"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Aplica a:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{documentoMB.aplicacion}">
+                            <p:outputLabel styleClass="labelFormulario" value="Aplica a:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{documentoMB.aplicacion}">
                                 <p:ajax event="change" listener="#{documentoMB.validarAplicacion}" update="@none"/>
                                 <f:selectItem itemValue="#{null}" itemLabel="..."/>
                                 <f:selectItems value="#{documentoMB.listaAplicacionDocumento}" var="aplicacion" itemLabel="#{aplicacion.codaplicacion}-#{aplicacion.nomaplicacion}" itemValue="#{aplicacion.idaplicacion}"/>
                             </p:selectOneMenu>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Activo:"/>
-                            <p:inputSwitch class="campoFormulario" value="#{documentoMB.activo}" onLabel="Si" offLabel="No"/> 
+                            <p:outputLabel styleClass="labelFormulario" value="Activo:"/>
+                            <p:inputSwitch styleClass="campoFormulario" value="#{documentoMB.activo}" onLabel="Si" offLabel="No"/> 
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Rango Incial:"/>
-                            <p:inputText class="campoFormulario" value="#{documentoMB.rangoInicial}"/>                            
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Rango Incial:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{documentoMB.rangoInicial}"/>                            
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Rango Final:"/>
-                            <p:inputText class="campoFormulario" value="#{documentoMB.rangoFinal }"/>                            
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Rango Final:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{documentoMB.rangoFinal }"/>                            
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Num Actual:"/>
-                            <p:inputText class="campoFormulario" value="#{documentoMB.numActual}" disabled="true" style="color: black"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Num Actual:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{documentoMB.numActual}" disabled="true" style="color: black"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="ResDian:"/>
-                            <p:inputText class="campoFormulario" value="#{documentoMB.resDian}" maxlength="200" size="105"/>
+                            <p:outputLabel styleClass="labelFormulario" value="ResDian:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{documentoMB.resDian}" maxlength="200" size="105"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Observaciones:"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Observaciones:"/>
                             <div style="clear: left"/>
-                            <p:inputTextarea class="campoFormulario" value="#{documentoMB.observacion}" style="width: 99%" maxlength="65535"/>
+                            <p:inputTextarea styleClass="campoFormulario" value="#{documentoMB.observacion}" style="width: 99%" maxlength="65535"/>
                         </p:column>
                     </p:row>
                     <p:row>

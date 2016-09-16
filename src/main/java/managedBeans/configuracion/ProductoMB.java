@@ -22,6 +22,7 @@ import facades.CfgMarcaproductoFacade;
 import facades.CfgProductoFacade;
 import facades.CfgReferenciaproductoFacade;
 import facades.CfgTallaFacade;
+import facades.CfgUnidadFacade;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -87,6 +88,7 @@ public class ProductoMB implements Serializable {
     private List<CfgMarcaproducto> listaMarca;
     private List<CfgColor> listaColor;
     private List<CfgTalla> listaTalla;
+    private List<CfgUnidad> listaUnidad;
     private LazyDataModel<CfgProducto> listaProducto;
     private List<String> listFormsModal;
 
@@ -96,6 +98,7 @@ public class ProductoMB implements Serializable {
     private CfgMarcaproducto marcaSeleccionada;
     private CfgProducto productoSeleccionado;
 
+    private boolean renderBoton;
     @EJB
     CfgEmpresaFacade empresaFacade;
 
@@ -116,6 +119,9 @@ public class ProductoMB implements Serializable {
 
     @EJB
     CfgTallaFacade tallaFacade;
+    
+    @EJB
+    CfgUnidadFacade unidadFacade;
 
     public ProductoMB() {
     }
@@ -124,11 +130,13 @@ public class ProductoMB implements Serializable {
     private void init() {
         FacesContext context = FacesContext.getCurrentInstance();
         pathRoot = context.getExternalContext().getInitParameter("directory.images");
+        renderBoton = false;
         sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
         empresaSeleccionada = sesionMB.getEmpresaActual();
         listaColor = colorFacade.findAll();
         listaTalla = tallaFacade.findAll();
+        listaUnidad = unidadFacade.findAll();
         if (empresaSeleccionada != null) {
             listaCategoria = categoriaFacade.buscarPorEmpresa(empresaSeleccionada);
             listaReferencia = referenciaFacade.buscarPorEmpresa(empresaSeleccionada);
@@ -236,6 +244,8 @@ public class ProductoMB implements Serializable {
             setPrecio((float) productoSeleccionado.getPrecio());
             setActivo(productoSeleccionado.getActivo());
             setEsServicio(productoSeleccionado.getEsServicio());
+            if(usuarioActual.getCfgRolIdrol().getCodrol().equals("00001") || usuarioActual.getCfgRolIdrol().getCodrol().equals("00002"))
+            renderBoton = true;
 
         } else {
             setCodigoBarra(null);
@@ -288,6 +298,14 @@ public class ProductoMB implements Serializable {
         }
     }
 
+    public void eliminar(){
+        if(productoSeleccionado!=null){
+            productoSeleccionado.setActivo(false);
+            productoFacade.edit(productoSeleccionado);
+            cancelar();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Producto modificado"));
+        }
+    }
     private void editarProducto() {
         if (!validacion()) {
             return;
@@ -357,7 +375,8 @@ public class ProductoMB implements Serializable {
             producto.setCfgTallaIdTalla(talla);
 //            producto.setCodigoInterno(codigoProducto + color.getIdColor() + talla.getIdTalla());
             //la unidad de medida del producto por defecto es UND. Cambiar esto cuando la unidad sea dinamico.
-            producto.setCfgUnidadIdUnidad(new CfgUnidad(1));
+            CfgUnidad unidad = unidadFacade.find(idunidad);
+            producto.setCfgUnidadIdUnidad(unidad);
             producto.setPrecio(getPrecio());
             producto.setEsServicio(esServicio);
             producto.setActivo(activo);
@@ -505,6 +524,7 @@ public class ProductoMB implements Serializable {
         productoSeleccionado = null;
         listaMarca.clear();
         listaReferencia.clear();
+        renderBoton = false;
         RequestContext.getCurrentInstance().update("IdFormProducto");
         RequestContext.getCurrentInstance().update(listFormsModal);
 
@@ -730,6 +750,14 @@ public class ProductoMB implements Serializable {
         return listaTalla;
     }
 
+    public List<CfgUnidad> getListaUnidad() {
+        return listaUnidad;
+    }
+
+    public void setListaUnidad(List<CfgUnidad> listaUnidad) {
+        this.listaUnidad = listaUnidad;
+    }
+
     public UploadedFile getFile() {
         return file;
     }
@@ -770,6 +798,14 @@ public class ProductoMB implements Serializable {
      */
     public String getNombreArchivo() {
         return nombreArchivo;
+    }
+
+    public boolean isRenderBoton() {
+        return renderBoton;
+    }
+
+    public void setRenderBoton(boolean renderBoton) {
+        this.renderBoton = renderBoton;
     }
 
 }

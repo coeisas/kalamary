@@ -25,98 +25,116 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
-                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.categoriaSeleccionada.nombreCategoria}" readonly="true"/>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgCategoria').show()"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Categoria:"/>
+                            <h:inputText styleClass="campoFormulario cajaH" value="#{productoMB.categoriaSeleccionada.nombreCategoria}" readonly="true"/>
+                            <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" onclick="PF('dlgCategoria').show()"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Referencia:"/>
-                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.referenciaSeleccionada.nombreReferencia}" readonly="true"/>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgReferencia').show()"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Referencia:"/>
+                            <h:inputText styleClass="campoFormulario cajaH" value="#{productoMB.referenciaSeleccionada.nombreReferencia}" readonly="true"/>
+                            <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" onclick="PF('dlgReferencia').show()"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Marca:"/>
-                            <h:inputText class="campoFormulario cajaH" value="#{productoMB.marcaSeleccionada.nombreMarca}" readonly="true"/>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" onclick="PF('dlgMarca').show()"/>
+                                                         <p:outputLabel styleClass="labelFormularioObligatorio" value="Marca:"/>
+                            <h:inputText styleClass="campoFormulario cajaH" value="#{productoMB.marcaSeleccionada.nombreMarca}" readonly="true"/>
+                            <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" onclick="PF('dlgMarca').show()"/>
+                            
+
+                            
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo Producto:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.codigoProducto}">
+                            <p:outputLabel styleClass="labelFormulario" value="Codigo Barras:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{productoMB.codigoBarra}" size="15"/>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Codigo Producto:"/>
+                            <p:inputText styleClass="campoFormulario cajaH upperCase" value="#{productoMB.codigoProducto}" maxlength="10">
                                 <!--p:ajax event="blur" listener="# {productoMB.buscarProducto}" update="@none"/-->
                             </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{productoMB.cargarProductos}"/>
+                            <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" actionListener="#{productoMB.cargarProductos}"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Codigo Barras:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{productoMB.codigoBarra}" size="15"/>
-                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Color:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{productoMB.idcolor}">
+                            <p:outputLabel styleClass="labelFormularioObligatorio " value="Producto:"/>
+                            <p:inputText styleClass="campoFormulario  upperCase" size="60" value="#{productoMB.nombreProducto}"/>
+                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                            <p:commandButton styleClass="campoFormulario" icon="ui-icon-image" value="Imagen" onclick="PF('dlgImagen').show()"/>
+                            <p:outputLabel id="nombreImagen" value="#{productoMB.nombreArchivo}" styleClass="labelFormularioInformativa"/>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel styleClass="labelFormulario" value="Color:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{productoMB.idcolor}">
                                 <f:selectItems value="#{productoMB.listaColor}" var="color" itemLabel="#{color.color}" itemValue="#{color.idColor}"/>
                             </p:selectOneMenu>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Talla:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{productoMB.idtalla}">
+                            <p:outputLabel styleClass="labelFormulario" value="Talla:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{productoMB.idtalla}">
                                 <f:selectItems value="#{productoMB.listaTalla}" var="talla" itemLabel="#{talla.talla}" itemValue="#{talla.idTalla}"/>
+                            </p:selectOneMenu>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Unidad"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{productoMB.idunidad}" style="width: 150px;">
+                                <f:selectItems value="#{productoMB.listaUnidad}" var="unidad" itemLabel="#{unidad.unidad}" itemValue="#{unidad.idUnidad}"/>
                             </p:selectOneMenu>
                         </p:column>
                     </p:row>
                     <p:row>
-                        <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Producto:"/>
-                            <p:inputText class="campoFormulario upperCase" size="100" value="#{productoMB.nombreProducto}"/>
-                            <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-image" value="Imagen" onclick="PF('dlgImagen').show()"/>
-                            <p:outputLabel id="nombreImagen" value="#{productoMB.nombreArchivo}" class="labelFormularioInformativa"/>
-                        </p:column>
+                        
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Stock Min:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.stockMin}"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Stock Min:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{productoMB.stockMin}"/>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Costo Adq:"/>
-                            <p:inputText class="campoFormulario" value="#{productoMB.costoAdq}">
-                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
-                            </p:inputText>
-                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="IVA %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.iva}">
-                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
-                            </p:inputText>
-                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="FLETE %:"/>
-                            <p:inputText class="campoFormulario" size="3"  value="#{productoMB.flete}">
-                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
-                            </p:inputText>
-                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Costos IND %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.costoInd}">
+                            <p:outputLabel styleClass="labelFormulario" value="Costo Adq:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{productoMB.costoAdq}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Costo Final:"/>
-                            <p:outputLabel id="IdCostoFinal" class="labelFormularioInformativa" value="#{productoMB.costoFinal}">
+                            <p:outputLabel styleClass="labelFormulario" value="IVA %:"/>
+                            <p:inputText styleClass="campoFormulario" size="3" value="#{productoMB.iva}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
+                            <p:outputLabel styleClass="labelFormulario" value="FLETE %:"/>
+                            <p:inputText styleClass="campoFormulario" size="3"  value="#{productoMB.flete}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
+                            <div style="float: left;margin-left: 10px;height: 1.5em"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Costos IND %:"/>
+                            <p:inputText styleClass="campoFormulario" size="3" value="#{productoMB.costoInd}">
+                                <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
+                            </p:inputText>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel styleClass="labelFormulario" value="Costo Final:"/>
+                            <p:outputLabel id="IdCostoFinal" styleClass="labelFormularioInformativa" value="#{productoMB.costoFinal}">
                                 <f:convertNumber  type="currency"/>
                             </p:outputLabel>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{productoMB.utilidad}">
+                            <p:outputLabel styleClass="labelFormulario" value="Utilidad %:"/>
+                            <p:inputText styleClass="campoFormulario" size="3" value="#{productoMB.utilidad}">
                                 <p:ajax event="blur" listener="#{productoMB.determinarCostoFinalAndPrecio}" update="@none"/>
                             </p:inputText>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Precio:"/>
-                            <p:outputLabel id="IdPrecio" class="labelFormularioInformativa" value="#{productoMB.precio}">
+                            <p:outputLabel styleClass="labelFormulario" value="Precio:"/>
+                            <p:outputLabel id="IdPrecio" styleClass="labelFormularioInformativa" value="#{productoMB.precio}">
                                 <f:convertNumber type="currency"/>
                             </p:outputLabel>
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Activo:"/>
-                            <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column>
+                            <p:outputLabel styleClass="labelFormulario" value="Activo:"/>
+                            <p:inputSwitch styleClass="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.activo}" />
                             <div style="float: left;margin-left: 10px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Servicio:"/>
-                            <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.esServicio}" />                            
+                            <p:outputLabel styleClass="labelFormulario" value="Servicio:"/>
+                            <p:inputSwitch styleClass="campoFormulario" onLabel="Si" offLabel="No" value="#{productoMB.esServicio}" />                            
                         </p:column>
                     </p:row>
                     <p:row>
@@ -124,6 +142,11 @@
                             <p:commandButton icon="ui-icon-disk" value="Guardar" actionListener="#{productoMB.determinarAccion}"/>
                             &nbsp;
                             <p:commandButton icon="ui-icon-cancel" value="Cancelar" actionListener="#{productoMB.cancelar}"/>
+                            &nbsp;
+                            <p:commandButton icon="ui-icon-disk" value="Eliminar" actionListener="#{productoMB.eliminar}" rendered="#{productoMB.renderBoton}">
+                                    
+                            </p:commandButton>
+                            
                         </p:column>
                     </p:row>
                 </p:panelGrid>

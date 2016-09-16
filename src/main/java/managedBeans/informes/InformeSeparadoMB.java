@@ -178,6 +178,7 @@ public class InformeSeparadoMB implements Serializable {
             //SE BUSCA LA CARTERA DEL SEPARADO
             FacCarteraCliente carteraCliente = carteraFacade.buscarPorDocumentoMaestro(separado);
             if (carteraCliente != null) {
+                informeSeparado.setFechaVencimiento(carteraCliente.getFechaLimite());
                 float abonado = 0;
                 informeSeparado.setSaldo(carteraCliente.getSaldo());
                 //SE CARGA EL DETALLE DE LA CARTERA (ABONOS)

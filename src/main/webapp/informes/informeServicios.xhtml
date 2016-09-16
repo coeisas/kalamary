@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="../templates/layout.xhtml">
+    <ui:define name="title">Informe Servicios</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="FormProductosA">
+            <p:panelGrid style="margin: 0 auto;width: 70%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column colspan="2">Informe Servicios</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column colspan="2">
+                        <p:outputLabel value="Producto:" styleClass="labelFormularioObligatorio"/>
+                        <p:inputText id="IdDocumentoVendedor" value="#{informeServiciosMB.codigoProducto}" styleClass="campoFormulario">
+                    <p:ajax event="blur" listener="#{informeServiciosMB.buscarProducto}" update="@none"/>
+                </p:inputText>
+                        <p:commandButton icon="ui-icon-search" title="Buscar Producto" styleClass="campoFormulario" actionListener="#{informeServiciosMB.cargarModalProductos}"/>
+                        <p:outputLabel id="IdNomVendedor" styleClass="labelFormularioInformativa" value="#{informeServiciosMB.nombreProducto}"/>                
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center" colspan="2">
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte" title="Generar Reporte" onclick="this.form.target = '_blank'" actionListener="#{informeServiciosMB.generarReporte}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-newwin" value="Generar Reporte CSV" title="Generar Reporte" action="#{informeServiciosMB.generarReporteCSV}" ajax="false"/>&nbsp;
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" title="Limpiar" actionListener="#{informeServiciosMB.limpiar}"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+        </h:form>
+
+        <p:dialog id="IdModalProducto" widgetVar="dlgProducto" header="BUSCAR PRODUCTO" resizable="false" width="70%" modal="true">
+            <h:form id="FormModalProducto">
+                <p:dataTable value="#{informeServiciosMB.listaProducto}" var="producto" emptyMessage="No hay productos registrados" rows="10" paginator="true" paginatorPosition="bottom" selection="#{informeServiciosMB.productoSeleccionado}" rowKey="#{producto.idProducto}" selectionMode="single" lazy="true">
+                    <p:column headerText="Codigo Interno" filterBy="#{producto.codigoInterno}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codigoInterno}</p:column>
+                    <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
+                    <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
+                    <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
+                    <p:column headerText="Disponibilidad">#{producto.unidadesDisponibles(movimientoInventarioMB.sedeActual)}</p:column>
+                </p:dataTable>
+                <p:separator/>
+                <div>
+                    <p:commandButton value="Aceptar" actionListener="#{informeServiciosMB.cargarInformacionProducto}" onclick="PF('dlgProducto').hide()"/>
+                </div>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>
+

@@ -680,7 +680,7 @@ public class AbonoMB implements Serializable {
         CfgDocumento documentoConcecutivoInventarioSalida = documentoFacade.buscarDocumentoInventarioSalidaBySede(sedeActual);
         //los documentos aplicados a factura y salida inventario deben estar vigentes
         if (documentoConcecutivoFactura == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "No hay un documento vigente aplicado a factura"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Alerta", "Verifique vigencia de factura o valide que se encuentre activo"));
             return;
         }
         if (documentoConcecutivoInventarioSalida == null) {
