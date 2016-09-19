@@ -17,6 +17,16 @@
                     </p:row>
                 </f:facet>
                 <p:row>
+                    <p:column>
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Incial:"/>
+                        <p:calendar styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeVentaVendedoresMB.fechaInicial}"/>     
+                    </p:column>
+                    <p:column>
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Final:"/>
+                        <p:calendar styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{informeVentaVendedoresMB.fechaFinal}"/>     
+                    </p:column>
+                </p:row>
+                <p:row>
                     <p:column colspan="2">
                         <p:outputLabel value="Vendedor:" styleClass="labelFormularioObligatorio"/>
                 <p:inputText id="IdDocumentoVendedor" value="#{informeVentaVendedoresMB.documentoVendedor}" styleClass="campoFormulario">

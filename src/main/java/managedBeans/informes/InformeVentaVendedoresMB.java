@@ -27,6 +27,7 @@ import net.sf.jasperreports.engine.JRException;
 import org.primefaces.context.RequestContext;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,8 @@ public class InformeVentaVendedoresMB implements Serializable {
     private SegUsuario vendedorSeleccionado;
     private CfgEmpresa empresaActual;
     private CfgEmpresasede sedeActual;
+    private Date fechaInicial;
+    private Date fechaFinal;
     private SegUsuario usuarioActual;
     private SesionMB sesionMB;
     private String documentoVendedor;
@@ -114,6 +117,12 @@ public class InformeVentaVendedoresMB implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No se encontro informacion del usuario"));
             return false;
         }
+        if (fechaFinal != null && fechaInicial != null) {
+            if (fechaFinal.before(fechaInicial)) {
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Verifique el orden de las fechas"));
+                return false;
+            }
+        }
         
         return ban;
     }
@@ -134,6 +143,19 @@ public class InformeVentaVendedoresMB implements Serializable {
             Map<String, Object> parametros = new HashMap<>();
             if(vendedorSeleccionado!=null)parametros.put("P_IDENTIFICACION", vendedorSeleccionado.getNumDoc());
             parametros.put("P_EMPRESA", sedeActual.getIdSede());
+            if(fechaInicial==null && fechaFinal==null){
+                SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+                try{
+                    fechaInicial = sd.parse("2010-01-01");
+                    String fechaAct = sd.format(new Date());
+                    fechaFinal = sd.parse(fechaAct);
+                }catch(Exception ex){
+                    
+                }
+            }
+            parametros.put("P_FECHA_INICIAL", fechaInicial);
+            parametros.put("P_FECHA_FINAL", fechaFinal);
+
             try{
                 Connection con = DBConnector.getInstance().getConnection();
                 JasperPrint jasperPrint = JasperFillManager.fillReport(ruta, parametros, con);
@@ -156,7 +178,16 @@ public class InformeVentaVendedoresMB implements Serializable {
             FacesContext.getCurrentInstance().responseComplete();
             String baseURL = context.getExternalContext().getRequestContextPath();
             SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
-            String url =  baseURL +"/ReportesCSV?tipo=ventasVendedores&url="+baseURL+"&identificacion="+(documentoVendedor!=null?documentoVendedor:"0")+"&sede="+sedeActual.getIdSede();
+            String fechaIni = null;
+            String fechaFin = null;
+            if(fechaInicial==null && fechaFinal==null){
+                    fechaIni  ="2010-01-01";
+                    fechaFin = sd.format(new Date());
+            }else{
+                fechaIni  =sd.format(fechaInicial);
+                fechaFin  =sd.format(fechaFinal);
+            }
+            String url =  baseURL +"/ReportesCSV?tipo=ventasVendedores&url="+baseURL+"&identificacion="+(documentoVendedor!=null?documentoVendedor:"0")+"&sede="+sedeActual.getIdSede()+"&fechaInicial="+fechaIni+"&fechaFinal="+fechaFin;
             String encodeURL = context.getExternalContext().encodeResourceURL(url);
         
             context.getExternalContext().redirect(encodeURL);
@@ -169,6 +200,8 @@ public class InformeVentaVendedoresMB implements Serializable {
         vendedorSeleccionado = null;
         nombreVendedor = null;
         documentoVendedor = null;
+        fechaInicial = null;
+        fechaFinal = null;
         RequestContext.getCurrentInstance().update("IdFormInformeVentaVendedores");
     }
     public SegUsuario getVendedorSeleccionado() {
@@ -233,6 +266,22 @@ public class InformeVentaVendedoresMB implements Serializable {
 
     public void setNombreVendedor(String nombreVendedor) {
         this.nombreVendedor = nombreVendedor;
+    }
+
+    public Date getFechaInicial() {
+        return fechaInicial;
+    }
+
+    public void setFechaInicial(Date fechaInicial) {
+        this.fechaInicial = fechaInicial;
+    }
+
+    public Date getFechaFinal() {
+        return fechaFinal;
+    }
+
+    public void setFechaFinal(Date fechaFinal) {
+        this.fechaFinal = fechaFinal;
     }
 
     

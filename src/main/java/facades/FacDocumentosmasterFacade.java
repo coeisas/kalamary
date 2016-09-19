@@ -60,41 +60,46 @@ public class FacDocumentosmasterFacade extends AbstractFacade<FacDocumentosmaste
     }
 
 //documentos de facturacion
-    public List<FacDocumentosmaster> buscarFacturasBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin, int offset, int limit) {
+    public List<FacDocumentosmaster> buscarFacturasBySedeLazy(CfgEmpresasede sede, CfgCliente cliente, int numFactura, Calendar fechaIni, Calendar fechafin, int offset, int limit, int tipoFacturacion) {
         try {
-            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion LIKE '1'";
+            String consulta = "SELECT d FROM FacDocumentosmaster d WHERE d.cfgempresasedeidSede = ?1 AND d.cfgDocumento.cfgAplicaciondocumentoIdaplicacion.codaplicacion =?2 ";
+            
+            
             if (cliente != null) {
-                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?2");
+                consulta = consulta.concat(" AND d.cfgclienteidCliente = ?3");
             }
             if (numFactura > 0) {
-                consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?3");
+                consulta = consulta.concat(" AND d.facDocumentosmasterPK.numDocumento = ?4");
             }
             if (fechaIni != null) {
-                consulta = consulta.concat(" AND d.fecCrea >= ?4");
+                consulta = consulta.concat(" AND d.fecCrea >= ?5");
             }
             if (fechafin != null) {
-                consulta = consulta.concat(" AND d.fecCrea <= ?5");
+                consulta = consulta.concat(" AND d.fecCrea <= ?6");
             }
 //            System.out.println(fechaIni +"-"+fechafin );
 //            System.out.println(consulta);
             Query query = em.createQuery(consulta);
             query.setParameter(1, sede);
+            query.setParameter(2, String.valueOf(tipoFacturacion));
             if (cliente != null) {
-                query.setParameter(2, cliente);
+                query.setParameter(3, cliente);
             }
             if (numFactura > 0) {
-                query.setParameter(3, numFactura);
+                query.setParameter(4, numFactura);
             }
             if (fechaIni != null) {
-                query.setParameter(4, fechaIni.getTime());
+                fechaIni.set(Calendar.HOUR_OF_DAY, 0);
+                query.setParameter(5, fechaIni.getTime());
             }
             if (fechafin != null) {
-                query.setParameter(5, fechafin.getTime());
+                query.setParameter(6, fechafin.getTime());
             }
             query.setMaxResults(limit);
             query.setFirstResult(offset);
             return query.getResultList();
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }

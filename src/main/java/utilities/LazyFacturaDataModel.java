@@ -27,22 +27,27 @@ public class LazyFacturaDataModel extends LazyDataModel<FacDocumentosmaster> {
     private Calendar fechaIncial;
     private Calendar fechaFinal;
     private int numFactura;
+    private int tipoFacturacion;
 
     public LazyFacturaDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede) {
         this.documentosmasterFacade = documentosmasterFacade;
         this.sede = sede;
     }
 
-    public LazyFacturaDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede, CfgCliente cliente, Calendar fechaIncial, Calendar fechaFinal, int numFactura) {
+    public LazyFacturaDataModel(FacDocumentosmasterFacade documentosmasterFacade, CfgEmpresasede sede, CfgCliente cliente, Calendar fechaIncial, Calendar fechaFinal, int numFactura,int tipoFacturacion) {
         this.documentosmasterFacade = documentosmasterFacade;
         this.sede = sede;
         this.cliente = cliente;
         this.fechaIncial = fechaIncial;
         this.fechaFinal = fechaFinal;
+        if (fechaIncial != null) {
+            this.fechaIncial.add(Calendar.HOUR, 0);//se incremente un dia por en la base de datos se guarda con hora y el valor enviado es a las 0 horas
+        }
         if (fechaFinal != null) {
-            fechaFinal.add(Calendar.DATE, 1);//se incremente un dia por en la base de datos se guarda con hora y el valor enviado es a las 0 horas
+            this.fechaFinal.add(Calendar.DATE, 1);//se incremente un dia por en la base de datos se guarda con hora y el valor enviado es a las 0 horas
         }
         this.numFactura = numFactura;
+        this.tipoFacturacion = tipoFacturacion;
     }
 
     @Override
@@ -72,7 +77,7 @@ public class LazyFacturaDataModel extends LazyDataModel<FacDocumentosmaster> {
 
     private List<FacDocumentosmaster> loadDocuementoMaster(int first, int pageSize, Map<String, Object> filters) {
         List<FacDocumentosmaster> data;
-        data = documentosmasterFacade.buscarFacturasBySedeLazy(sede, cliente, numFactura, fechaIncial, fechaFinal, first, pageSize);
+        data = documentosmasterFacade.buscarFacturasBySedeLazy(sede, cliente, numFactura, fechaIncial, fechaFinal, first, pageSize,tipoFacturacion);
         this.setRowCount(documentosmasterFacade.totalFacturasBySede(sede, cliente, numFactura, fechaIncial, fechaFinal));
         return data;
     }

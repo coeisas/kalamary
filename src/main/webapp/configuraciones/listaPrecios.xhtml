@@ -22,20 +22,20 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Categoria:"/>
-                        <p:selectOneMenu id="IdCategoria" class="campoFormulario" value="#{listaPrecioMB.idCategoria}">
+                        <p:outputLabel styleClass="labelFormulario" value="Categoria:"/>
+                        <p:selectOneMenu id="IdCategoria" styleClass="campoFormulario" value="#{listaPrecioMB.idCategoria}">
                             <p:ajax event="change" listener="#{listaPrecioMB.cargarReferencia}" update="@none"/>
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{listaPrecioMB.listaCategoria}" var="categoria" itemLabel="#{categoria.nombreCategoria}" itemValue="#{categoria.idCategoria}"/>
                         </p:selectOneMenu>
-                        <p:outputLabel class="labelFormulario" value="Referencia:"/>                        
-                        <p:selectOneMenu id="IdReferencia" class="campoFormulario" value="#{listaPrecioMB.idReferencia}">
+                        <p:outputLabel styleClass="labelFormulario" value="Referencia:"/>                        
+                        <p:selectOneMenu id="IdReferencia" styleClass="campoFormulario" value="#{listaPrecioMB.idReferencia}">
                             <p:ajax event="change" listener="#{listaPrecioMB.cargarMarca}" update="@none"/>
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{listaPrecioMB.listaReferencia}" var="referencia" itemLabel="#{referencia.nombreReferencia}" itemValue="#{referencia.idReferencia}"/>
                         </p:selectOneMenu>
-                        <p:outputLabel class="labelFormulario" value="Marca:"/>
-                        <p:selectOneMenu id="IdMarca" class="campoFormulario" value="#{listaPrecioMB.idMarca}">
+                        <p:outputLabel styleClass="labelFormulario" value="Marca:"/>
+                        <p:selectOneMenu id="IdMarca" styleClass="campoFormulario" value="#{listaPrecioMB.idMarca}">
                             <p:ajax event="change" listener="#{listaPrecioMB.cargarProducto}" update="@none"/>
                             <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                             <f:selectItems value="#{listaPrecioMB.listaMarca}" var="marca" itemLabel="#{marca.nombreMarca}" itemValue="#{marca.idMarca}"/>
@@ -65,7 +65,7 @@
                 <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                 <p:column headerText="Producto" width="30%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
                 <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
-                <p:column id="costoAdq" headerText="Costo Adquisicion">
+                <p:column id="costoAdq" headerText="Costo Adquisicion" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <p:cellEditor>
                         <f:facet name="input"><h:inputText value="#{producto.costoAdquisicion}" /></f:facet>
                         <f:facet name="output">
@@ -76,7 +76,7 @@
                     </p:cellEditor>
 
                 </p:column>
-                <p:column id="costoInd" headerText="%Costo Indirecto">
+                <p:column id="costoInd" headerText="%Costo Indirecto" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <p:cellEditor>
                         <f:facet name="input">
                             <h:inputText value="#{producto.costoIndirecto}"/>
@@ -88,7 +88,7 @@
                         </f:facet>  
                     </p:cellEditor>
                 </p:column>
-                <p:column id="iva" headerText="%IVA">
+                <p:column id="iva" headerText="%IVA" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <p:cellEditor>
                         <f:facet name="input">
                             <h:inputText value="#{producto.iva}"/>
@@ -100,7 +100,7 @@
                         </f:facet>  
                     </p:cellEditor>
                 </p:column>
-                <p:column id="flete" headerText="%Flete">
+                <p:column id="flete" headerText="%Flete" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <p:cellEditor>
                         <f:facet name="input">
                             <h:inputText value="#{producto.flete}"/>
@@ -112,12 +112,12 @@
                         </f:facet>  
                     </p:cellEditor>
                 </p:column>
-                <p:column headerText="Costo Final">
+                <p:column headerText="Costo Final" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <h:outputText value="#{producto.costo}">
                         <f:convertNumber type="currency"/>
                     </h:outputText>                   
                 </p:column>
-                <p:column id="utilidad" headerText="%Utilidad">
+                <p:column id="utilidad" headerText="%Utilidad" rendered="#{listaPrecioMB.mostrarColumnas}">
                     <p:cellEditor>
                         <f:facet name="input">
                             <h:inputText value="#{producto.utilidad}"/>

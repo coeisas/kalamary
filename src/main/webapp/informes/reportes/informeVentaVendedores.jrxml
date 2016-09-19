@@ -7,6 +7,8 @@
 		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
 	</parameter>
 	<parameter name="P_EMPRESA" class="java.lang.Integer"/>
+	<parameter name="P_FECHA_INICIAL" class="java.util.Date"/>
+	<parameter name="P_FECHA_FINAL" class="java.util.Date"/>
 	<queryString>
 		<![CDATA[SELECT f.fecCrea,d.prefijoDoc, fc.fac_documentosmaster_numDocumento,ifnull(di.valorImpuesto,0) iva,f.subtotal-f.descuento as subtotal,f.total,
 concat('CC ',s.numDoc,' ',s.nom1Usuario,' ',s.nom2Usuario,' ',s.apellido1,' ',s.apellido2) as nombre
@@ -17,6 +19,7 @@ left join fac_documentoimpuesto di on di.fac_documentosmaster_numDocumento = fc.
 inner join seg_usuario s on s.idUsuario = f.seg_usuario_idUsuario1
 where f.estado!='CANCELADA' and f.estado!='ANULADA'
 and f.cfg_empresasede_idSede=$P{P_EMPRESA}
+and f.fecCrea between $P{P_FECHA_INICIAL} and  ADDDATE($P{P_FECHA_FINAL}, INTERVAL 13 DAY)
 and f.cfg_documento_idDoc =d.idDoc
 and d.codDocumento  !=6
 and s.cfg_rol_idrol=3

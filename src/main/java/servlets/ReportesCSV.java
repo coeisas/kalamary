@@ -120,6 +120,7 @@ public class ReportesCSV extends HttpServlet {
                             " left join fac_documentoimpuesto di on di.fac_documentosmaster_numDocumento = fc.fac_documentosmaster_numDocumento and di.porcentajeImpuesto=16 and di.fac_documentosmaster_cfg_documento_idDoc=f.cfg_documento_idDoc "+
                             "where f.estado!='CANCELADA' and f.estado!='ANULADA' " +
                             "and f.cfg_empresasede_idSede=? "
+                            + "and f.fecCrea between ? and  ADDDATE(?, INTERVAL 13 DAY) "
                             + "and f.cfg_documento_idDoc =d.idDoc " +
                             "and d.codDocumento  !=6 " +
                             "and s.cfg_rol_idrol=3 " ;
@@ -349,6 +350,8 @@ public class ReportesCSV extends HttpServlet {
                     break;
                     case "ventasVendedores":
                         ps.setInt(indice++, sede);
+                        ps.setString(indice++, fechaInicial);
+                    ps.setString(indice++, fechaFinal);
                     if (!identificacion.equals("0")) {
                         if(!identificacion.equals(""))
                             ps.setString(indice++, identificacion);
