@@ -443,7 +443,7 @@ public class ListadoFacturaMB implements Serializable {
             try {
                 documentoSeleccionado.setEstado("ANULADA");
                 documentosmasterFacade.edit(documentoSeleccionado);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Factura anulada"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Documento anulado"));
                 listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura,tipoFactura==1?1:7);
                 RequestContext.getCurrentInstance().update("IdFormListadoFacturas");
 
