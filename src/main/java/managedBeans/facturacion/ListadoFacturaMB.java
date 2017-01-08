@@ -168,6 +168,8 @@ public class ListadoFacturaMB implements Serializable {
             listaTipoFactura.add(aux);
             aux = new SelectItem(2, "ESPECIAL");
             listaTipoFactura.add(aux);
+            aux = new SelectItem(3, "SEPARADO");
+            listaTipoFactura.add(aux);
         }
         fechaIncial = new Date();
         fechaFinal = new Date();
@@ -207,9 +209,11 @@ public class ListadoFacturaMB implements Serializable {
                     CfgDocumento documento;
                     if (tipoFactura == 1) {
                         documento = documentoFacade.buscarDocumentoDeFacturaBySede(sedeActual);
-                    } else {
+                    } else if (tipoFactura==2){
                         documento = documentoFacade.buscarDocumentoDeRemisionEspecialBySede(sedeActual);
-                    }
+                    }else{
+                       documento = documentoFacade.buscarDocumentoDeSeparadoBySede(sedeActual);
+                     }
                     String aux = documento.getPrefijoDoc();
                     int init = aux.length();
                     if (init < factura.length()) {
@@ -232,9 +236,11 @@ public class ListadoFacturaMB implements Serializable {
         if (clienteSeleccionado != null || numFactura != 0 || fechaIncial != null || fechaFinal != null) {
             cargarFechasCalendar();
             if (tipoFactura == 1) {//muestra las facturas normales
-                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
-            } else {
+                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura,1);
+            } else if (tipoFactura==2){
                 listadoFacturas = new LazyFacturaEspecialDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
+            }else if (tipoFactura==3){
+                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura,7);
             }
             renderTablaFactura = true;
         } else {
@@ -461,8 +467,8 @@ public class ListadoFacturaMB implements Serializable {
                 documentoSeleccionado.setEstado("ANULADA");
                 documentoSeleccionado.setFecAnul(new Date());
                 documentosmasterFacade.edit(documentoSeleccionado);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Factura anulada"));
-                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Correcto", "Documento anulado"));
+                listadoFacturas = new LazyFacturaDataModel(documentosmasterFacade, sedeActual, clienteSeleccionado, fechaIni, fechaFin, numFactura,tipoFactura==1?1:7);
                 RequestContext.getCurrentInstance().update("IdFormListadoFacturas");
 
                 //SE CREA UN MOVIMIENTO DE INVENTARIO (ENTRADA) PARA LA FACTURA ANULADA

@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="../templates/layout.xhtml"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:define name="title">Unidad</ui:define>
+    <ui:define name="content">
+        <p:growl autoUpdate="true" showDetail="true"/>
+        <h:form id="IdFormUnidad">
+            <p:panelGrid style="margin: 0 auto;width: 80%">
+                <f:facet name="header">
+                    <p:row>
+                        <p:column>Unidad</p:column>
+                    </p:row>
+                </f:facet>
+                <p:row>
+                    <p:column>
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Unidad"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{unidadMB.nombreUnidad}" size="50" maxlength="45">
+                        </p:inputText>
+                        <div style="float: left;margin-left: 20px;height: 1.5em"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Abreviatura"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{unidadMB.abreviaturaUnidad}" size="50" maxlength="45">
+                        </p:inputText>
+                    </p:column>
+                </p:row>
+                <p:row>
+                    <p:column style="text-align: center">
+                        <p:commandButton icon="ui-icon-disk" value="Guardar" title="Guardar" actionListener="#{unidadMB.accion}" update=":IdFormUnidad"/>&nbsp;
+                        <p:commandButton icon="ui-icon-cancel" value="Cancelar" title="Cancelar"  actionListener="#{unidadMB.cancelar}" update=":IdFormUnidad"/>
+                    </p:column>
+                </p:row>
+            </p:panelGrid>
+            <br/>
+            <p:dataTable
+                id="idTablaUnidad"
+                value="#{unidadMB.listaUnidad}"
+                var="unidad"
+                rowKey="#{unidad.idUnidad}"
+                paginator="true"
+                style="width: 80%;margin: 0 auto"
+                rows="15"
+                disabledSelection="true"
+                paginatorPosition="bottom">
+                <p:column headerText="Unidad" filterMatchMode="startsWith"  filterBy="#{unidad.unidad}">
+                    #{unidad.unidad}
+                </p:column>
+                <p:column headerText="Unidad">
+                    #{unidad.abreviatura}
+                </p:column>
+                <p:column headerText="Seleccionar" width="70px;">
+                   <p:commandButton icon="ui-icon-search" title="Ver" style="height: 15px;width: 20px;"  update=":IdFormUnidad"  action="#{unidadMB.cargar(unidad.idUnidad)}"/>
+                </p:column>
+                <p:column headerText="Eliminar" width="70px;">
+                   <p:commandButton icon="ui-icon-trash" title="Ver" style="height: 15px;width: 20px;"  update=":IdFormUnidad"  action="#{unidadMB.eliminar(unidad.idUnidad)}">
+                       <p:confirm header="Confirmation" message="¿Seguro deseas eliminar la unidad #{unidad.unidad}?" icon="ui-icon-alert" />
+                   </p:commandButton>
+                </p:column>
+                
+            </p:dataTable>
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+

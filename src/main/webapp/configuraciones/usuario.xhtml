@@ -20,14 +20,14 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{usuarioMB.numIdentificacion}">
+                            <p:outputLabel for="IdDocumento" styleClass="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" styleClass="campoFormulario" size="20" value="#{usuarioMB.numIdentificacion}">
                                 <p:ajax event="change" listener="#{usuarioMB.buscarUsuario}" update="@none"/>
                             </p:inputText>                           
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" actionListener="#{usuarioMB.cargarUsuarios}"/>
+                            <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" actionListener="#{usuarioMB.cargarUsuarios}"/>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idIdentificacion}">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{usuarioMB.idIdentificacion}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
                             </p:selectOneMenu>
@@ -48,69 +48,69 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Sede:"/>
-                            <h:inputText id="IdSede" class="campoFormulario cajaH" value="#{usuarioMB.sedeSeleccionada.nomSede}" readonly="true" style="width: 200px"/>
-                            <p:commandButton class="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()" actionListener="#{usuarioMB.cargarSedes}"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Sede:"/>
+                            <h:inputText id="IdSede" styleClass="campoFormulario cajaH" value="#{usuarioMB.sedeSeleccionada.nomSede}" readonly="true" style="width: 200px"/>
+                            <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" onclick="PF('dlgSede').show()" actionListener="#{usuarioMB.cargarSedes}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
-                            <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerNombre}"/>                       
+                            <p:outputLabel for="IdPrimerNombre" styleClass="labelFormularioObligatorio" value="Primer Nombre:"/>
+                            <p:inputText id="IdPrimerNombre" styleClass="campoFormulario upperCase" size="25" value="#{usuarioMB.primerNombre}"/>                       
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
-                            <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoNombre}"/>                        
+                            <p:outputLabel for="IdSegundoNombre" styleClass="labelFormulario" value="Segundo Nombre:"/>
+                            <p:inputText id="IdSegundoNombre" styleClass="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoNombre}"/>                        
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
-                            <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.primerApellido}" />                        
+                            <p:outputLabel for="IdPrimerApellido" styleClass="labelFormularioObligatorio" value="Primer Apellido:"/>
+                            <p:inputText id="IdPrimerApellido" styleClass="campoFormulario upperCase" size="25" value="#{usuarioMB.primerApellido}" />                        
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
-                            <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoApellido}" />                                                
+                            <p:outputLabel for="IdSegundoApellido" styleClass="labelFormulario" value="Segundo Apellido:"/>
+                            <p:inputText id="IdSegundoApellido" styleClass="campoFormulario upperCase" size="25" value="#{usuarioMB.segundoApellido}" />                                                
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdComision" class="labelFormulario" value="Comision Venta %:"/>
-                            <p:spinner id="IdComision" class="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>                           
+                            <p:outputLabel for="IdComision" styleClass="labelFormulario" value="Comision Venta %:"/>
+                            <p:spinner id="IdComision" styleClass="campoFormulario" min="0" max="100" label="Comision Venta %:" size="1" value="#{usuarioMB.comision}"/>                           
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
-                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{usuarioMB.direccion}"/>
+                            <p:outputLabel for="IdDireccion" styleClass="labelFormularioObligatorio" value="Direccion:"/>
+                            <p:inputText id="IdDireccion" styleClass="campoFormulario upperCase" size="80" value="#{usuarioMB.direccion}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
-                            <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>                         
+                            <p:outputLabel for="IdTelefono" styleClass="labelFormularioObligatorio" value="Telefono:"/>
+                            <p:inputText id="IdTelefono" styleClass="campoFormulario" size="15" value="#{usuarioMB.telefono}"/>                         
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{usuarioMB.mail}"/>                          
+                            <p:outputLabel for="IdMail" styleClass="labelFormulario" value="Mail"/>
+                            <p:inputText id="IdMail" styleClass="campoFormulario upperCase" size="50" value="#{usuarioMB.mail}"/>                          
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
-                            <p:calendar id="IdFechaNacimiento" class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{usuarioMB.fechaNacimiento}"/>
+                            <p:outputLabel for="IdFechaNacimiento" styleClass="labelFormulario" value="F. Nacimiento:"/>
+                            <p:calendar id="IdFechaNacimiento" styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{usuarioMB.fechaNacimiento}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel class="labelFormularioObligatorio" value="Usuario:"/>
-                            <p:inputText class="campoFormulario lowerCase" value="#{usuarioMB.usuario}">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Usuario:"/>
+                            <p:inputText styleClass="campoFormulario lowerCase" value="#{usuarioMB.usuario}">
                                 <p:ajax event="blur" listener="#{usuarioMB.validarUsuario}" update="@none"/>
                             </p:inputText>                     
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel id="IdLabelPass1" for="IdPass1" class="labelFormularioObligatorio" value="Contraseña:" style="color: #{usuarioMB.background}"/>
-                            <p:password id="IdPass1" class="campoFormulario" value="#{usuarioMB.contrasenia}" >
+                            <p:outputLabel id="IdLabelPass1" for="IdPass1" styleClass="labelFormularioObligatorio" value="Contraseña:" style="color: #{usuarioMB.background}"/>
+                            <p:password id="IdPass1" styleClass="campoFormulario" value="#{usuarioMB.contrasenia}" >
                                 <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass1 IdLabelPass2"/>
                             </p:password>
                             <div style="float: left;margin-left: 25px;height: 1.5em"/>
-                            <p:outputLabel id="IdLabelPass2" for="IdPass2" class="labelFormulario" value="Rep. Contraseña:" style="color: #{usuarioMB.background}"/>
-                            <p:password id="IdPass2" class="campoFormulario" value="#{usuarioMB.contraseniaR}" >
+                            <p:outputLabel id="IdLabelPass2" for="IdPass2" styleClass="labelFormulario" value="Rep. Contraseña:" style="color: #{usuarioMB.background}"/>
+                            <p:password id="IdPass2" styleClass="campoFormulario" value="#{usuarioMB.contraseniaR}" >
                                 <p:ajax event="keyup" listener="#{usuarioMB.validarContrasenia}" update="IdLabelPass2 IdLabelPass1"/>
                             </p:password>
                         </p:column>
@@ -118,20 +118,20 @@
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel class="labelFormularioObligatorio" value="Rol:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idRole}">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Rol:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{usuarioMB.idRole}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaRoles}" var="role" itemLabel="#{role.nomrol}" itemValue="#{role.idrol}"/>
                             </p:selectOneMenu>                          
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Caja:" />
-                            <p:selectOneMenu class="campoFormulario" value="#{usuarioMB.idCaja}">
+                            <p:outputLabel styleClass="labelFormulario" value="Caja:" />
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{usuarioMB.idCaja}">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{usuarioMB.listaCajas}" var="caja" itemLabel="#{caja.nomCaja}" itemValue="#{caja.idCaja}"/>
                             </p:selectOneMenu>                        
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Activo:" style="display: #{usuarioMB.displayActivoControl}"/>
-                            <p:inputSwitch value="#{usuarioMB.usuarioActivo}" class="campoFormulario" style="display: #{usuarioMB.displayActivoControl}" offLabel="No" onLabel="Si"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Activo:" style="display: #{usuarioMB.displayActivoControl}"/>
+                            <p:inputSwitch value="#{usuarioMB.usuarioActivo}" styleClass="campoFormulario" style="display: #{usuarioMB.displayActivoControl}" offLabel="No" onLabel="Si"/>
                         </p:column>
                     </p:row>
 

@@ -135,6 +135,9 @@ public class FacturaMB implements Serializable {
     private float totalUSD;
     private float utilidad;
     private float cuotaInicial;
+    private float descuentoTotal;
+    private float descuentoTotalValor;
+    private int   tipoDescuentoFactura;
 //    private int numCuotas;
     private Date fechaLimite;
     private String observacion;
@@ -259,6 +262,7 @@ public class FacturaMB implements Serializable {
     @PostConstruct
     private void init() {
         //si es super usuario o admin permitir escoger la empresa y la sede
+        descuentoTotal = 0;
         tipoImpresion = 1;
         setEnableBtnPrint(false);
         listaMunicipios = new ArrayList();
@@ -737,6 +741,7 @@ public class FacturaMB implements Serializable {
         for (FacDocumentodetalle documentodetalle : listaDetalle) {
             totalDescuento += documentodetalle.getValorDescuento();
         }
+        totalDescuento = totalDescuento + descuentoTotal;
     }
 
     //se usa unicamente cuando se cargar una autorizacion
@@ -776,7 +781,7 @@ public class FacturaMB implements Serializable {
     }
 
     private void calcularTotalFactura() {
-        totalFactura = subtotal - totalDescuento;
+        totalFactura = subtotal - totalDescuento ;
         for (CfgImpuesto impuesto : listaImpuestos) {
             totalFactura += impuesto.getTotalImpuesto();
         }
@@ -1587,6 +1592,7 @@ public class FacturaMB implements Serializable {
         setSubtotal(0);
         setTotalDescuento(0);
         setTotalFactura(0);
+        setDescuentoTotal(0);
 //        numCuotas = 2;
         observacion = "";
         fechaLimite = new Date();
@@ -2123,6 +2129,36 @@ public class FacturaMB implements Serializable {
             return null;
         }
     }
+    
+    public void cambio(){
+        descuentoTotal = 0;
+        descuentoTotalValor = 0;
+        RequestContext.getCurrentInstance().update("IdFormFactura");
+    }
+    public void aplicarDescuento(){
+        try {
+            descuentoTotal = 0;
+            calcularTotalDescuento();
+            calcularImpuesto();
+            calcularTotalFactura();
+            calcularTotalUSD();
+            if(tipoDescuentoFactura==1){
+                descuentoTotalValor = descuentoTotalValor/10;
+                descuentoTotal = totalFactura * descuentoTotalValor;
+                descuentoTotal  =Redondear(descuentoTotal,0);
+                
+                
+            }else{
+                descuentoTotal = descuentoTotalValor;
+            }
+            calcularTotalDescuento();
+            calcularImpuesto();
+            calcularTotalFactura();
+            calcularTotalUSD();
+            RequestContext.getCurrentInstance().update("IdFormFactura");
+        } catch (Exception e) {
+        }
+    }
 
     public void setImage(StreamedContent image) {
         this.image = image;
@@ -2254,4 +2290,30 @@ public class FacturaMB implements Serializable {
     public void setCodigoInterno(String codigoInterno) {
         this.codigoInterno = codigoInterno;
     }
+
+    public float getDescuentoTotal() {
+        return descuentoTotal;
+    }
+
+    public void setDescuentoTotal(float descuentoTotal) {
+        this.descuentoTotal = descuentoTotal;
+    }
+
+    public int getTipoDescuentoFactura() {
+        return tipoDescuentoFactura;
+    }
+
+    public void setTipoDescuentoFactura(int tipoDescuentoFactura) {
+        this.tipoDescuentoFactura = tipoDescuentoFactura;
+    }
+
+    public float getDescuentoTotalValor() {
+        return descuentoTotalValor;
+    }
+
+    public void setDescuentoTotalValor(float descuentoTotalValor) {
+        this.descuentoTotalValor = descuentoTotalValor;
+    }
+    
+    
 }

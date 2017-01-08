@@ -49,7 +49,7 @@ public class ListaPrecioMB implements Serializable {
     private CfgMarcaproducto marcaSeleccionada;
     private SegUsuario usuarioActual;
     private CfgEmpresa empresaActual;
-
+    private boolean mostrarColumnas;
     @EJB
     CfgCategoriaproductoFacade categoriaFacade;
     @EJB
@@ -67,6 +67,7 @@ public class ListaPrecioMB implements Serializable {
         FacesContext context = FacesContext.getCurrentInstance();
         SesionMB sesionMB = context.getApplication().evaluateExpressionGet(context, "#{sesionMB}", SesionMB.class);
         usuarioActual = sesionMB.getUsuarioActual();
+        mostrarColumnas = !usuarioActual.getCfgRolIdrol().getCodrol().equals("00003");
         empresaActual = sesionMB.getEmpresaActual();
         limpiarFormulario();
     }
@@ -237,4 +238,11 @@ public class ListaPrecioMB implements Serializable {
         return listaMarca;
     }
 
+    public boolean isMostrarColumnas() {
+        return mostrarColumnas;
+    }
+
+    public void setMostrarColumnas(boolean mostrarColumnas) {
+        this.mostrarColumnas = mostrarColumnas;
+    }
 }

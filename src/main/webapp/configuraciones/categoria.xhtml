@@ -18,13 +18,13 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{categoriaMB.codigoCategoria}" size="8" maxlength="5">
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Codigo:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{categoriaMB.codigoCategoria}" size="8" maxlength="5">
                             <p:ajax event="blur" listener="#{categoriaMB.buscarCategoria}" update="@none"/>
                         </p:inputText>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Categoria:"/>
-                        <p:inputText class="campoFormulario upperCase" value="#{categoriaMB.nombreCategoria}" size="60" maxlength="50">
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Categoria:"/>
+                        <p:inputText styleClass="campoFormulario upperCase" value="#{categoriaMB.nombreCategoria}" size="60" maxlength="50">
                         </p:inputText>
                     </p:column>
                 </p:row>

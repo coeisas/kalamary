@@ -9,7 +9,7 @@ import entities.CfgTalla;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
+import javax.persistence.Query;
 /**
  *
  * @author mario
@@ -27,5 +27,14 @@ public class CfgTallaFacade extends AbstractFacade<CfgTalla> {
     public CfgTallaFacade() {
         super(CfgTalla.class);
     }
-    
+    public CfgTalla getTallaXid(int id){
+        try {
+            Query query = em.createNamedQuery("CfgTalla.findByIdTalla");
+            query.setParameter("idTalla", id);
+            return (CfgTalla) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
 }

@@ -190,6 +190,18 @@
 				</textElement>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
+			<textField pattern="dd/MMM/yyyy h.mm a">
+				<reportElement x="472" y="0" width="100" height="20" uuid="1f5183f2-57cf-4694-8d58-7fc0c81908b5"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="372" y="0" width="100" height="20" uuid="797c6a28-fa1a-4c31-96cd-05d2cf241849"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha Generación]]></text>
+			</staticText>
 		</band>
 	</pageFooter>
 </jasperReport>

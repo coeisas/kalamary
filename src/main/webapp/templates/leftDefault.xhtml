@@ -6,14 +6,14 @@
                 xmlns:p="http://primefaces.org/ui">
     <style>
         .ui-slidemenu-wrapper {
-            height: 280px !important;
+            height: 490px !important;
         }
         .ui-slidemenu-content {
-            height: 260px !important;
+            height: 460px !important;
         }
     </style>
     <h:form id="IdFormMenu">
-        <p:slideMenu style="width: 95%" backLabel="Regresar">
+        <p:slideMenu style="width: 97%" backLabel="Regresar">
             <p:submenu label="Facturacion">
                 <p:menuitem icon="ui-icon-print" value="Facturacion"  outcome="/facturacion/factura.xhtml"/>
                 <p:menuitem icon="ui-icon-script" value="Listado de Facturas" outcome="/facturacion/listadoFacturas.xhtml"/>
@@ -53,6 +53,8 @@
                     <p:menuitem icon="ui-icon-pencil" value="Lista Precios" outcome="/configuraciones/listaPrecios.xhtml" />
                     <p:menuitem icon="ui-icon-calculator" value="Kit" outcome="/configuraciones/kit.xhtml" />
                     <p:menuitem icon="ui-icon-person" value="Proveedor" outcome="/configuraciones/proveedor.xhtml" />
+                    <p:menuitem icon="ui-icon-grip-dotted-vertical" value="Talla" outcome="/configuraciones/talla.xhtml" />
+                    <p:menuitem icon="ui-icon-grip-solid-horizontal" value="Unidad" outcome="/configuraciones/unidad.xhtml" />
                 </p:submenu>
                 <p:submenu label="Seguridad"  style="height: auto" expanded="false">
                     <p:menuitem icon="ui-icon-person" value="Usuarios" outcome="/configuraciones/usuario.xhtml" />
@@ -67,8 +69,23 @@
                 <p:menuitem icon="ui-icon-star" value="Informe Inventario - Valor" outcome="/informes/informeValorInventario.xhtml" />
                 <p:menuitem icon="ui-icon-star" value="Informe Inventario - Consolidado" outcome="/informes/informeInventario.xhtml" />
                 <p:menuitem icon="ui-icon-star" value="Informe Inventario - Detallado" outcome="/informes/informeMovInventario.xhtml" />
-                <p:menuitem icon="ui-icon-lightbulb" value="Informe Producto" outcome="/informes/informeProductos.xhtml" />               
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Producto" outcome="/informes/informeProductos.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Rotación Producto" outcome="/informes/informeRotacionProducto.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Ventas Por Cliente" outcome="/informes/informeVentasClientes.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Productos Más Vendidos" outcome="/informes/informeProductoVendidos.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe De Ventas Por Vendedor" outcome="/informes/informeVentaVendedores.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe De Productos" outcome="/informes/informeProductosA.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe De Servicios" outcome="/informes/informeServicios.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe De Stock" outcome="/informes/informeStock.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Ventas Productos Por Cliente" outcome="/informes/informeProductosClientes.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Informe Cotización" outcome="/informes/informeCotizacion.xhtml" />
             </p:submenu>
+            <p:submenu label="Alertas"  style="height: auto" expanded="false">
+                <p:menuitem icon="ui-icon-lightbulb" value="Vencimientos Facturas" outcome="/informes/vencimientoFacturas.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Vencimientos Separados" outcome="/informes/vencimientoSeparados.xhtml" />
+                <p:menuitem icon="ui-icon-lightbulb" value="Productos sin rotación 90 días" outcome="/informes/productosSinRotacion.xhtml" />
+            </p:submenu>
+                
         </p:slideMenu>
     </h:form>              
 </ui:composition>

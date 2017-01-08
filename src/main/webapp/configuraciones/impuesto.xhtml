@@ -20,22 +20,22 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo Impuesto:"/>
-                            <p:inputText class="campoFormulario" value="#{impuestoMB.codigoImpuesto}">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Codigo Impuesto:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{impuestoMB.codigoImpuesto}">
                                 <p:ajax event="blur" listener="#{impuestoMB.buscarImpuesto}" update="@none"/>
                             </p:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Impuesto:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{impuestoMB.nombreImpuesto}"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Impuesto:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{impuestoMB.nombreImpuesto}"/>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="% Impuesto:"/>
-                            <p:inputText class="campoFormulario" value="#{impuestoMB.porcentajeImpuesto}"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="% Impuesto:"/>
+                            <p:inputText styleClass="campoFormulario" value="#{impuestoMB.porcentajeImpuesto}"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Tipo Empresa:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{impuestoMB.tipoEmpresa}" style="width: 60%">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Tipo Empresa:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{impuestoMB.tipoEmpresa}" style="width: 60%">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoEmpresa" itemLabel="#{tipoEmpresa.descripcion}" itemValue="#{tipoEmpresa.id}"/>
                             </p:selectOneMenu>

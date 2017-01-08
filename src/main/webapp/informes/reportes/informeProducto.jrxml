@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a65837af-5ead-47f0-bcfd-36900c67256f">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="81"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="title" class="java.lang.String"/>
 	<parameter name="logo" class="java.io.InputStream"/>
@@ -129,6 +129,18 @@
 				<reportElement x="429" y="4" width="40" height="20" uuid="1878ea90-00ae-4276-954d-752088cc668f"/>
 				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
+			<textField pattern="dd/MMM/yyyy h.mm a">
+				<reportElement x="652" y="1" width="100" height="20" uuid="030d0e41-a66b-49eb-aba4-2227cafe7933"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="552" y="1" width="100" height="20" uuid="f74d7172-665f-4e9a-aed8-3c757fc84252"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Fecha Generación]]></text>
+			</staticText>
 		</band>
 	</pageFooter>
 	<summary>

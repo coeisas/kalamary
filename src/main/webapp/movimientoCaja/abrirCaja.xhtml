@@ -19,27 +19,27 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Fecha Apertura:"/>
-                        <p:outputLabel class="labelFormularioInformativa" value="#{abrirCajaMB.fechaApertura}">
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Apertura:"/>
+                        <p:outputLabel styleClass="labelFormularioInformativa" value="#{abrirCajaMB.fechaApertura}">
                             <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="MMMM dd yyyy, h:mm a"/>
                         </p:outputLabel>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Caja:"/>
-                        <!--p:outputLabel class="labelFormularioInformativa" value="# {abrirCajaMB.cajaActual.nomCaja}"/-->
-                        <h:inputText style="float: left;width: 100px" class="cajaH" readonly="true" value="#{abrirCajaMB.cajaActual.nomCaja}"/>
-                        <p:outputLabel class="labelFormulario" value="Usuario:"/>
-                        <p:outputLabel class="labelFormularioInformativa" value="#{sesionMB.usuarioActual.nombreCompleto()}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Caja:"/>
+                        <!--p:outputLabel styleClass="labelFormularioInformativa" value="# {abrirCajaMB.cajaActual.nomCaja}"/-->
+                        <h:inputText style="float: left;width: 100px" styleClass="cajaH" readonly="true" value="#{abrirCajaMB.cajaActual.nomCaja}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Usuario:"/>
+                        <p:outputLabel styleClass="labelFormularioInformativa" value="#{sesionMB.usuarioActual.nombreCompleto()}"/>
                     </p:column>
                 </p:row>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Base:"/>
-                        <p:inputText class="campoFormulario" value="#{abrirCajaMB.base}" disabled="#{!abrirCajaMB.abilitadaCajaBase}"/>
-                        <p:outputLabel class="labelFormulario" value="T.R.M:"/>
-                        <p:inputText class="campoFormulario" value="#{abrirCajaMB.trm}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="Base:"/>
+                        <p:inputText styleClass="campoFormulario" value="#{abrirCajaMB.base}" disabled="#{!abrirCajaMB.abilitadaCajaBase}"/>
+                        <p:outputLabel styleClass="labelFormulario" value="T.R.M:"/>
+                        <p:inputText styleClass="campoFormulario" value="#{abrirCajaMB.trm}"/>
                     </p:column>
                 </p:row>
                 <p:row>

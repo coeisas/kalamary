@@ -38,8 +38,8 @@
             <p:remoteCommand name="determinarValorFormaPago" actionListener="#{facturaMB.determinarValorFormaPago}"/>  
             <p:remoteCommand name="determinarCodigoInterno" actionListener="#{facturaMB.determinarCodigoInterno}"/>  
             <div>
-                <p:outputLabel class="labelFormularioObligatorio" value="Tipo Factura:"/>
-                <p:selectOneMenu class="campoFormulario" value="#{facturaMB.tipoFactura}">
+                <p:outputLabel styleClass="labelFormularioObligatorio" value="Tipo Factura:"/>
+                <p:selectOneMenu styleClass="campoFormulario" value="#{facturaMB.tipoFactura}">
                     <p:ajax event="change" listener="#{facturaMB.validarTipoFacturacion}" update="@none"/>
                     <f:selectItem itemLabel="..." itemValue="0" noSelectionOption="true"/>
                     <f:selectItems value="#{facturaMB.listaTipoFactura}"/>
@@ -48,24 +48,24 @@
             <div style="clear: left"/>
             <br/>
             <div>
-                <p:outputLabel value="Cliente:" class="labelFormularioObligatorio"/>
-                <p:inputText class="campoFormulario" value="#{facturaMB.identificacionCliente}">
+                <p:outputLabel value="Cliente:" styleClass="labelFormularioObligatorio"/>
+                <p:inputText styleClass="campoFormulario" value="#{facturaMB.identificacionCliente}">
                     <p:ajax event="blur" listener="#{facturaMB.buscarCliente}" update="@none"/> 
                 </p:inputText>
-                <p:commandButton icon="ui-icon-search" title="Buscar Cliente" class="campoFormulario" actionListener="#{facturaMB.cargarModalClientes}"/>
-                <p:commandButton icon="ui-icon-person" title="Crear Cliente" class="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
-                <p:commandButton icon="ui-icon-script" title="Cargar Cotizacion" class="campoFormulario" actionListener="#{facturaMB.cargarCotizaciones}"/>
-                <p:outputLabel id="IdNomCliente" class="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
+                <p:commandButton icon="ui-icon-search" title="Buscar Cliente" styleClass="campoFormulario" actionListener="#{facturaMB.cargarModalClientes}"/>
+                <p:commandButton icon="ui-icon-person" title="Crear Cliente" styleClass="campoFormulario" onclick="PF('dlgCrearCliente').show()"/>
+                <p:commandButton icon="ui-icon-script" title="Cargar Cotizacion" styleClass="campoFormulario" actionListener="#{facturaMB.cargarCotizaciones}"/>
+                <p:outputLabel id="IdNomCliente" styleClass="labelFormularioInformativa" value="#{facturaMB.nombreCliente}"/>
             </div>
             <div style="clear: left"/>
             <br/>
             <div>
-                <p:outputLabel value="Vendedor:" class="labelFormularioObligatorio"/>
-                <p:inputText id="IdDocumentoVendedor" value="#{facturaMB.documentoVendedor}" class="campoFormulario">
+                <p:outputLabel value="Vendedor:" styleClass="labelFormularioObligatorio"/>
+                <p:inputText id="IdDocumentoVendedor" value="#{facturaMB.documentoVendedor}" styleClass="campoFormulario">
                     <p:ajax event="blur" listener="#{facturaMB.buscarVendedor}" update="@none"/>
                 </p:inputText>
-                <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" class="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
-                <p:outputLabel id="IdNomVendedor" class="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>                
+                <p:commandButton icon="ui-icon-search" title="Buscar Vendedor" styleClass="campoFormulario" actionListener="#{facturaMB.cargarListaVendedores}"/>
+                <p:outputLabel id="IdNomVendedor" styleClass="labelFormularioInformativa" value="#{facturaMB.nombreVendedor}"/>                
             </div>
 
             <div style="clear: left"/>
@@ -141,34 +141,60 @@
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
+            <br /><br />
             <p:panel id="IdSubTotal" style="width: 95%;margin: 0 auto;padding: 0;border: none">
-                <div class="divContent">
+                <div styleClass="divContent">
                     <p:panelGrid columns="2">
-                        <p:outputLabel class="label" value="SUBTOTAL:"/>
+                        <p:outputLabel styleClass="label" value="SUBTOTAL:"/>
                         <p:outputLabel value="#{facturaMB.subtotal}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="DESCUENTO:"/> 
+                        <p:outputLabel styleClass="label" value="DESCUENTO:"/> 
                         <p:outputLabel value="#{facturaMB.totalDescuento}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
                         <c:forEach items="#{facturaMB.listaImpuestos}" var="impuesto">
-                            <p:outputLabel class="label" value="#{impuesto.nomImpuesto}:"/> 
+                            <p:outputLabel styleClass="label" value="#{impuesto.nomImpuesto}:"/> 
                             <p:outputLabel value="#{impuesto.totalImpuesto}">
                                 <f:convertNumber type="currency"/>
                             </p:outputLabel>
 
                         </c:forEach>
-                        <p:outputLabel class="label" value="TOTAL:"/>
+                        <p:outputLabel styleClass="label" value="TOTAL:"/>
                         <p:outputLabel value="#{facturaMB.totalFactura}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
-                        <p:outputLabel class="label" value="TOTAL USD:"/> 
+                        <p:outputLabel styleClass="label" value="TOTAL USD:"/> 
                         <p:outputLabel value="#{facturaMB.totalUSD}">
                             <f:convertNumber type="currency"/>
                         </p:outputLabel>
                     </p:panelGrid>
                 </div>                   
+            </p:panel>
+            <br />
+            <p:panel id="idDescuentoPorce" style="width: 95%;margin: 0 auto;padding: 0;border: none">
+            <p:row>
+                <p:column colspan="4">
+                    <p:outputLabel value="Tipo Descuento sobre Factura:" styleClass="labelFormulario"/>
+                    <p:selectOneMenu value="#{facturaMB.tipoDescuentoFactura}" styleClass="campoFormulario" style="margin-top:0.5%;">
+                                <f:selectItems value="#{facturaMB.listaTipoDescuento}" var="tipoDescuento" itemLabel="#{tipoDescuento.label}" itemValue="#{tipoDescuento.value}" />
+                                <p:ajax event="change" listener="#{facturaMB.cambio}"  update="@none"/>
+                     </p:selectOneMenu>                            
+                    <p:outputLabel value="Descuento sobre Factura" styleClass="labelFormulario"/>
+                    <p:inputText id="descuentoTotal" value="#{facturaMB.descuentoTotalValor}" styleClass="campoFormulario" style="margin-top:0.5%;">
+                        <f:convertNumber type="number"/>
+                        <p:ajax event="blur" listener="#{facturaMB.aplicarDescuento}" update="@none"/>
+                        </p:inputText>
+                </p:column>
+            </p:row>
+                <br/>
+            </p:panel>
+            <p:panel id="idDescuento" style="width: 95%;margin: 0 auto;padding: 0;border: none">
+            <p:row>
+                <p:column colspan="2">
+                    
+                </p:column>
+            </p:row>
             </p:panel>
             <div style="clear: right"/>
             <br/>
@@ -267,19 +293,19 @@
         <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="30%" resizable="false">
             <h:form id="FormModalFactura">
                 <p:panel style="display: #{facturaMB.display}">
-                    <p:panelGrid class="panelGridSinBorder">
+                    <p:panelGrid styleClass="panelGridSinBorder">
                         <p:row>
                             <p:column>
-                                <p:outputLabel class="labelFormularioObligatorio" value="Cuota Incial:"/>
-                                <p:inputText class="campoFormulario" value="#{facturaMB.cuotaInicial}">
+                                <p:outputLabel styleClass="labelFormularioObligatorio" value="Cuota Incial:"/>
+                                <p:inputText styleClass="campoFormulario" value="#{facturaMB.cuotaInicial}">
                                     <p:ajax event="keyup" update="@none"/>
                                 </p:inputText>
                             </p:column>
                         </p:row>
                         <p:row>
                             <p:column>
-                                <p:outputLabel class="labelFormularioObligatorio" value="Fecha Limite:"/>
-                                <p:calendar class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{facturaMB.fechaLimite}"/>
+                                <p:outputLabel styleClass="labelFormularioObligatorio" value="Fecha Limite:"/>
+                                <p:calendar styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{facturaMB.fechaLimite}"/>
                             </p:column>
                         </p:row>
                     </p:panelGrid>
@@ -305,18 +331,18 @@
                     </p:column>
                 </p:dataTable>
                 <br/>
-                <p:panelGrid class="panelGridSinBorder">
+                <p:panelGrid styleClass="panelGridSinBorder">
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Total Factura:"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.totalFactura}">
+                            <p:outputLabel styleClass="labelFormulario" value="Total Factura:"/>
+                            <p:outputLabel styleClass="labelFormularioInformativa" value="#{facturaMB.totalFactura}">
                                 <f:convertNumber type="currency"/>
                             </p:outputLabel>                            
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Total Items:"/><p:outputLabel class="labelFormularioInformativa" value="#{facturaMB.listaDetalle.size()}"/>                          
+                            <p:outputLabel styleClass="labelFormulario" value="Total Items:"/><p:outputLabel styleClass="labelFormularioInformativa" value="#{facturaMB.listaDetalle.size()}"/>                          
                         </p:column>
                     </p:row>
                 </p:panelGrid>
@@ -328,7 +354,7 @@
         </p:dialog>
         <p:dialog widgetVar="dlgResult" modal="true" header="TIPO DE IMPRESION" resizable="false" width="15%">
             <h:form>
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:panelGrid styleClass="panelGridSinBorder" style="margin: 0 auto">
                     <p:row>
                         <p:column>
                             <p:selectOneRadio value="#{facturaMB.tipoImpresion}">
@@ -364,8 +390,8 @@
                 <p:panelGrid style="width: 98%;">
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Pais:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{facturaMB.idPais}" filter="true" filterMatchMode="contains">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Pais:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{facturaMB.idPais}" filter="true" filterMatchMode="contains">
                                 <p:ajax event="change" listener="#{facturaMB.validacionPais}" update="@none"/>
                                 <f:selectItems value="#{aplicacionMB.listaPaises}" var="pais" itemValue="#{pais.codPais}" itemLabel="#{pais.nomPais}"/>
                             </p:selectOneMenu>
@@ -385,12 +411,12 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdDocumento" class="labelFormularioObligatorio" value="Documento:" />
-                            <p:inputText id="IdDocumento" class="campoFormulario" size="20" value="#{facturaMB.numIdentificacion}">
+                            <p:outputLabel for="IdDocumento" styleClass="labelFormularioObligatorio" value="Documento:" />
+                            <p:inputText id="IdDocumento" styleClass="campoFormulario" size="20" value="#{facturaMB.numIdentificacion}">
                                 <p:ajax event="blur" listener="#{facturaMB.buscarClienteModal}" update="@none"/>
                             </p:inputText>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Identificacion:"/>
-                            <p:selectOneMenu class="campoFormulario" value="#{facturaMB.idIdentificacion}" filter="true" filterMatchMode="contains">
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Identificacion:"/>
+                            <p:selectOneMenu styleClass="campoFormulario" value="#{facturaMB.idIdentificacion}" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoIdentificacion}" var="identificacion" itemLabel="#{identificacion.abreviatura} - #{identificacion.identificacion}" itemValue="#{identificacion.id}"/>                            
                             </p:selectOneMenu>
@@ -399,14 +425,14 @@
 
                     <p:row rendered="#{facturaMB.mostrarDepartamentoMunicipio}">
                         <p:column>
-                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" class="labelFormularioObligatorio" />
-                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{facturaMB.idDepartamento}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                            <p:outputLabel for="IdSelectDepartamentos" value="Departamento:" styleClass="labelFormularioObligatorio" />
+                            <p:selectOneMenu id="IdSelectDepartamentos" value="#{facturaMB.idDepartamento}" style="width: 150px" styleClass="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemValue="#{null}" itemLabel="..."  noSelectionOption="true"/>       
                                 <f:selectItems value="#{aplicacionMB.listaDepartementos}" var="departamento" itemValue="#{departamento.idDepartamento}" itemLabel="#{departamento.idDepartamento} - #{departamento.nomDepartamento}"/>                                
                                 <p:ajax event="change" update="IdSelectMunicipios" listener="#{facturaMB.actualizarMunicipios}"/>
                             </p:selectOneMenu> 
-                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" class="labelFormularioObligatorio"/>
-                            <p:selectOneMenu id="IdSelectMunicipios" value="#{facturaMB.idMunicipio}" style="width: 150px" class="campoFormulario" filter="true" filterMatchMode="contains">
+                            <p:outputLabel for="IdSelectMunicipios" value="Municipio:" styleClass="labelFormularioObligatorio"/>
+                            <p:selectOneMenu id="IdSelectMunicipios" value="#{facturaMB.idMunicipio}" style="width: 150px" styleClass="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemValue="#{null}" itemLabel="..." noSelectionOption="true" />       
                                 <f:selectItems value="#{facturaMB.listaMunicipios}" var="municipio" itemValue="#{municipio.cfgMunicipioPK.idMunicipio}" itemLabel=" #{municipio.cfgDepartamento.idDepartamento}#{municipio.cfgMunicipioPK.idMunicipio} - #{municipio.nomMunicipio}"/>                                
                             </p:selectOneMenu>
@@ -415,8 +441,8 @@
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdTipoCliente" class="labelFormularioObligatorio" value="Tipo Cliente:"/>
-                            <p:selectOneMenu id="IdTipoCliente" value="#{facturaMB.idTipoCliente}" class="campoFormulario" filter="true" filterMatchMode="contains">
+                            <p:outputLabel for="IdTipoCliente" styleClass="labelFormularioObligatorio" value="Tipo Cliente:"/>
+                            <p:selectOneMenu id="IdTipoCliente" value="#{facturaMB.idTipoCliente}" styleClass="campoFormulario" filter="true" filterMatchMode="contains">
                                 <f:selectItem itemLabel="..." itemValue="#{null}" noSelectionOption="true"/>
                                 <f:selectItems value="#{aplicacionMB.listaTipoEmpresa}" var="tipoCliente" itemLabel="#{tipoCliente.descripcion}" itemValue="#{tipoCliente.id}"/>
                             </p:selectOneMenu>                        
@@ -424,47 +450,47 @@
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerNombre" class="labelFormularioObligatorio" value="Primer Nombre:"/>
-                            <p:inputText id="IdPrimerNombre" class="campoFormulario upperCase" size="25" value="#{facturaMB.primerNombre}"/>
-                            <p:outputLabel for="IdSegundoNombre" class="labelFormulario" value="Segundo Nombre:"/>
-                            <p:inputText id="IdSegundoNombre" class="campoFormulario upperCase" size="25" value="#{facturaMB.segundoNombre}"/>                        
+                            <p:outputLabel for="IdPrimerNombre" styleClass="labelFormularioObligatorio" value="Primer Nombre:"/>
+                            <p:inputText id="IdPrimerNombre" styleClass="campoFormulario upperCase" size="25" value="#{facturaMB.primerNombre}"/>
+                            <p:outputLabel for="IdSegundoNombre" styleClass="labelFormulario" value="Segundo Nombre:"/>
+                            <p:inputText id="IdSegundoNombre" styleClass="campoFormulario upperCase" size="25" value="#{facturaMB.segundoNombre}"/>                        
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column>
-                            <p:outputLabel for="IdPrimerApellido" class="labelFormularioObligatorio" value="Primer Apellido:"/>
-                            <p:inputText id="IdPrimerApellido" class="campoFormulario upperCase" size="25" value="#{facturaMB.primerApellido}" />
-                            <p:outputLabel for="IdSegundoApellido" class="labelFormulario" value="Segundo Apellido:"/>
-                            <p:inputText id="IdSegundoApellido" class="campoFormulario upperCase" size="25" value="#{facturaMB.segundoApellido}" />                                                
+                            <p:outputLabel for="IdPrimerApellido" styleClass="labelFormularioObligatorio" value="Primer Apellido:"/>
+                            <p:inputText id="IdPrimerApellido" styleClass="campoFormulario upperCase" size="25" value="#{facturaMB.primerApellido}" />
+                            <p:outputLabel for="IdSegundoApellido" styleClass="labelFormulario" value="Segundo Apellido:"/>
+                            <p:inputText id="IdSegundoApellido" styleClass="campoFormulario upperCase" size="25" value="#{facturaMB.segundoApellido}" />                                                
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel for="IdDireccion" class="labelFormularioObligatorio" value="Direccion:"/>
-                            <p:inputText id="IdDireccion" class="campoFormulario upperCase" size="80" value="#{facturaMB.direccion}"/>
-                            <p:outputLabel for="IdTelefono" class="labelFormularioObligatorio" value="Telefono:"/>
-                            <p:inputText id="IdTelefono" class="campoFormulario" size="15" value="#{facturaMB.telefono}"/>                        
+                            <p:outputLabel for="IdDireccion" styleClass="labelFormularioObligatorio" value="Direccion:"/>
+                            <p:inputText id="IdDireccion" styleClass="campoFormulario upperCase" size="80" value="#{facturaMB.direccion}"/>
+                            <p:outputLabel for="IdTelefono" styleClass="labelFormularioObligatorio" value="Telefono:"/>
+                            <p:inputText id="IdTelefono" styleClass="campoFormulario" size="15" value="#{facturaMB.telefono}"/>                        
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
 
-                            <p:outputLabel for="IdMail" class="labelFormulario" value="Mail"/>
-                            <p:inputText id="IdMail" class="campoFormulario upperCase" size="50" value="#{facturaMB.mail}"/>
-                            <p:outputLabel for="IdFechaNacimiento" class="labelFormulario" value="F. Nacimiento:"/>
-                            <p:calendar id="IdFechaNacimiento"  class="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{facturaMB.fechaNacimiento}"/>
+                            <p:outputLabel for="IdMail" styleClass="labelFormulario" value="Mail"/>
+                            <p:inputText id="IdMail" styleClass="campoFormulario upperCase" size="50" value="#{facturaMB.mail}"/>
+                            <p:outputLabel for="IdFechaNacimiento" styleClass="labelFormulario" value="F. Nacimiento:"/>
+                            <p:calendar id="IdFechaNacimiento"  styleClass="campoFormulario" navigator="true" locale="es" maxlength="10" timeZone="America/Bogota" pattern="dd/MM/yyyy" mask="99/99/9999" size="10" yearRange="c-100:c+1" value="#{facturaMB.fechaNacimiento}"/>
                         </p:column>
                     </p:row>
 
                     <p:row>
                         <p:column colspan="2">
-                            <p:outputLabel for="IdCupoCredito" class="labelFormulario" value="Cupo Credito:"/>
-                            <p:inputText id="IdCupoCredito" class="campoFormulario" value="#{facturaMB.cupoCredito}" />
-                            <p:outputLabel for="IdTarjetaMembresia" class="labelFormulario" value="Tarjeta Membresia:" />
-                            <p:inputText id="IdTarjetaMembresia" class="campoFormulario" value="#{facturaMB.tarjetaMembresia}" />
+                            <p:outputLabel for="IdCupoCredito" styleClass="labelFormulario" value="Cupo Credito:"/>
+                            <p:inputText id="IdCupoCredito" styleClass="campoFormulario" value="#{facturaMB.cupoCredito}" />
+                            <p:outputLabel for="IdTarjetaMembresia" styleClass="labelFormulario" value="Tarjeta Membresia:" />
+                            <p:inputText id="IdTarjetaMembresia" styleClass="campoFormulario" value="#{facturaMB.tarjetaMembresia}" />
                         </p:column>
                     </p:row>
 

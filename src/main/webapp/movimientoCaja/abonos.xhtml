@@ -29,13 +29,13 @@
                 </f:facet>
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormularioObligatorio" value="Cliente:"/>
-                        <p:inputText id="IdNumDocumento" class="campoFormulario" value="#{abonoMB.identificacionCliente}">
+                        <p:outputLabel styleClass="labelFormularioObligatorio" value="Cliente:"/>
+                        <p:inputText id="IdNumDocumento" styleClass="campoFormulario" value="#{abonoMB.identificacionCliente}">
                             <p:ajax event="blur" listener="#{abonoMB.buscarCliente}" update="@none"/>
                         </p:inputText>
                         <p:watermark for="IdNumDocumento" value="Identificación"/>
-                        <p:commandButton class="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{abonoMB.cargarClientes}"/>
-                        <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.nombreCliente}"/>
+                        <p:commandButton styleClass="campoFormulario" icon="ui-icon-search" title="Buscar Cliente" actionListener="#{abonoMB.cargarClientes}"/>
+                        <p:outputLabel styleClass="labelFormularioInformativa" value="#{abonoMB.nombreCliente}"/>
                     </p:column>
                 </p:row>
                 <p:row>
@@ -67,18 +67,18 @@
             <p:panelGrid style="margin: 0 auto;width: 90%">
                 <p:row>
                     <p:column>
-                        <p:outputLabel class="labelFormulario" value="Total:"/>
-                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.total}">
+                        <p:outputLabel styleClass="labelFormulario" value="Total:"/>
+                        <p:inputText styleClass="campoFormulario" readonly="true" value="#{abonoMB.total}">
                             <f:convertNumber type="currency"/>
                         </p:inputText>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Saldo:"/>
-                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.saldo}">
+                        <p:outputLabel styleClass="labelFormulario" value="Saldo:"/>
+                        <p:inputText styleClass="campoFormulario" readonly="true" value="#{abonoMB.saldo}">
                             <f:convertNumber type="currency"/>
                         </p:inputText>
                         <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                        <p:outputLabel class="labelFormulario" value="Fecha Limite:"/>
-                        <p:inputText class="campoFormulario" readonly="true" value="#{abonoMB.fechaLimite}">
+                        <p:outputLabel styleClass="labelFormulario" value="Fecha Limite:"/>
+                        <p:inputText styleClass="campoFormulario" readonly="true" value="#{abonoMB.fechaLimite}">
                             <f:convertDateTime locale="es" timeZone="America/Bogota" pattern="dd/MM/yyyy"/>
                         </p:inputText>
                     </p:column>
@@ -139,11 +139,11 @@
 
         <p:dialog id="IdModalFormaPago" widgetVar="dlgFormaPago" header="ESTABLECER FORMA DE PAGO" modal="true" width="25%" resizable="false">
             <h:form id="FormModalPago">
-                <p:panelGrid class="panelGridSinBorder">
+                <p:panelGrid styleClass="panelGridSinBorder">
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Saldo:"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.saldo}">
+                            <p:outputLabel styleClass="labelFormulario" value="Saldo:"/>
+                            <p:outputLabel styleClass="labelFormularioInformativa" value="#{abonoMB.saldo}">
                                 <f:convertNumber type="currency"/>
                             </p:outputLabel>                            
                         </p:column>
@@ -179,11 +179,11 @@
         
         <p:dialog widgetVar="dlgResult" modal="true" header="GENERAR RECIBO DE CAJA" resizable="false" width="25%">
             <h:form id="FormModalRC">
-                <p:panelGrid class="panelGridSinBorder" style="margin: 0 auto">
+                <p:panelGrid styleClass="panelGridSinBorder" style="margin: 0 auto">
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Recibo Caja:"/>
-                            <p:outputLabel class="labelFormularioInformativa" value="#{abonoMB.reciboReciente.determinarNumFactura()}"/>
+                            <p:outputLabel styleClass="labelFormulario" value="Recibo Caja:"/>
+                            <p:outputLabel styleClass="labelFormularioInformativa" value="#{abonoMB.reciboReciente.determinarNumFactura()}"/>
                         </p:column>
                     </p:row>
                     <p:row>

@@ -48,7 +48,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public List<CfgProducto> buscarPorEmpresa(CfgEmpresa empresa, int first, int pageSize) {
         try {
-            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1");
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 and p.activo=1");
             query.setParameter(1, empresa);
             query.setFirstResult(first);
             query.setMaxResults(pageSize);
@@ -60,7 +60,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public List<CfgProducto> buscarPorEmpresaTodos(CfgEmpresa empresa) {
         try {
-            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1");
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 and p.activo=1");
             query.setParameter(1, empresa);
             return query.getResultList();
         } catch (Exception e) {
@@ -100,7 +100,7 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
 
     public CfgProducto buscarPorEmpresaAndCodigo(CfgEmpresa empresa, String codigo) {
         try {
-            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.codProducto = ?2");
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1 AND p.codProducto = ?2 ");
             query.setParameter(1, empresa);
             query.setParameter(2, codigo);
             return (CfgProducto) query.getSingleResult();
@@ -275,6 +275,16 @@ public class CfgProductoFacade extends AbstractFacade<CfgProducto> {
             query.setParameter(1, idEmpresa);
             query.setParameter(2, codigoInterno);
             return (CfgProducto) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    public List<CfgProducto> buscarPorEmpresaTodos2(CfgEmpresa empresa) {
+        try {
+            Query query = em.createQuery("SELECT p FROM CfgProducto p WHERE p.cfgempresaidEmpresa = ?1");
+            query.setParameter(1, empresa);
+            return query.getResultList();
         } catch (Exception e) {
             return null;
         }

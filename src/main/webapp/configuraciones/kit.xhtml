@@ -21,35 +21,35 @@
                     </f:facet>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Codigo:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{kitMB.codigoKit}">
+                            <p:outputLabel styleClass ="labelFormularioObligatorio" value="Codigo:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{kitMB.codigoKit}">
                                 <p:ajax event="blur" listener="#{kitMB.buscarKit}" update="@none"/>
                             </p:inputText>
-                            <p:commandButton icon="ui-icon-search" class="campoFormulario" actionListener="#{kitMB.cargarKits}"/>
+                            <p:commandButton icon="ui-icon-search" styleClass="campoFormulario" actionListener="#{kitMB.cargarKits}"/>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormularioObligatorio" value="Kit:"/>
-                            <p:inputText class="campoFormulario upperCase" value="#{kitMB.nombreKit}" size="55"/>
+                            <p:outputLabel styleClass="labelFormularioObligatorio" value="Kit:"/>
+                            <p:inputText styleClass="campoFormulario upperCase" value="#{kitMB.nombreKit}" size="55"/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column>
-                            <p:outputLabel class="labelFormulario" value="Costo:"/>
-                            <h:inputText class="cajaH" style="float: left;width: 100px" value="#{kitMB.costo}" readonly="true">
+                            <p:outputLabel styleClass="labelFormulario" value="Costo:"/>
+                            <h:inputText styleClass="cajaH" style="float: left;width: 100px" value="#{kitMB.costo}" readonly="true">
                                 <f:convertNumber type="currency" maxFractionDigits="0"/>
                             </h:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Utilidad %:"/>
-                            <p:inputText class="campoFormulario" size="3" value="#{kitMB.utilidad}">
+                            <p:outputLabel styleClass="labelFormulario" value="Utilidad (0.#):"/>
+                            <p:inputText styleClass="campoFormulario" size="3" value="#{kitMB.utilidad}">
                                 <p:ajax event="change" listener="#{kitMB.calcularPrecioKit}" update="IdPrecioKit"/>
                             </p:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Precio:"/>
-                            <h:inputText id="IdPrecioKit" class="cajaH" style="float: left;width: 100px" value="#{kitMB.precio}" readonly="true">
+                            <p:outputLabel styleClass="labelFormulario" value="Precio:"/>
+                            <h:inputText id="IdPrecioKit" styleClass="cajaH" style="float: left;width: 100px" value="#{kitMB.precio}" readonly="true">
                                 <f:convertNumber type="currency" maxFractionDigits="0"/>
                             </h:inputText>
                             <div style="float: left;margin-left: 20px;height: 1.5em"/>
-                            <p:outputLabel class="labelFormulario" value="Activo:"/>
-                            <p:inputSwitch class="campoFormulario" onLabel="Si" offLabel="No" value="#{kitMB.activo}" />
+                            <p:outputLabel styleClass="labelFormulario" value="Activo:"/>
+                            <p:inputSwitch styleClass="campoFormulario" onLabel="Si" offLabel="No" value="#{kitMB.activo}" />
                         </p:column>
                     </p:row>
                 </p:panelGrid>
@@ -78,7 +78,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column headerText="Vlr Unit">
+                    <p:column headerText="Vlr Costo">
                         <h:outputText value="#{itemKit.precioUnitario}">
                             <f:convertNumber type="currency" maxFractionDigits="0"/>
                         </h:outputText>
@@ -120,8 +120,8 @@
                     <p:column headerText="Codigo" filterBy="#{producto.codProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.codProducto}</p:column>
                     <p:column headerText="Producto" width="50%" filterBy="#{producto.nomProducto}" filterMatchMode="contains" filterStyle="width:95%">#{producto.nomProducto} [ #{producto.cfgTallaIdTalla != null ? producto.cfgTallaIdTalla.talla:''}  - #{producto.cfgColorIdColor != null ? producto.cfgColorIdColor.color:''} ]</p:column>
                     <p:column headerText="Marca">#{producto.cfgmarcaproductoidMarca.nombreMarca}</p:column>
-                    <p:column headerText="Precio">
-                        <h:outputText value="#{producto.precio}">
+                    <p:column headerText="Costo">
+                        <h:outputText value="#{producto.costo}">
                             <f:convertNumber type="currency"/>
                         </h:outputText>
                     </p:column>

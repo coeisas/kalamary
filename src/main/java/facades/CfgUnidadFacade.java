@@ -9,7 +9,7 @@ import entities.CfgUnidad;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
+import javax.persistence.Query;
 /**
  *
  * @author mario
@@ -26,6 +26,17 @@ public class CfgUnidadFacade extends AbstractFacade<CfgUnidad> {
 
     public CfgUnidadFacade() {
         super(CfgUnidad.class);
+    }
+    
+    public CfgUnidad getUnidadXid(int id){
+        try {
+            Query query = em.createNamedQuery("CfgUnidad.findByIdUnidad");
+            query.setParameter("idUnidad", id);
+            return (CfgUnidad) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+
     }
     
 }
